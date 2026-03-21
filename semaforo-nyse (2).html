@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semáforo NYSE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root {
+    --bg:#0a0a0f;--surface:#111118;--surface2:#1a1a24;--border:#2a2a3a;
+    --text:#e8e8f0;--text2:#8888a8;--text3:#4a4a6a;
+    --green:#00e87a;--green-bg:rgba(0,232,122,0.08);
+    --yellow:#f5c842;--yellow-bg:rgba(245,200,66,0.08);
+    --red:#ff4466;--red-bg:rgba(255,68,102,0.08);
+    --accent:#6366f1;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+  .app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px}
+  .header{text-align:center;margin-bottom:48px}
+  .logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
+  .logo-icon{width:32px;height:32px;display:flex;flex-direction:column;gap:4px;justify-content:center}
+  .logo-dot{height:7px;border-radius:2px}
+  .logo-dot.g{background:var(--green);width:100%}
+  .logo-dot.y{background:var(--yellow);width:70%}
+  .logo-dot.r{background:var(--red);width:45%}
+  .logo-text{font-family:var(--mono);font-size:22px;font-weight:500;letter-spacing:-.5px}
+  .logo-text span{color:var(--accent)}
+  .tagline{font-size:12px;color:var(--text3);font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .search-box{display:flex;gap:10px;margin-bottom:12px}
+  .search-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-family:var(--mono);font-size:15px;color:var(--text);outline:none;transition:border-color .2s;text-transform:uppercase}
+  .search-input::placeholder{color:var(--text3);text-transform:none}
+  .search-input:focus{border-color:var(--accent)}
+  .search-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:14px 28px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;white-space:nowrap}
+  .search-btn:hover{opacity:.88}
+  .search-btn:active{transform:scale(.98)}
+  .search-btn:disabled{opacity:.4;cursor:not-allowed}
+  .examples{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}
+  .chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;transition:all .15s}
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+  .loading{text-align:center;padding:60px 20px;display:none}
+  .spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading p{color:var(--text2);font-size:13px;font-family:var(--mono)}
+  .error-msg{background:var(--red-bg);border:1px solid rgba(255,68,102,.25);border-radius:10px;padding:14px 18px;color:var(--red);font-size:13px;margin-bottom:20px;display:none;font-family:var(--mono);line-height:1.6}
+  .report{display:none;animation:fadeUp .4s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .report-header{margin-bottom:24px}
+  .company-name{font-size:26px;font-weight:600;margin-bottom:4px}
+  .report-meta{font-family:var(--mono);font-size:12px;color:var(--text3)}
+  .diag-banner{border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:16px;border:1px solid}
+  .diag-banner.green{background:var(--green-bg);border-color:rgba(0,232,122,.2)}
+  .diag-banner.yellow{background:var(--yellow-bg);border-color:rgba(245,200,66,.2)}
+  .diag-banner.red{background:var(--red-bg);border-color:rgba(255,68,102,.2)}
+  .diag-icon{font-size:28px;margin-top:2px}
+  .diag-label{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+  .diag-value{font-size:20px;font-weight:600;margin-bottom:6px}
+  .diag-banner.green .diag-value{color:var(--green)}
+  .diag-banner.yellow .diag-value{color:var(--yellow)}
+  .diag-banner.red .diag-value{color:var(--red)}
+  .diag-text{font-size:13px;color:var(--text2);line-height:1.6}
+  .data-note{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 16px;margin-bottom:24px;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px}
+  .data-note strong{color:var(--text2)}
+  .section-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+  .table-wrap{overflow-x:auto;margin-bottom:32px}
+  table{width:100%;border-collapse:collapse;min-width:580px}
+  th{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:400;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+  td{padding:13px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+  tr{background:var(--surface)}
+  tr:hover{background:var(--surface2)}
+  tr:last-child td{border-bottom:none}
+  .ind-name{font-weight:500}
+  .ind-en{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
+  .ind-val{font-family:var(--mono);font-weight:500;font-size:14px}
+  .ind-param{font-family:var(--mono);font-size:11px;color:var(--text3)}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap}
+  .badge.ok{background:var(--green-bg);color:var(--green)}
+  .badge.warn{background:var(--yellow-bg);color:var(--yellow)}
+  .badge.fail{background:var(--red-bg);color:var(--red)}
+  .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  .vlink{font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none;display:block}
+  .vlink:hover{text-decoration:underline}
+  .vwhere{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
+  .news-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+  .news-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+  .sbadge{font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;white-space:nowrap;margin-top:2px;flex-shrink:0}
+  .sbadge.pos{background:var(--green-bg);color:var(--green)}
+  .sbadge.neu{background:rgba(136,136,168,.1);color:var(--text2)}
+  .sbadge.neg{background:var(--red-bg);color:var(--red)}
+  .nbody{flex:1}
+  .ntitle{font-size:13px;line-height:1.5}
+  .ntitle a{color:var(--text);text-decoration:none}
+  .ntitle a:hover{color:var(--accent)}
+  .nmeta{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px}
+  .sent-sum{font-family:var(--mono);font-size:12px;color:var(--text2);margin-bottom:32px}
+  .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px}
+  @media(max-width:560px){.vgrid{grid-template-columns:1fr}}
+  .vcard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+  .vcard a{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-bottom:3px}
+  .vcard a:hover{text-decoration:underline}
+  .vcard span{font-family:var(--mono);font-size:10px;color:var(--text3)}
+  .footer{text-align:center;padding:32px 0 16px;font-family:var(--mono);font-size:11px;color:var(--text3)}
+  .debug-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-family:var(--mono);font-size:11px;color:var(--text3);display:none;white-space:pre-wrap;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <div class="logo-dot g"></div>
+        <div class="logo-dot y"></div>
+        <div class="logo-dot r"></div>
+      </div>
+      <div class="logo-text">Semáforo <span>NYSE</span></div>
+    </div>
+    <div class="tagline">Análisis de Calidad de Activos · v5.0</div>
+  </div>
+
+  <div class="search-box">
+    <input class="search-input" id="tickerInput" type="text" placeholder="Ingresá el ticker (ej: AAPL, BP, GOLD)" autocomplete="off"/>
+    <button class="search-btn" id="btn" onclick="analyze()">Analizar</button>
+  </div>
+
+  <div class="examples">
+    <span class="chip" onclick="go('AAPL')">AAPL</span>
+    <span class="chip" onclick="go('BP')">BP</span>
+    <span class="chip" onclick="go('GOLD')">GOLD · Barrick</span>
+    <span class="chip" onclick="go('MSFT')">MSFT</span>
+    <span class="chip" onclick="go('NVDA')">NVDA</span>
+    <span class="chip" onclick="go('KO')">KO · Coca-Cola</span>
+    <span class="chip" onclick="go('JNJ')">JNJ</span>
+    <span class="chip" onclick="go('XOM')">XOM · ExxonMobil</span>
+  </div>
+
+  <div class="error-msg" id="err"></div>
+  <div class="debug-box" id="debug"></div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p id="loadTxt">Conectando con Financial Modeling Prep...</p>
+  </div>
+  <div class="report" id="report"></div>
+  <div class="footer">© 2026 Carlos Traseira · Todos los derechos reservados</div>
+</div>
+
+<script>
+const FMP='PdXJWoiZsKAcIeUbBW2lGoN5vz7chrNx';
+const ANTHROPIC_KEY=window.__ANTHROPIC_API_KEY__;
+
+function go(t){document.getElementById('tickerInput').value=t;analyze()}
+document.getElementById('tickerInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyze()});
+
+const msgs=['Conectando con FMP...','Extrayendo indicadores...','Obteniendo noticias...','Analizando con IA...','Generando diagnóstico...'];
+let mi;
+function startLoad(){let i=0;document.getElementById('loadTxt').textContent=msgs[0];mi=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('loadTxt').textContent=msgs[i]},1800)}
+function stopLoad(){clearInterval(mi)}
+
+function showErr(m,detail){
+  const e=document.getElementById('err');
+  e.textContent=m;
+  e.style.display='block';
+  if(detail){
+    const d=document.getElementById('debug');
+    d.textContent=detail;
+    d.style.display='block';
+  }
+}
+
+// Try multiple endpoint patterns
+async function fmpFetch(paths){
+  for(const path of paths){
+    try{
+      const url='https://financialmodelingprep.com'+path+'&apikey='+FMP;
+      const r=await fetch(url);
+      const data=await r.json();
+      if(data&&data['Error Message'])continue;
+      if(Array.isArray(data)&&data.length>0)return{data,url};
+      if(data&&typeof data==='object'&&!Array.isArray(data)&&Object.keys(data).length>0)return{data:[data],url};
+    }catch(e){continue}
+  }
+  return null;
+}
+
+function fmtM(v){
+  if(v==null)return'N/D';
+  const a=Math.abs(v),s=v<0?'–':'';
+  if(a>=1e9)return s+(a/1e9).toFixed(2)+' mil millones USD';
+  if(a>=1e6)return s+(a/1e6).toFixed(2)+' millones USD';
+  return s+(a/1e3).toFixed(2)+' mil USD';
+}
+
+function calcSt(val,thr,hib,wp=0.2){
+  if(val==null)return'warn';
+  if(hib)return val>=thr?'ok':val>=thr*(1-wp)?'warn':'fail';
+  return val<=thr?'ok':val<=thr*(1+wp)?'warn':'fail';
+}
+
+async function analyze(){
+  const raw=document.getElementById('tickerInput').value.trim().toUpperCase();
+  if(!raw)return;
+  const ticker=raw.split(/[\s,(]/)[0];
+
+  document.getElementById('err').style.display='none';
+  document.getElementById('debug').style.display='none';
+  document.getElementById('report').style.display='none';
+  document.getElementById('loading').style.display='block';
+  document.getElementById('btn').disabled=true;
+  startLoad();
+
+  try{
+    // Try stable then v3 endpoints for profile
+    const profResult=await fmpFetch([
+      `/stable/profile?symbol=${ticker}`,
+      `/api/v3/profile/${ticker}?`
+    ]);
+    if(!profResult)throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE/NASDAQ.`);
+    const p=profResult.data[0];
+
+    // Try stable then v3 for ratios TTM
+    const ratResult=await fmpFetch([
+      `/stable/ratios-ttm?symbol=${ticker}`,
+      `/api/v3/ratios-ttm/${ticker}?`
+    ]);
+    const r=ratResult?ratResult.data[0]:{};
+
+    // Try stable for key metrics TTM
+    const metResult=await fmpFetch([
+      `/stable/key-metrics-ttm?symbol=${ticker}`,
+      `/api/v3/key-metrics-ttm/${ticker}?`
+    ]);
+    const m=metResult?metResult.data[0]:{};
+
+    // Try stable for news
+    const newsResult=await fmpFetch([
+      `/stable/stock-news?symbols=${ticker}&limit=5`,
+      `/api/v3/stock_news?tickers=${ticker}&limit=5&`
+    ]);
+    const newsArr=newsResult?newsResult.data:[];
+
+    // Extract values — try multiple field name variants
+    const pe=r.priceEarningsRatioTTM||r.peRatioTTM||m.peRatioTTM||null;
+    const roeRaw=r.returnOnEquityTTM!=null?r.returnOnEquityTTM:null;
+    const roe=roeRaw!=null?(Math.abs(roeRaw)<=2?roeRaw*100:roeRaw):null;
+    const marginRaw=r.netProfitMarginTTM!=null?r.netProfitMarginTTM:null;
+    const margin=marginRaw!=null?(Math.abs(marginRaw)<=2?marginRaw*100:marginRaw):null;
+    const debtRaw=r.debtEquityRatioTTM!=null?r.debtEquityRatioTTM:null;
+    const debtEq=debtRaw!=null?(Math.abs(debtRaw)<=10?debtRaw*100:debtRaw):null;
+    const fcfPS=r.freeCashFlowPerShareTTM||m.freeCashFlowPerShareTTM||null;
+    const shares=p.sharesOutstanding||p.shareOutstanding||null;
+    const fcf=fcfPS!=null&&shares?fcfPS*shares:null;
+
+    const inds=[
+      {nameEs:'Trailing P/E',nameEn:'Price/Earnings (ttm)',value:pe!=null?pe.toFixed(2)+'x':'N/D',raw:pe,param:'< 30x',s:calcSt(pe,30,false),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics › Valuation Measures'},
+      {nameEs:'ROE',nameEn:'Return on Equity (ttm)',value:roe!=null?roe.toFixed(2)+'%':'N/D',raw:roe,param:'> 15%',s:calcSt(roe,15,true),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics › Management Effectiveness'},
+      {nameEs:'Profit Margin',nameEn:'Net Profit Margin (ttm)',value:margin!=null?margin.toFixed(2)+'%':'N/D',raw:margin,param:'> 10%',s:calcSt(margin,10,true),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics › Profitability'},
+      {nameEs:'Deuda / Patrimonio',nameEn:'Total Debt/Equity (mrq)',value:debtEq!=null?debtEq.toFixed(2)+'%':'N/D',raw:debtEq,param:'< 100%',s:calcSt(debtEq,100,false),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics › Balance Sheet'},
+      {nameEs:'Free Cash Flow',nameEn:'Levered Free Cash Flow (ttm)',value:fmtM(fcf),raw:fcf,param:'Positivo',s:fcf==null?'warn':(fcf>0?'ok':'fail'),yu:`https://finance.yahoo.com/quote/${ticker}/financials/`,yw:'Financials › Cash Flow'}
+    ];
+
+    const pass=inds.filter(i=>i.s==='ok').length;
+    let dLabel,dColor,dIcon;
+    if(pass===5){dLabel='SÍ (A+)';dColor='green';dIcon='🟢'}
+    else if(pass===4){dLabel='SÍ (A)';dColor='green';dIcon='🟢'}
+    else if(pass===3){dLabel='CONDICIONAL';dColor='yellow';dIcon='🟡'}
+    else{dLabel='NO';dColor='red';dIcon='🔴'}
+
+    const indSum=inds.map(i=>`${i.nameEs}: ${i.value} (parámetro ${i.param}) → ${i.s.toUpperCase()}`).join('\n');
+    const newsT=newsArr.slice(0,5).map(n=>n.title||'').filter(Boolean).join('\n');
+
+    const aiR=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        messages:[{role:'user',content:`Empresa: ${p.companyName} (${ticker})\nSector: ${p.sector||'N/D'}\nDiagnóstico: ${dLabel} (${pass}/5 cumplen)\n\nIndicadores reales:\n${indSum}\n\nNoticias:\n${newsT||'Sin noticias'}\n\nRespondé SOLO JSON sin markdown:\n{"diagnosisText":"2 frases en español","news":[{"title":"...","sentiment":"POSITIVO|NEUTRAL|NEGATIVO","sentimentCode":"pos|neu|neg","impact":"frase corta"},{"title":"...","sentiment":"...","sentimentCode":"...","impact":"..."},{"title":"...","sentiment":"...","sentimentCode":"...","impact":"..."}],"sentimentPct":número}`}]
+      })
+    });
+    const aiD=await aiR.json();
+    const aiJ=JSON.parse(aiD.content[0].text.trim().match(/\{[\s\S]*\}/)[0]);
+
+    stopLoad();
+    document.getElementById('loading').style.display='none';
+    document.getElementById('btn').disabled=false;
+
+    const news=aiJ.news.map((n,i)=>({
+      ...n,
+      url:newsArr[i]?.url||`https://www.google.com/search?q=${encodeURIComponent(ticker+' '+n.title)}&tbm=nws`,
+      source:newsArr[i]?.site||'Fuente financiera'
+    }));
+
+    render({ticker,p,inds,pass,dLabel,dColor,dIcon,diagText:aiJ.diagnosisText,news,sentPct:aiJ.sentimentPct});
+
+  }catch(e){
+    stopLoad();
+    document.getElementById('loading').style.display='none';
+    document.getElementById('btn').disabled=false;
+    showErr(e.message||'Error al analizar. Verificá el ticker e intentá de nuevo.');
+  }
+}
+
+function render(d){
+  const sl={ok:'CUMPLE',warn:'LÍMITE',fail:'NO CUMPLE'};
+  const rows=d.inds.map(i=>`<tr><td><div class="ind-name">${i.nameEs}</div><div class="ind-en">${i.nameEn}</div></td><td class="ind-val">${i.value}</td><td class="ind-param">${i.param}</td><td><span class="badge ${i.s}"><span class="dot"></span>${sl[i.s]}</span></td><td><a class="vlink" href="${i.yu}" target="_blank" rel="noopener">Verificar en Yahoo ↗</a><div class="vwhere">${i.yw}</div></td></tr>`).join('');
+  const nhtml=d.news.map(n=>`<div class="news-item"><span class="sbadge ${n.sentimentCode}">${n.sentiment}</span><div class="nbody"><div class="ntitle"><a href="${n.url}" target="_blank" rel="noopener">${n.title}</a></div><div class="nmeta">${n.source} · ${n.impact}</div></div></div>`).join('');
+  const vcards=d.inds.map(i=>`<div class="vcard"><a href="${i.yu}" target="_blank" rel="noopener">${i.nameEs} ↗</a><span>${i.yw}</span></div>`).join('');
+  const sc=d.sentPct>=60?'var(--green)':d.sentPct>=40?'var(--yellow)':'var(--red)';
+  document.getElementById('report').innerHTML=`
+    <div class="report-header">
+      <div class="company-name">${d.p.companyName} <span style="color:var(--text3);font-size:16px;font-family:var(--mono)">(${d.ticker})</span></div>
+      <div class="report-meta">${d.p.exchangeShortName||d.p.exchange||''} · ${d.p.sector||''} · ${d.p.country||''} · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
+    </div>
+    <div class="diag-banner ${d.dColor}">
+      <div class="diag-icon">${d.dIcon}</div>
+      <div>
+        <div class="diag-label">Diagnóstico final · ${d.pass}/5 indicadores cumplen</div>
+        <div class="diag-value">${d.dLabel}</div>
+        <div class="diag-text">${d.diagText}</div>
+      </div>
+    </div>
+    <div class="data-note">📡 <span>Datos: <strong>Financial Modeling Prep API</strong> · Verificación: <strong>Yahoo Finance</strong> (links en cada fila)</span></div>
+    <div class="section-label">Filtro de Calidad — 5 Indicadores Fundamentales</div>
+    <div class="table-wrap"><table><thead><tr><th>Indicador</th><th>Valor actual</th><th>Parámetro</th><th>Estado</th><th>Verificación</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="section-label">Análisis de Sentimiento — Noticias de Alto Impacto</div>
+    <div class="news-list">${nhtml}</div>
+    <div class="sent-sum">Sentimiento general: <span style="color:${sc};font-weight:500">${d.sentPct}% positivo</span></div>
+    <div class="section-label">Guía de Verificación en Yahoo Finance</div>
+    <div class="vgrid">${vcards}</div>`;
+  document.getElementById('report').style.display='block';
+  document.getElementById('report').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>
