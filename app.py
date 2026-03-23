@@ -10,9 +10,11 @@ try:
     gemini_key = st.secrets["GEMINI_API_KEY"]
     fmp_key = st.secrets["FMP_API_KEY"]
 
-    # 2. Configuración de IA
-    genai.configure(api_key=gemini_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+ # --- CONFIGURACIÓN DE IA ---
+genai.configure(api_key=gemini_key)
+
+# Asegúrate de que esta línea esté EXACTAMENTE así:
+model = genai.GenerativeModel('gemini-1.5-flash')
 
     st.title("🚦 Semáforo NYSE (Modo FMP 250)")
     ticker = st.text_input("Ticker de la empresa:", "BP").upper().strip()
