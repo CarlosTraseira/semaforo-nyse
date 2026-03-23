@@ -11,9 +11,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# 👉 CAMBIAR A False PARA USAR ALPHA REAL
 USE_MOCK_DATA = True
-
 ALPHA_KEY = st.secrets.get("ALPHA_VANTAGE_API_KEY", "")
 
 # ==================================================
@@ -26,7 +24,7 @@ def num(x):
         return None
 
 
-def semaforo_texto(color):
+def semaforo(color):
     return {
         "green": "🟢 Bueno",
         "yellow": "🟡 Regular",
@@ -35,59 +33,44 @@ def semaforo_texto(color):
     }.get(color, "⚪ N/D")
 
 
-def evaluar_pe(pe):
-    if pe is None:
-        return "grey"
-    if pe < 30:
-        return "green"
-    if pe < 45:
-        return "yellow"
+def evaluar_pe(x):
+    if x is None: return "grey"
+    if x < 30: return "green"
+    if x < 45: return "yellow"
     return "red"
 
 
-def evaluar_roe(roe):
-    if roe is None:
-        return "grey"
-    if roe >= 0.15:
-        return "green"
-    if roe >= 0.08:
-        return "yellow"
+def evaluar_roe(x):
+    if x is None: return "grey"
+    if x >= 0.15: return "green"
+    if x >= 0.08: return "yellow"
     return "red"
 
 
-def evaluar_margin(m):
-    if m is None:
-        return "grey"
-    if m >= 0.10:
-        return "green"
-    if m >= 0.05:
-        return "yellow"
+def evaluar_margin(x):
+    if x is None: return "grey"
+    if x >= 0.10: return "green"
+    if x >= 0.05: return "yellow"
     return "red"
 
 
-def evaluar_debt(d):
-    if d is None:
-        return "grey"
-    if d < 1:
-        return "green"
-    if d < 2:
-        return "yellow"
+def evaluar_debt(x):
+    if x is None: return "grey"
+    if x < 1: return "green"
+    if x < 2: return "yellow"
     return "red"
 
 
-def evaluar_fcf(fcf):
-    if fcf is None:
-        return "grey"
-    if fcf > 0:
-        return "green"
-    return "red"
+def evaluar_fcf(x):
+    if x is None: return "grey"
+    return "green" if x > 0 else "red"
 
 
 # ==================================================
 # UI
 # ==================================================
 st.title("🚦 Semáforo Fundamental – NYSE")
-st.caption("Evaluación rápida de calidad financiera con datos verificables")
+st.caption("Indicadores fundamentales con verificación directa en la fuente")
 
 ticker = st.text_input(
     "Ticker (ej: AAPL, MSFT, KO)",
@@ -100,9 +83,6 @@ ticker = st.text_input(
 if st.button("Analizar empresa"):
     with st.spinner("Procesando datos..."):
 
-        # ------------------------------
-        # MODO MOCK (DESARROLLO)
-        # ------------------------------
         if USE_MOCK_DATA:
             data = {
                 "Name": "Apple Inc.",
@@ -114,10 +94,6 @@ if st.button("Analizar empresa"):
                 "DebtToEquityRatio": "1.7",
                 "FreeCashFlowTTM": "95000000000"
             }
-
-        # ------------------------------
-        # MODO REAL (ALPHA VANTAGE)
-        # ------------------------------
         else:
             if not ALPHA_KEY:
                 st.error("Falta configurar ALPHA_VANTAGE_API_KEY en secrets.")
@@ -127,20 +103,7 @@ if st.button("Analizar empresa"):
                 "https://www.alphavantage.co/query"
                 f"?function=OVERVIEW&symbol={ticker}&apikey={ALPHA_KEY}"
             )
-
-            r = requests.get(url, timeout=15)
-            data = r.json()
-
-            if not data or "Symbol" not in data:
-                st.error("Ticker inválido o límite diario alcanzado.")
-                st.stop()
-
-        # ==================================================
-        # EXTRACCIÓN
-        # ==================================================
-        company = data.get("Name")
-        sector = data.get("Sector")
-        industry = data.get("Industry")
+            data = requests.get(url, timeout=15).json()
 
         pe = num(data.get("TrailingPE"))
         roe = num(data.get("ReturnOnEquityTTM"))
@@ -148,9 +111,6 @@ if st.button("Analizar empresa"):
         debt = num(data.get("DebtToEquityRatio"))
         fcf = num(data.get("FreeCashFlowTTM"))
 
-        # ==================================================
-        # TABLA
-        # ==================================================
         df = pd.DataFrame({
             "Indicador": [
                 "Trailing P/E",
@@ -167,49 +127,37 @@ if st.button("Analizar empresa"):
                 f"${fcf/1e9:.1f} B" if fcf else "N/D"
             ],
             "Evaluación": [
-                semaforo_texto(evaluar_pe(pe)),
-                semaforo_texto(evaluar_roe(roe)),
-                semaforo_texto(evaluar_margin(margin)),
-                semaforo_texto(evaluar_debt(debt)),
-                semaforo_texto(evaluar_fcf(fcf))
+                semaforo(evaluar_pe(pe)),
+                semaforo(evaluar_roe(roe)),
+                semaforo(evaluar_margin(margin)),
+                semaforo(evaluar_debt(debt)),
+                semaforo(evaluar_fcf(fcf))
             ]
         })
 
-        # ==================================================
-        # OUTPUT
-        # ==================================================
-        st.subheader(f"{company} ({ticker})")
-        st.caption(f"{sector} · {industry}")
-
+        st.subheader(f"{data.get('Name')} ({ticker})")
         st.table(df)
 
         # ==================================================
-        # LINKS DE VERIFICACIÓN
+        # VERIFICACIÓN
         # ==================================================
-        st.markdown("### 🔎 Verificación de datos")
-        st.markdown(
-            f"""
-- **Alpha Vantage (fuente primaria)**  
-  https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}
+        st.markdown("### 🔎 Cómo verificar cada indicador")
 
-- **Yahoo Finance**  
-  https://finance.yahoo.com/quote/{ticker}
+        st.markdown(f"""
+**Trailing P/E, ROE, Profit Margin, Debt/Equity**  
+👉 Yahoo Finance – *Statistics*  
+https://finance.yahoo.com/quote/{ticker}/key-statistics  
+📌 Ver secciones *Valuation Measures* y *Financial Highlights*
 
-- **Macrotrends (Cash Flow histórico)**  
-  https://www.macrotrends.net/stocks/charts/{ticker}/
-            """
-        )
+**Free Cash Flow (TTM)**  
+👉 Yahoo Finance – *Cash Flow*  
+https://finance.yahoo.com/quote/{ticker}/cash-flow  
+📌 Ver tabla *Cash Flow Statement* → fila *Free Cash Flow*
 
-        # ==================================================
-        # FOOTER
-        # ==================================================
+**Fuente primaria (datos crudos)**  
+👉 Alpha Vantage – Company Overview  
+https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}
+""")
+
         if USE_MOCK_DATA:
-            st.info(
-                "🧪 Modo desarrollo activo (datos simulados).\n"
-                "Cambiar USE_MOCK_DATA = False para usar datos reales."
-            )
-        else:
-            st.info(
-                "Fuente de datos: Alpha Vantage · function=OVERVIEW\n"
-                "Free tier: 25 requests por día."
-            )
+            st.info("🧪 Modo desarrollo (datos simulados).")
