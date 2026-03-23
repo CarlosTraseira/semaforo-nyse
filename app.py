@@ -7,30 +7,38 @@ st.set_page_config(page_title="Semáforo NYSE Pro", page_icon="🚦")
 
 # --- CONEXIÓN CON SECRETS ---
 try:
+    # Leemos las llaves que ya tienes bien puestas en Secrets
     gemini_key = st.secrets["GEMINI_API_KEY"]
     av_key = st.secrets["AV_API_KEY"]
 
+    # Configuración de Google AI
     genai.configure(api_key=gemini_key)
     
-    # CAMBIO CRÍTICO: Usamos un nombre de modelo más compatible
-    model = genai.GenerativeModel('models/gemini-1.5-flash-latest')
+    # CAMBIO CLAVE: Usamos el nombre corto del modelo para evitar el error 404
+    model = genai.GenerativeModel('gemini-1.5-flash')
 
     st.title("🚦 Semáforo de Calidad NYSE")
     ticker = st.text_input("Introduce el Ticker (ej: BP, AAPL):", "BP").upper()
 
     if st.button("Analizar"):
-        with st.spinner('Consultando datos financieros...'):
-            # Consulta a Alpha Vantage
+        with st.spinner('Obteniendo datos de Alpha Vantage...'):
+            # Consulta a Alpha Vantage con tu llave
             url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={av_key}'
-            data = requests.get(url).json()
+            r = requests.get(url)
+            data = r.json()
 
             if "Symbol" not in data:
-                st.error("Límite de API alcanzado o Ticker incorrecto. Alpha Vantage permite 25 consultas/día.")
+                st.error("Límite de API alcanzado o Ticker incorrecto.")
             else:
-                # Extraemos y convertimos datos a números reales
-                pe = float(data.get('TrailingPE', 0) if data.get('TrailingPE') != 'None' else 0)
-                roe = float(data.get('ReturnOnEquityTTM', 0) if data.get('ReturnOnEquityTTM') != 'None' else 0) * 100
-                margin = float(data.get('ProfitMargin', 0) if data.get('ProfitMargin') != 'None' else 0) * 100
+                # Extraemos datos reales (adiós al 2239x de Yahoo)
+                pe_raw = data.get('TrailingPE', '0')
+                roe_raw = data.get('ReturnOnEquityTTM', '0')
+                margin_raw = data.get('ProfitMargin', '0')
+
+                # Convertimos a números (manejando casos donde venga 'None')
+                pe = float(pe_raw) if pe_raw != 'None' else 0.0
+                roe = float(roe_raw) * 100 if roe_raw != 'None' else 0.0
+                margin = float(margin_raw) * 100 if margin_raw != 'None' else 0.0
 
                 st.subheader(f"Auditoría Real: {ticker}")
                 df = pd.DataFrame({
@@ -39,12 +47,17 @@ try:
                 })
                 st.table(df)
 
-                # Veredicto de la IA
-                prompt = f"Analiza la empresa {ticker} con estos datos: P/E de {pe}, ROE de {roe}% y Margen de {margin}%. Da un veredicto de Semáforo (Verde, Amarillo o Rojo) y justifica brevemente."
-                response = model.generate_content(prompt)
-                st.subheader("🧠 Veredicto de la IA")
-                st.write(response.text)
+                # Generar el veredicto con Gemini
+                prompt = f"Analiza financieramente a {ticker} con: P/E {pe}, ROE {roe}% y Margen {margin}%. Da un veredicto de Semáforo (Verde, Amarillo o Rojo) y justifica brevemente."
+                
+                # Intento de generación con manejo de errores específico para el modelo
+                try:
+                    response = model.generate_content(prompt)
+                    st.subheader("🧠 Veredicto de la IA")
+                    st.write(response.text)
+                except Exception as ai_err:
+                    st.error(f"Error al generar análisis con IA: {ai_err}")
 
 except Exception as e:
-    st.error(f"Error de sistema: {e}")
-    st.info("Revisa que tus Secrets en Streamlit se llamen exactamente GEMINI_API_KEY y AV_API_KEY.")
+    st.error(f"Error de configuración: {e}")
+    st.info("Revisa que tus Secrets se llamen GEMINI_API_KEY y AV_API_KEY.")
