@@ -6,15 +6,14 @@ import pandas as pd
 # CONFIG GENERAL
 # ==================================================
 st.set_page_config(
-    page_title="🚦 Semáforo Fundamental – NYSE",
+    page_title="Semáforo Fundamental – NYSE",
     page_icon="🚦",
     layout="centered"
 )
 
-# 👉 CAMBIÁ ESTO A False CUANDO QUIERAS USAR ALPHA REAL
+# 👉 CAMBIAR A False PARA USAR ALPHA REAL
 USE_MOCK_DATA = True
 
-# API KEY (solo se usa si USE_MOCK_DATA = False)
 ALPHA_KEY = st.secrets.get("ALPHA_VANTAGE_API_KEY", "")
 
 # ==================================================
@@ -28,13 +27,12 @@ def num(x):
 
 
 def semaforo_texto(color):
-    if color == "green":
-        return "🟢 Bueno"
-    if color == "yellow":
-        return "🟡 Regular"
-    if color == "red":
-        return "🔴 Malo"
-    return "⚪ N/D"
+    return {
+        "green": "🟢 Bueno",
+        "yellow": "🟡 Regular",
+        "red": "🔴 Malo",
+        "grey": "⚪ N/D"
+    }.get(color, "⚪ N/D")
 
 
 def evaluar_pe(pe):
@@ -77,11 +75,19 @@ def evaluar_debt(d):
     return "red"
 
 
+def evaluar_fcf(fcf):
+    if fcf is None:
+        return "grey"
+    if fcf > 0:
+        return "green"
+    return "red"
+
+
 # ==================================================
 # UI
 # ==================================================
 st.title("🚦 Semáforo Fundamental – NYSE")
-st.caption("Evaluación rápida de calidad financiera")
+st.caption("Evaluación rápida de calidad financiera con datos verificables")
 
 ticker = st.text_input(
     "Ticker (ej: AAPL, MSFT, KO)",
@@ -105,7 +111,8 @@ if st.button("Analizar empresa"):
                 "TrailingPE": "28.5",
                 "ReturnOnEquityTTM": "0.55",
                 "ProfitMargin": "0.25",
-                "DebtToEquityRatio": "1.7"
+                "DebtToEquityRatio": "1.7",
+                "FreeCashFlowTTM": "95000000000"
             }
 
         # ------------------------------
@@ -139,6 +146,7 @@ if st.button("Analizar empresa"):
         roe = num(data.get("ReturnOnEquityTTM"))
         margin = num(data.get("ProfitMargin"))
         debt = num(data.get("DebtToEquityRatio"))
+        fcf = num(data.get("FreeCashFlowTTM"))
 
         # ==================================================
         # TABLA
@@ -148,19 +156,22 @@ if st.button("Analizar empresa"):
                 "Trailing P/E",
                 "ROE (TTM)",
                 "Profit Margin",
-                "Debt / Equity"
+                "Debt / Equity",
+                "Free Cash Flow (TTM)"
             ],
             "Valor": [
                 f"{pe:.2f}" if pe else "N/D",
                 f"{roe*100:.2f}%" if roe else "N/D",
                 f"{margin*100:.2f}%" if margin else "N/D",
-                f"{debt:.2f}" if debt else "N/D"
+                f"{debt:.2f}" if debt else "N/D",
+                f"${fcf/1e9:.1f} B" if fcf else "N/D"
             ],
             "Evaluación": [
                 semaforo_texto(evaluar_pe(pe)),
                 semaforo_texto(evaluar_roe(roe)),
                 semaforo_texto(evaluar_margin(margin)),
-                semaforo_texto(evaluar_debt(debt))
+                semaforo_texto(evaluar_debt(debt)),
+                semaforo_texto(evaluar_fcf(fcf))
             ]
         })
 
@@ -172,13 +183,33 @@ if st.button("Analizar empresa"):
 
         st.table(df)
 
+        # ==================================================
+        # LINKS DE VERIFICACIÓN
+        # ==================================================
+        st.markdown("### 🔎 Verificación de datos")
+        st.markdown(
+            f"""
+- **Alpha Vantage (fuente primaria)**  
+  https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}
+
+- **Yahoo Finance**  
+  https://finance.yahoo.com/quote/{ticker}
+
+- **Macrotrends (Cash Flow histórico)**  
+  https://www.macrotrends.net/stocks/charts/{ticker}/
+            """
+        )
+
+        # ==================================================
+        # FOOTER
+        # ==================================================
         if USE_MOCK_DATA:
             st.info(
-                "🧪 Modo desarrollo activo (datos simulados).\n\n"
-                "Cambiar USE_MOCK_DATA = False para usar Alpha Vantage real."
+                "🧪 Modo desarrollo activo (datos simulados).\n"
+                "Cambiar USE_MOCK_DATA = False para usar datos reales."
             )
         else:
             st.info(
-                "Fuente de datos: Alpha Vantage (function=OVERVIEW)\n\n"
+                "Fuente de datos: Alpha Vantage · function=OVERVIEW\n"
                 "Free tier: 25 requests por día."
             )
