@@ -2,17 +2,28 @@ import streamlit as st
 import yfinance as yf
 import google.generativeai as genai
 import pandas as pd
-import requests
 
 # Configuración de página
 st.set_page_config(page_title="Semáforo NYSE Pro", page_icon="🚦")
 
-# --- BARRA LATERAL PARA API KEYS ---
-st.sidebar.header("Configuración de Seguridad")
-gemini_key = st.sidebar.text_input("1. Introduce Gemini API Key:", type="password")
+# --- LÓGICA DE API KEY (BLINDADA) ---
+api_key = None
 
-if gemini_key:
-    genai.configure(api_key=gemini_key)
+# 1. Intenta leer de Secrets
+if "GEMINI_API_KEY" in st.secrets:
+    api_key = st.secrets["GEMINI_API_KEY"]
+# 2. Si falla, intenta leer de una sección general
+elif "general" in st.secrets and "GEMINI_API_KEY" in st.secrets["general"]:
+    api_key = st.secrets["general"]["GEMINI_API_KEY"]
+
+# Si NO se encontró en secrets, mostrar el input en la barra lateral
+if not api_key:
+    api_key = st.sidebar.text_input("Introduce Gemini API Key:", type="password")
+
+if api_key:
+    # Configurar la IA
+    genai.configure(api_key=api_key)
+    # ... resto del código igual ...
     model = genai.GenerativeModel('gemini-1.5-flash')
 
     st.title("🚦 Semáforo de Calidad NYSE")
