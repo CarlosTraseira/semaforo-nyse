@@ -6,62 +6,61 @@ import requests
 # 1. Configuración de página
 st.set_page_config(page_title="Semáforo NYSE Pro", page_icon="🚦")
 
-# --- CARGA Y LIMPIEZA DE LLAVES ---
+# --- CARGA SEGURA DE SECRETOS ---
 try:
-    # Limpiamos posibles espacios o comillas extra que se cuelen en los Secrets
+    # Limpieza de llaves para evitar errores de copiado
     gemini_key = st.secrets["GEMINI_API_KEY"].strip().replace('"', '').replace("'", "")
     fmp_key = st.secrets["FMP_API_KEY"].strip().replace('"', '').replace("'", "")
     
     genai.configure(api_key=gemini_key)
     model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
-    st.error(f"Error en la configuración de llaves: {e}")
+    st.error(f"Error en Secrets: {e}")
     st.stop()
 
 st.title("🚦 Semáforo NYSE Pro")
 ticker = st.text_input("Introduce el Ticker (ej: AAPL):", "AAPL").upper().strip()
 
 if st.button("Analizar"):
-    with st.spinner(f'Consultando datos para {ticker}...'):
-        # Endpoints gratuitos de FMP
-        url_quote = f"https://financialmodelingprep.com/api/v3/quote/{ticker}?apikey={fmp_key}"
-        url_profile = f"https://financialmodelingprep.com/api/v3/profile/{ticker}?apikey={fmp_key}"
+    with st.spinner(f'Consultando datos actualizados para {ticker}...'):
+        # USAMOS EL ENDPOINT v3/quote QUE ES EL MÁS ESTABLE Y MODERNO
+        url = f"https://financialmodelingprep.com/api/v3/quote/{ticker}?apikey={fmp_key}"
         
         try:
-            resp = requests.get(url_quote)
-            res_quote = resp.json()
+            resp = requests.get(url)
+            data = resp.json()
             
-            # VERIFICACIÓN DE ERROR DE API (Clave para resolver tu KeyError)
-            if isinstance(res_quote, dict) and "Error Message" in res_quote:
-                st.error(f"⚠️ Error de la API FMP: {res_quote['Error Message']}")
-                st.info("Revisa si tu API Key en Secrets es correcta o si expiró.")
-            elif not res_quote:
-                st.warning(f"No se encontraron datos para {ticker}. Verifica el símbolo.")
+            # Verificación de errores de la API
+            if isinstance(data, dict) and "Error Message" in data:
+                st.error(f"FMP dice: {data['Error Message']}")
+            elif not data:
+                st.warning("No se encontraron datos. Intenta con un ticker conocido como AAPL.")
             else:
-                # Si llegamos aquí, los datos son válidos
-                q = res_quote[0]
-                res_profile = requests.get(url_profile).json()
-                p = res_profile[0] if res_profile else {}
+                # Datos extraídos del endpoint moderno
+                info = data[0]
+                nombre = info.get('name', ticker)
+                precio = info.get('price', 0)
+                pe = info.get('pe', 0) or 0
+                cambio = info.get('changesPercentage', 0)
 
-                # Métricas
-                pe = q.get('pe', 0) or 0
-                precio = q.get('price', 0)
-                beta = p.get('beta', 0) or 0
-
-                st.subheader(f"Análisis de {q.get('name', ticker)}")
+                st.subheader(f"Análisis de {nombre}")
                 
-                # Tabla de datos
+                # Tabla de métricas
                 df = pd.DataFrame({
-                    "Indicador": ["Precio", "P/E Ratio", "Beta (Riesgo)"],
-                    "Valor": [f"${precio}", f"{pe:.2f}x", f"{beta:.2f}"]
+                    "Métrica": ["Precio Actual", "P/E Ratio", "Variación Día (%)"],
+                    "Valor": [f"${precio:,.2f}", f"{pe:.2f}x", f"{cambio:.2f}%"]
                 })
                 st.table(df)
 
                 # --- IA VERDICT ---
-                prompt = f"Analiza {ticker}: PE {pe:.2f}, Beta {beta:.2f}. Da un veredicto de inversión muy corto."
-                response = model.generate_content(prompt)
                 st.subheader("🧠 Veredicto de la IA")
-                st.success(response.text)
+                prompt = f"Analiza {nombre} ({ticker}): Precio ${precio}, PE {pe:.2f}. Di si es una buena opción de inversión hoy."
+                
+                try:
+                    res_ia = model.generate_content(prompt)
+                    st.success(res_ia.text)
+                except:
+                    st.warning("La IA no pudo procesar el veredicto, pero los datos están listos.")
 
         except Exception as e:
-            st.error(f"Hubo un problema al procesar los datos: {e}")
+            st.error(f"Error de conexión: {e}")
