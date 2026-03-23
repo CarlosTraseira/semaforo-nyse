@@ -1,66 +1,120 @@
 import streamlit as st
-import google.generativeai as genai
-import pandas as pd
 import requests
+import pandas as pd
 
-# 1. Configuración de página
-st.set_page_config(page_title="Semáforo NYSE Pro", page_icon="🚦")
+# --------------------------------------------------
+# CONFIG
+# --------------------------------------------------
+st.set_page_config(
+    page_title="🚦 Semáforo Fundamental – Alpha Vantage",
+    page_icon="🚦",
+    layout="centered"
+)
 
-# --- CARGA SEGURA DE SECRETOS ---
-try:
-    # Limpieza de llaves para evitar errores de copiado
-    gemini_key = st.secrets["GEMINI_API_KEY"].strip().replace('"', '').replace("'", "")
-    fmp_key = st.secrets["FMP_API_KEY"].strip().replace('"', '').replace("'", "")
-    
-    genai.configure(api_key=gemini_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-except Exception as e:
-    st.error(f"Error en Secrets: {e}")
+ALPHA_KEY = st.secrets.get("ALPHA_VANTAGE_API_KEY", "")
+
+# --------------------------------------------------
+# HELPERS
+# --------------------------------------------------
+def num(x):
+    try:
+        return float(x)
+    except:
+        return None
+
+
+def semaforo(valor, bueno, regular):
+    """
+    Devuelve color según umbrales
+    """
+    if valor is None:
+        return "⚪ N/D"
+    if valor >= bueno:
+        return "🟢 Bueno"
+    if valor >= regular:
+        return "🟡 Regular"
+    return "🔴 Malo"
+
+
+# --------------------------------------------------
+# UI
+# --------------------------------------------------
+st.title("🚦 Semáforo Fundamental (Alpha Vantage)")
+st.caption("Datos fundamentales reales – Free Tier")
+
+ticker = st.text_input(
+    "Ticker (NYSE / NASDAQ)",
+    value="AAPL",
+    help="Ejemplos: AAPL, MSFT, KO, JPM"
+).upper().strip()
+
+if not ALPHA_KEY:
+    st.warning("⚠️ Falta configurar ALPHA_VANTAGE_API_KEY en secrets.")
     st.stop()
 
-st.title("🚦 Semáforo NYSE Pro")
-ticker = st.text_input("Introduce el Ticker (ej: AAPL):", "AAPL").upper().strip()
+# --------------------------------------------------
+# FETCH DATA
+# --------------------------------------------------
+if st.button("Analizar empresa"):
+    with st.spinner("Consultando Alpha Vantage..."):
 
-if st.button("Analizar"):
-    with st.spinner(f'Consultando datos actualizados para {ticker}...'):
-        # USAMOS EL ENDPOINT v3/quote QUE ES EL MÁS ESTABLE Y MODERNO
-        url = f"https://financialmodelingprep.com/api/v3/quote/{ticker}?apikey={fmp_key}"
-        
-        try:
-            resp = requests.get(url)
-            data = resp.json()
-            
-            # Verificación de errores de la API
-            if isinstance(data, dict) and "Error Message" in data:
-                st.error(f"FMP dice: {data['Error Message']}")
-            elif not data:
-                st.warning("No se encontraron datos. Intenta con un ticker conocido como AAPL.")
-            else:
-                # Datos extraídos del endpoint moderno
-                info = data[0]
-                nombre = info.get('name', ticker)
-                precio = info.get('price', 0)
-                pe = info.get('pe', 0) or 0
-                cambio = info.get('changesPercentage', 0)
+        url = (
+            "https://www.alphavantage.co/query"
+            f"?function=OVERVIEW&symbol={ticker}&apikey={ALPHA_KEY}"
+        )
 
-                st.subheader(f"Análisis de {nombre}")
-                
-                # Tabla de métricas
-                df = pd.DataFrame({
-                    "Métrica": ["Precio Actual", "P/E Ratio", "Variación Día (%)"],
-                    "Valor": [f"${precio:,.2f}", f"{pe:.2f}x", f"{cambio:.2f}%"]
-                })
-                st.table(df)
+        r = requests.get(url, timeout=15)
+        data = r.json()
 
-                # --- IA VERDICT ---
-                st.subheader("🧠 Veredicto de la IA")
-                prompt = f"Analiza {nombre} ({ticker}): Precio ${precio}, PE {pe:.2f}. Di si es una buena opción de inversión hoy."
-                
-                try:
-                    res_ia = model.generate_content(prompt)
-                    st.success(res_ia.text)
-                except:
-                    st.warning("La IA no pudo procesar el veredicto, pero los datos están listos.")
+        if not data or "Symbol" not in data:
+            st.error("Ticker inválido o límite diario alcanzado.")
+            st.stop()
 
-        except Exception as e:
-            st.error(f"Error de conexión: {e}")
+        # --------------------------------------------------
+        # EXTRACT
+        # --------------------------------------------------
+        company = data.get("Name")
+        sector = data.get("Sector")
+        industry = data.get("Industry")
+
+        pe = num(data.get("TrailingPE"))
+        roe = num(data.get("ReturnOnEquityTTM"))
+        margin = num(data.get("ProfitMargin"))
+        debt = num(data.get("DebtToEquityRatio"))
+
+        # --------------------------------------------------
+        # TABLE
+        # --------------------------------------------------
+        df = pd.DataFrame({
+            "Indicador": [
+                "Trailing P/E",
+                "ROE (TTM)",
+                "Profit Margin",
+                "Debt / Equity"
+            ],
+            "Valor": [
+                f"{pe:.2f}" if pe else "N/D",
+                f"{roe*100:.2f}%" if roe else "N/D",
+                f"{margin*100:.2f}%" if margin else "N/D",
+                f"{debt:.2f}" if debt else "N/D"
+            ],
+            "Evaluación": [
+                semaforo(30 - pe if pe else None, 0, -10),
+                semaforo(roe, 0.15, 0.08),
+                semaforo(margin, 0.10, 0.05),
+                semaforo(1 / debt if debt else None, 1, 0.5)
+            ]
+        })
+
+        # --------------------------------------------------
+        # OUTPUT
+        # --------------------------------------------------
+        st.subheader(f"{company} ({ticker})")
+        st.caption(f"{sector} · {industry}")
+
+        st.table(df)
+
+        st.info(
+            "Fuente: Alpha Vantage – function=OVERVIEW\n\n"
+            "Nota: el free tier permite 25 consultas por día."
+        )
