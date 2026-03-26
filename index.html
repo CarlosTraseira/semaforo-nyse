@@ -20,6 +20,7 @@
   body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
   body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
   .app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px}
+
   .header{text-align:center;margin-bottom:48px}
   .logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
   .logo-icon{width:32px;height:32px;display:flex;flex-direction:column;gap:4px;justify-content:center}
@@ -30,6 +31,7 @@
   .logo-text{font-family:var(--mono);font-size:22px;font-weight:500;letter-spacing:-.5px}
   .logo-text span{color:var(--accent)}
   .tagline{font-size:12px;color:var(--text3);font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+
   .search-box{display:flex;gap:10px;margin-bottom:12px}
   .search-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-family:var(--mono);font-size:15px;color:var(--text);outline:none;transition:border-color .2s;text-transform:uppercase}
   .search-input::placeholder{color:var(--text3);text-transform:none}
@@ -38,20 +40,26 @@
   .search-btn:hover{opacity:.88}
   .search-btn:active{transform:scale(.98)}
   .search-btn:disabled{opacity:.4;cursor:not-allowed}
+
   .examples{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}
   .chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;transition:all .15s}
   .chip:hover{border-color:var(--accent);color:var(--text)}
+
   .loading{text-align:center;padding:60px 20px;display:none}
   .spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
   @keyframes spin{to{transform:rotate(360deg)}}
   .loading p{color:var(--text2);font-size:13px;font-family:var(--mono)}
+
   .error-msg{background:var(--red-bg);border:1px solid rgba(255,68,102,.25);border-radius:10px;padding:14px 18px;color:var(--red);font-size:13px;margin-bottom:20px;display:none;font-family:var(--mono);line-height:1.6}
   .cache-note{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 14px;margin-bottom:16px;font-family:var(--mono);font-size:11px;color:var(--text3);display:none}
+
   .report{display:none;animation:fadeUp .4s ease}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
   .report-header{margin-bottom:24px}
   .company-name{font-size:26px;font-weight:600;margin-bottom:4px}
   .report-meta{font-family:var(--mono);font-size:12px;color:var(--text3)}
+
   .diag-banner{border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:16px;border:1px solid}
   .diag-banner.green{background:var(--green-bg);border-color:rgba(0,232,122,.2)}
   .diag-banner.yellow{background:var(--yellow-bg);border-color:rgba(245,200,66,.2)}
@@ -63,9 +71,12 @@
   .diag-banner.yellow .diag-value{color:var(--yellow)}
   .diag-banner.red .diag-value{color:var(--red)}
   .diag-text{font-size:13px;color:var(--text2);line-height:1.6}
+
   .data-note{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 16px;margin-bottom:24px;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .data-note strong{color:var(--text2)}
+
   .section-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+
   .table-wrap{overflow-x:auto;margin-bottom:32px}
   table{width:100%;border-collapse:collapse;min-width:440px}
   th{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:400;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
@@ -77,11 +88,13 @@
   .ind-en{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
   .ind-val{font-family:var(--mono);font-weight:500;font-size:15px}
   .ind-param{font-family:var(--mono);font-size:11px;color:var(--text3)}
+
   .badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap}
   .badge.ok{background:var(--green-bg);color:var(--green)}
   .badge.warn{background:var(--yellow-bg);color:var(--yellow)}
   .badge.fail{background:var(--red-bg);color:var(--red)}
   .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
   .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px}
   @media(max-width:560px){.vgrid{grid-template-columns:1fr}}
   .vcard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
@@ -89,14 +102,7 @@
   .vcard a{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-bottom:3px}
   .vcard a:hover{text-decoration:underline}
   .vcard span{font-family:var(--mono);font-size:10px;color:var(--text3);display:block}
-  /* Debug panel */
-  .debug-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:24px;display:none}
-  .debug-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;cursor:pointer}
-  .debug-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-family:var(--mono);font-size:11px;max-height:300px;overflow-y:auto}
-  .debug-row{display:contents}
-  .debug-key{color:var(--text3);padding:2px 0}
-  .debug-val{color:var(--text2);padding:2px 0;word-break:break-all}
-  .debug-val.has-data{color:var(--green)}
+
   .footer{text-align:center;padding:32px 0 16px;font-family:var(--mono);font-size:11px;color:var(--text3)}
 </style>
 </head>
@@ -111,7 +117,7 @@
       </div>
       <div class="logo-text">Semáforo <span>NYSE</span></div>
     </div>
-    <div class="tagline">Análisis de Calidad de Activos · v9.0</div>
+    <div class="tagline">Análisis de Calidad de Activos · v10.0</div>
   </div>
 
   <div class="search-box">
@@ -134,212 +140,195 @@
   <div class="cache-note" id="cacheNote"></div>
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p id="loadTxt">Conectando con Alpha Vantage...</p>
+    <p id="loadTxt">Conectando con Finnhub...</p>
   </div>
-
-  <!-- Debug panel: shows all raw fields from Alpha Vantage -->
-  <div class="debug-panel" id="debugPanel">
-    <div class="debug-title" onclick="toggleDebug()">▶ Datos crudos de Alpha Vantage (clic para expandir/colapsar)</div>
-    <div class="debug-grid" id="debugGrid" style="display:none"></div>
-  </div>
-
   <div class="report" id="report"></div>
   <div class="footer">© 2026 Carlos Traseira · Todos los derechos reservados</div>
 </div>
 
 <script>
-const AV = 'TTJPEOBF6QOVHEV8';
+const FH = 'd72mft9r01qlfd9nph2gd72mft9r01qlfd9nph30';
+const FH_BASE = 'https://finnhub.io/api/v1';
 const CACHE_TTL = 24 * 60 * 60 * 1000;
-
-// Fields we care about — key = Alpha Vantage field name
-const FIELDS_OF_INTEREST = ['TrailingPE','ForwardPE','PERatio','PriceToBookRatio',
-  'ReturnOnEquityTTM','ReturnOnAssetsTTM','ProfitMargin','OperatingMarginTTM',
-  'DebtEquityRatio','DebtToEquityRatio','TotalDebt','BookValue',
-  'FreeCashflow','OperatingCashflowTTM','CapitalExpendituresTTM',
-  'EPS','EBITDA','GrossProfit','RevenueTTM','RevenuePerShareTTM'];
 
 function go(t){ document.getElementById('tickerInput').value = t; analyze(); }
 document.getElementById('tickerInput').addEventListener('keydown', e => { if(e.key==='Enter') analyze(); });
 
-const msgs = ['Conectando con Alpha Vantage...','Extrayendo indicadores...','Procesando datos...','Generando diagnóstico...'];
+const msgs = ['Conectando con Finnhub...','Extrayendo indicadores fundamentales...','Procesando datos...','Generando diagnóstico...'];
 let mi;
 function startLoad(){ let i=0; document.getElementById('loadTxt').textContent=msgs[0]; mi=setInterval(()=>{ i=(i+1)%msgs.length; document.getElementById('loadTxt').textContent=msgs[i]; },2000); }
 function stopLoad(){ clearInterval(mi); }
 function showErr(m){ const e=document.getElementById('err'); e.textContent=m; e.style.display='block'; }
 
-function cacheKey(t){ return `snse_v9_${t}`; }
+function cacheKey(t){ return `snse_v10_${t}`; }
 function getCache(t){
-  try{ const r=localStorage.getItem(cacheKey(t)); if(!r)return null; const o=JSON.parse(r); if(Date.now()-o.ts>CACHE_TTL){localStorage.removeItem(cacheKey(t));return null;} return o; }catch(e){return null;}
+  try{
+    const r=localStorage.getItem(cacheKey(t));
+    if(!r) return null;
+    const o=JSON.parse(r);
+    if(Date.now()-o.ts>CACHE_TTL){ localStorage.removeItem(cacheKey(t)); return null; }
+    return o;
+  }catch(e){ return null; }
 }
-function setCache(t,d){ try{localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d}));}catch(e){} }
+function setCache(t,d){ try{ localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d})); }catch(e){} }
 
 function toFloat(v){
-  if(v==null||v===''||v==='None'||v==='-'||v==='N/A'||v==='0') return null;
-  const n=parseFloat(v); return isNaN(n)?null:n;
+  if(v==null||v===''||v===0) return null;
+  const n=parseFloat(v);
+  return isNaN(n)||!isFinite(n) ? null : n;
 }
-
-function fmtPct(v){ return v!=null?v.toFixed(2)+'%':'N/D'; }
-function fmtX(v){ return v!=null?v.toFixed(2)+'x':'N/D'; }
+function fmtPct(v){ return v!=null ? v.toFixed(2)+'%' : 'N/D'; }
+function fmtX(v){ return v!=null ? v.toFixed(2)+'x' : 'N/D'; }
 function fmtM(v){
-  if(v==null)return'N/D';
-  const a=Math.abs(v),s=v<0?'– ':'';
-  if(a>=1e9)return s+(a/1e9).toFixed(2)+' mil mill. USD';
-  if(a>=1e6)return s+(a/1e6).toFixed(2)+' mill. USD';
+  if(v==null) return 'N/D';
+  const a=Math.abs(v), s=v<0?'– ':'';
+  if(a>=1e9) return s+(a/1e9).toFixed(2)+' mil mill. USD';
+  if(a>=1e6) return s+(a/1e6).toFixed(2)+' mill. USD';
   return s+(a/1e3).toFixed(1)+' mil USD';
 }
 function calcSt(val,thr,hib,wp=0.2){
-  if(val==null)return'warn';
-  if(hib)return val>=thr?'ok':val>=thr*(1-wp)?'warn':'fail';
-  return val<=thr?'ok':val<=thr*(1+wp)?'warn':'fail';
+  if(val==null) return 'warn';
+  if(hib) return val>=thr ? 'ok' : val>=thr*(1-wp) ? 'warn' : 'fail';
+  return val<=thr ? 'ok' : val<=thr*(1+wp) ? 'warn' : 'fail';
 }
 function buildDiagText(inds,pass,name){
   const fail=inds.filter(i=>i.s==='fail').map(i=>i.nameEs);
-  if(pass===5)return`${name} supera todos los parámetros de calidad. Negocio sólido, apto para la estrategia de cashflow con opciones.`;
-  if(pass===4)return`${name} cumple 4 de 5 parámetros. Punto débil: ${fail[0]||'un indicador'}. Apto para operar con cautela.`;
-  if(pass===3)return`${name} tiene resultado mixto. ${fail.join(' y ')} no alcanzan los parámetros mínimos. Requiere gestión de riesgo estricta.`;
-  return`${name} no cumple los parámetros mínimos (${fail.join(', ')}). No recomendable para la estrategia de cashflow en este momento.`;
+  if(pass===5) return `${name} supera todos los parámetros de calidad. Negocio sólido, apto para la estrategia de cashflow con opciones.`;
+  if(pass===4) return `${name} cumple 4 de 5 parámetros. Punto débil: ${fail[0]||'un indicador'}. Apto para operar con cautela.`;
+  if(pass===3) return `${name} tiene resultado mixto. ${fail.join(' y ')} no alcanzan los parámetros mínimos. Requiere gestión de riesgo estricta.`;
+  return `${name} no cumple los parámetros mínimos (${fail.join(', ')}). No recomendable para la estrategia de cashflow en este momento.`;
 }
 
-function toggleDebug(){
-  const g=document.getElementById('debugGrid');
-  const t=document.querySelector('.debug-title');
-  if(g.style.display==='none'){g.style.display='grid';t.textContent='▼ Datos crudos de Alpha Vantage (clic para colapsar)';}
-  else{g.style.display='none';t.textContent='▶ Datos crudos de Alpha Vantage (clic para expandir)';}
+async function fhGet(endpoint){
+  const sep = endpoint.includes('?') ? '&' : '?';
+  const r = await fetch(`${FH_BASE}${endpoint}${sep}token=${FH}`);
+  if(!r.ok) throw new Error(`Error ${r.status}`);
+  return r.json();
 }
 
-function showDebug(d){
-  const panel=document.getElementById('debugPanel');
-  const grid=document.getElementById('debugGrid');
-  grid.innerHTML='';
-  FIELDS_OF_INTEREST.forEach(k=>{
-    const v=d[k];
-    const hasData=v&&v!=='None'&&v!=='-'&&v!=='N/A'&&v!=='0';
-    grid.innerHTML+=`<div class="debug-key">${k}</div><div class="debug-val ${hasData?'has-data':''}">${v||'—'}</div>`;
-  });
-  panel.style.display='block';
+async function analyze(){
+  const raw = document.getElementById('tickerInput').value.trim().toUpperCase();
+  if(!raw) return;
+  const ticker = raw.split(/[\s,(]/)[0];
+
+  document.getElementById('err').style.display = 'none';
+  document.getElementById('cacheNote').style.display = 'none';
+  document.getElementById('report').style.display = 'none';
+  document.getElementById('btn').disabled = true;
+
+  // Check cache
+  const cached = getCache(ticker);
+  if(cached){
+    const mins = Math.round((Date.now()-cached.ts)/60000);
+    document.getElementById('cacheNote').textContent = `Datos en caché para ${ticker} — guardados hace ${mins} min. Se actualizan cada 24 horas.`;
+    document.getElementById('cacheNote').style.display = 'block';
+    document.getElementById('btn').disabled = false;
+    renderFromData(cached.data, ticker, true);
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'block';
+  startLoad();
+
+  try{
+    // Two parallel calls: profile + basic financials
+    const [profile, metrics] = await Promise.all([
+      fhGet(`/stock/profile2?symbol=${ticker}`),
+      fhGet(`/stock/metric?symbol=${ticker}&metric=all`)
+    ]);
+
+    if(!profile || !profile.name) throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
+
+    const combined = { profile, metrics: metrics.metric || {} };
+    setCache(ticker, combined);
+
+    stopLoad();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('btn').disabled = false;
+    renderFromData(combined, ticker, false);
+
+  }catch(e){
+    stopLoad();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('btn').disabled = false;
+    showErr(e.message || 'Error al analizar. Verificá el ticker e intentá de nuevo.');
+  }
 }
 
-function buildIndicators(d, ticker){
-  // Try multiple field name variants for each indicator
-  const peRaw = toFloat(d['TrailingPE']) || toFloat(d['PERatio']);
-  const pe = peRaw!=null && peRaw>500 ? null : peRaw; // filter ADR distortions
+function buildIndicators(data, ticker){
+  const m = data.metrics;
 
-  const roeRaw = toFloat(d['ReturnOnEquityTTM']);
-  // AV returns ROE as decimal (0.017) OR percentage (1.7) — detect which
-  const roe = roeRaw!=null ? (Math.abs(roeRaw)<2 ? roeRaw*100 : roeRaw) : null;
+  // P/E — Finnhub field: peBasicExclExtraTTM or peTTM
+  const pe = toFloat(m['peBasicExclExtraTTM']) || toFloat(m['peTTM']) || toFloat(m['peNormalizedAnnual']);
 
-  const marginRaw = toFloat(d['ProfitMargin']);
-  // AV returns margin as decimal (0.0003) OR percentage
-  const margin = marginRaw!=null ? (Math.abs(marginRaw)<2 ? marginRaw*100 : marginRaw) : null;
+  // ROE — Finnhub field: roeTTM (as percentage, e.g. 152.0)
+  const roe = toFloat(m['roeTTM']);
 
-  // Debt/Equity — AV field name is DebtEquityRatio, value already in % for some tickers
-  const deRaw = toFloat(d['DebtEquityRatio']) || toFloat(d['DebtToEquityRatio']);
-  // If value is very small (e.g. 0.98), it's a ratio → multiply by 100
-  const debtEq = deRaw!=null ? (deRaw<10 ? deRaw*100 : deRaw) : null;
+  // Net Profit Margin — Finnhub: netProfitMarginTTM (as percentage, e.g. 27.0)
+  const margin = toFloat(m['netProfitMarginTTM']);
 
-  // Free Cash Flow — direct field
-  const fcf = toFloat(d['FreeCashflow']) || toFloat(d['OperatingCashflowTTM']);
+  // Debt/Equity — Finnhub: totalDebt/totalEquityQuarterly (as ratio, e.g. 1.45 = 145%)
+  const deRaw = toFloat(m['totalDebt/totalEquityQuarterly']) || toFloat(m['totalDebt/totalEquityAnnual']);
+  const debtEq = deRaw != null ? deRaw * 100 : null;
+
+  // Free Cash Flow — Finnhub: freeCashFlowTTM (in millions) or freeCashFlowPerShareTTM
+  const fcfRaw = toFloat(m['freeCashFlowTTM']);
+  const fcf = fcfRaw != null ? fcfRaw * 1e6 : null; // convert millions to units
 
   return [
     {
-      nameEs:'Trailing P/E', nameEn:'Price/Earnings (ttm)',
-      value: fmtX(pe), raw:pe, param:'< 30x',
-      s: pe==null?'warn':calcSt(pe,30,false),
-      yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw:'Statistics → Valuation Measures → Trailing P/E'
+      nameEs: 'Trailing P/E', nameEn: 'Price/Earnings (ttm)',
+      value: fmtX(pe), raw: pe, param: '< 30x',
+      s: pe==null ? 'warn' : calcSt(pe, 30, false),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Valuation Measures → Trailing P/E'
     },
     {
-      nameEs:'ROE', nameEn:'Return on Equity (ttm)',
-      value: fmtPct(roe), raw:roe, param:'> 15%',
-      s: calcSt(roe,15,true),
-      yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw:'Statistics → Management Effectiveness → Return on Equity (ttm)'
+      nameEs: 'ROE', nameEn: 'Return on Equity (ttm)',
+      value: fmtPct(roe), raw: roe, param: '> 15%',
+      s: calcSt(roe, 15, true),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Management Effectiveness → Return on Equity (ttm)'
     },
     {
-      nameEs:'Profit Margin', nameEn:'Net Profit Margin (ttm)',
-      value: fmtPct(margin), raw:margin, param:'> 10%',
-      s: calcSt(margin,10,true),
-      yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw:'Statistics → Profitability → Profit Margin'
+      nameEs: 'Profit Margin', nameEn: 'Net Profit Margin (ttm)',
+      value: fmtPct(margin), raw: margin, param: '> 10%',
+      s: calcSt(margin, 10, true),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Profitability → Profit Margin'
     },
     {
-      nameEs:'Deuda / Patrimonio', nameEn:'Total Debt/Equity (mrq)',
-      value: debtEq!=null?debtEq.toFixed(2)+'%':'N/D', raw:debtEq, param:'< 100%',
-      s: calcSt(debtEq,100,false),
-      yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw:'Statistics → Balance Sheet → Total Debt/Equity (mrq)'
+      nameEs: 'Deuda / Patrimonio', nameEn: 'Total Debt/Equity (mrq)',
+      value: debtEq != null ? debtEq.toFixed(2)+'%' : 'N/D', raw: debtEq, param: '< 100%',
+      s: calcSt(debtEq, 100, false),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Balance Sheet → Total Debt/Equity (mrq)'
     },
     {
-      nameEs:'Free Cash Flow', nameEn:'Free Cash Flow (ttm)',
-      value: fmtM(fcf), raw:fcf, param:'Positivo',
-      s: fcf==null?'warn':(fcf>0?'ok':'fail'),
-      yu:`https://finance.yahoo.com/quote/${ticker}/financials/`,
-      yw:'Financials → Cash Flow → Free Cash Flow (TTM)'
+      nameEs: 'Free Cash Flow', nameEn: 'Free Cash Flow (ttm)',
+      value: fmtM(fcf), raw: fcf, param: 'Positivo',
+      s: fcf==null ? 'warn' : (fcf>0 ? 'ok' : 'fail'),
+      yu: `https://finance.yahoo.com/quote/${ticker}/financials/`,
+      yw: 'Financials → Cash Flow → Free Cash Flow (TTM)'
     }
   ];
 }
 
-async function analyze(){
-  const raw=document.getElementById('tickerInput').value.trim().toUpperCase();
-  if(!raw)return;
-  const ticker=raw.split(/[\s,(]/)[0];
+function renderFromData(data, ticker, fromCache){
+  const inds = buildIndicators(data, ticker);
+  const pass = inds.filter(i=>i.s==='ok').length;
+  const p = data.profile;
+  const name = p.name || ticker;
 
-  document.getElementById('err').style.display='none';
-  document.getElementById('cacheNote').style.display='none';
-  document.getElementById('report').style.display='none';
-  document.getElementById('debugPanel').style.display='none';
-  document.getElementById('btn').disabled=true;
+  let dLabel, dColor, dIcon;
+  if(pass===5){ dLabel='SÍ (A+)'; dColor='green'; dIcon='🟢'; }
+  else if(pass===4){ dLabel='SÍ (A)'; dColor='green'; dIcon='🟢'; }
+  else if(pass===3){ dLabel='CONDICIONAL'; dColor='yellow'; dIcon='🟡'; }
+  else{ dLabel='NO'; dColor='red'; dIcon='🔴'; }
 
-  const cached=getCache(ticker);
-  if(cached){
-    document.getElementById('cacheNote').textContent=`Datos en caché para ${ticker} — guardados hace ${Math.round((Date.now()-cached.ts)/60000)} min. Se actualizan cada 24 horas.`;
-    document.getElementById('cacheNote').style.display='block';
-    document.getElementById('btn').disabled=false;
-    showDebug(cached.data);
-    renderFromData(cached.data,ticker,true);
-    return;
-  }
+  const sl = { ok:'CUMPLE', warn:'LÍMITE', fail:'NO CUMPLE' };
 
-  document.getElementById('loading').style.display='block';
-  startLoad();
-
-  try{
-    const url=`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=${AV}`;
-    const res=await fetch(url);
-    if(!res.ok)throw new Error(`Error de conexión (${res.status})`);
-    const d=await res.json();
-
-    if(d['Information'])throw new Error('Límite diario de consultas alcanzado (25/día en plan gratuito). Los datos en caché siguen disponibles para tickers ya consultados hoy.');
-    if(d['Error Message']||!d['Symbol'])throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
-
-    setCache(ticker,d);
-    stopLoad();
-    document.getElementById('loading').style.display='none';
-    document.getElementById('btn').disabled=false;
-    showDebug(d);
-    renderFromData(d,ticker,false);
-
-  }catch(e){
-    stopLoad();
-    document.getElementById('loading').style.display='none';
-    document.getElementById('btn').disabled=false;
-    showErr(e.message||'Error al analizar. Verificá el ticker e intentá de nuevo.');
-  }
-}
-
-function renderFromData(d,ticker,fromCache){
-  const inds=buildIndicators(d,ticker);
-  const pass=inds.filter(i=>i.s==='ok').length;
-  const name=d['Name']||ticker;
-
-  let dLabel,dColor,dIcon;
-  if(pass===5){dLabel='SÍ (A+)';dColor='green';dIcon='🟢';}
-  else if(pass===4){dLabel='SÍ (A)';dColor='green';dIcon='🟢';}
-  else if(pass===3){dLabel='CONDICIONAL';dColor='yellow';dIcon='🟡';}
-  else{dLabel='NO';dColor='red';dIcon='🔴';}
-
-  const sl={ok:'CUMPLE',warn:'LÍMITE',fail:'NO CUMPLE'};
-  const rows=inds.map(i=>`
+  const rows = inds.map(i=>`
     <tr>
       <td><div class="ind-name">${i.nameEs}</div><div class="ind-en">${i.nameEn}</div></td>
       <td class="ind-val">${i.value}</td>
@@ -347,18 +336,21 @@ function renderFromData(d,ticker,fromCache){
       <td><span class="badge ${i.s}"><span class="dot"></span>${sl[i.s]}</span></td>
     </tr>`).join('');
 
-  const vcards=inds.map(i=>`
+  const vcards = inds.map(i=>`
     <div class="vcard">
       <div class="vcard-name">${i.nameEs}</div>
       <a href="${i.yu}" target="_blank" rel="noopener">Verificar en Yahoo Finance ↗</a>
       <span>${i.yw}</span>
     </div>`).join('');
 
-  document.getElementById('report').innerHTML=`
+  const dateStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  document.getElementById('report').innerHTML = `
     <div class="report-header">
       <div class="company-name">${name} <span style="color:var(--text3);font-size:16px;font-family:var(--mono)">(${ticker})</span></div>
-      <div class="report-meta">${d['Exchange']||''}${d['Sector']?' · '+d['Sector']:''}${d['Country']?' · '+d['Country']:''} · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
+      <div class="report-meta">${p.exchange||''}${p.finnhubIndustry?' · '+p.finnhubIndustry:''}${p.country?' · '+p.country:''} · ${dateStr}</div>
     </div>
+
     <div class="diag-banner ${dColor}">
       <div class="diag-icon">${dIcon}</div>
       <div>
@@ -367,7 +359,11 @@ function renderFromData(d,ticker,fromCache){
         <div class="diag-text">${buildDiagText(inds,pass,name)}</div>
       </div>
     </div>
-    <div class="data-note">📡 <span>Datos: <strong>Alpha Vantage API</strong> · Verificación: <strong>Yahoo Finance</strong> (ver guía abajo)${fromCache?' · <em>Datos en caché</em>':''}</span></div>
+
+    <div class="data-note">
+      📡 <span>Datos: <strong>Finnhub API</strong> · Verificación: <strong>Yahoo Finance</strong> (ver guía abajo)${fromCache?' · <em>Datos en caché</em>':''}</span>
+    </div>
+
     <div class="section-label">Filtro de Calidad — 5 Indicadores Fundamentales</div>
     <div class="table-wrap">
       <table>
@@ -375,11 +371,13 @@ function renderFromData(d,ticker,fromCache){
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <div class="section-label">Guía de Verificación en Yahoo Finance</div>
-    <div class="vgrid">${vcards}</div>`;
 
-  document.getElementById('report').style.display='block';
-  document.getElementById('report').scrollIntoView({behavior:'smooth',block:'start'});
+    <div class="section-label">Guía de Verificación en Yahoo Finance</div>
+    <div class="vgrid">${vcards}</div>
+  `;
+
+  document.getElementById('report').style.display = 'block';
+  document.getElementById('report').scrollIntoView({behavior:'smooth', block:'start'});
 }
 </script>
 </body>
