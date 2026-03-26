@@ -1,150 +1,190 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Semáforo NYSE</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0f'/><rect x='10' y='4' width='12' height='7' rx='2' fill='%2300e87a'/><rect x='10' y='13' width='9' height='7' rx='2' fill='%23f5c842'/><rect x='10' y='22' width='6' height='6' rx='2' fill='%23ff4466'/></svg>">
+<title>Semáforo NYSE · Premium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
-  :root {
-    --bg:#0a0a0f;--surface:#111118;--surface2:#1a1a24;--border:#2a2a3a;
-    --text:#e8e8f0;--text2:#8888a8;--text3:#4a4a6a;
-    --green:#00e87a;--green-bg:rgba(0,232,122,0.08);
-    --yellow:#f5c842;--yellow-bg:rgba(245,200,66,0.08);
-    --red:#ff4466;--red-bg:rgba(255,68,102,0.08);
-    --accent:#6366f1;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
-  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-  .app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 20px}
+:root{
+  --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--s3:#202030;--border:#252535;
+  --text:#f0f0f8;--text2:#8888aa;--text3:#454560;
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.1);--green-glow:rgba(0,255,136,0.3);
+  --amber:#ffb840;--amber-dim:rgba(255,184,64,0.1);
+  --red:#ff4070;--red-dim:rgba(255,64,112,0.1);
+  --purple:#a855f7;--blue:#60a5fa;
+  --display:'Syne',sans-serif;--mono:'Fira Code',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh}
 
-  .header{text-align:center;margin-bottom:48px}
-  .logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
-  .logo-icon{width:32px;height:32px;display:flex;flex-direction:column;gap:4px;justify-content:center}
-  .logo-dot{height:7px;border-radius:2px}
-  .logo-dot.g{background:var(--green);width:100%}
-  .logo-dot.y{background:var(--yellow);width:70%}
-  .logo-dot.r{background:var(--red);width:45%}
-  .logo-text{font-family:var(--mono);font-size:22px;font-weight:500;letter-spacing:-.5px}
-  .logo-text span{color:var(--accent)}
-  .tagline{font-size:12px;color:var(--text3);font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+/* mesh gradient bg */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(99,102,241,0.06) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(0,255,136,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
 
-  .search-box{display:flex;gap:10px;margin-bottom:12px}
-  .search-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-family:var(--mono);font-size:15px;color:var(--text);outline:none;transition:border-color .2s;text-transform:uppercase}
-  .search-input::placeholder{color:var(--text3);text-transform:none}
-  .search-input:focus{border-color:var(--accent)}
-  .search-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:14px 28px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;white-space:nowrap}
-  .search-btn:hover{opacity:.88}
-  .search-btn:active{transform:scale(.98)}
-  .search-btn:disabled{opacity:.4;cursor:not-allowed}
+.app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:32px 20px 80px}
 
-  .examples{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}
-  .chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;transition:all .15s}
-  .chip:hover{border-color:var(--accent);color:var(--text)}
+/* HEADER */
+.header{text-align:center;margin-bottom:48px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}
+.logo-lights{display:flex;gap:6px;align-items:center}
+.ll{width:14px;height:14px;border-radius:50%}
+.ll.g{background:var(--green);box-shadow:0 0 12px var(--green-glow)}
+.ll.a{background:var(--amber)}
+.ll.r{background:var(--red)}
+.logo-name{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.03em}
+.logo-name span{color:var(--green)}
+.logo-tag{font-family:var(--mono);font-size:12px;color:var(--text3);letter-spacing:.16em;text-transform:uppercase}
 
-  .loading{text-align:center;padding:60px 20px;display:none}
-  .spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading p{color:var(--text2);font-size:13px;font-family:var(--mono)}
+/* SEARCH */
+.search-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.search-label{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.search-row{display:flex;gap:10px}
+.search-input{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;letter-spacing:.06em;text-transform:uppercase;transition:border-color .2s,box-shadow .2s}
+.search-input::placeholder{color:var(--text3);text-transform:none;font-weight:400;font-size:14px}
+.search-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.1)}
+.search-btn{background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:16px 26px;font-family:var(--display);font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
+.search-btn:hover{opacity:.88}
+.search-btn:active{transform:scale(.97)}
+.search-btn:disabled{opacity:.3;cursor:not-allowed}
 
-  .error-msg{background:var(--red-bg);border:1px solid rgba(255,68,102,.25);border-radius:10px;padding:14px 18px;color:var(--red);font-size:13px;margin-bottom:20px;display:none;font-family:var(--mono);line-height:1.6}
-  .cache-note{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 14px;margin-bottom:16px;font-family:var(--mono);font-size:11px;color:var(--text3);display:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--green);color:var(--green)}
 
-  .report{display:none;animation:fadeUp .4s ease}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* LOADING */
+.loading{display:none;text-align:center;padding:60px 20px}
+.spinner{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-family:var(--mono);font-size:13px;color:var(--text3)}
 
-  .report-header{margin-bottom:24px}
-  .company-name{font-size:26px;font-weight:600;margin-bottom:4px}
-  .report-meta{font-family:var(--mono);font-size:12px;color:var(--text3)}
+/* ERROR / CACHE */
+.error-msg{display:none;background:var(--red-dim);border:1px solid rgba(255,64,112,.3);border-radius:10px;padding:14px 18px;font-family:var(--mono);font-size:14px;color:var(--red);margin-bottom:16px;line-height:1.6}
+.cache-note{display:none;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:12px}
 
-  .diag-banner{border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:16px;border:1px solid}
-  .diag-banner.green{background:var(--green-bg);border-color:rgba(0,232,122,.2)}
-  .diag-banner.yellow{background:var(--yellow-bg);border-color:rgba(245,200,66,.2)}
-  .diag-banner.red{background:var(--red-bg);border-color:rgba(255,68,102,.2)}
-  .diag-icon{font-size:28px;margin-top:2px}
-  .diag-label{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
-  .diag-value{font-size:20px;font-weight:600;margin-bottom:6px}
-  .diag-banner.green .diag-value{color:var(--green)}
-  .diag-banner.yellow .diag-value{color:var(--yellow)}
-  .diag-banner.red .diag-value{color:var(--red)}
-  .diag-text{font-size:13px;color:var(--text2);line-height:1.6}
+/* REPORT */
+.report{display:none;animation:up .4s ease}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-  .data-note{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 16px;margin-bottom:24px;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .data-note strong{color:var(--text2)}
+/* Company header */
+.co-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:16px}
+.co-eyebrow{font-family:var(--mono);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px}
+.co-name{font-size:clamp(26px,5vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.co-ticker{color:var(--green);font-size:70%}
+.co-meta{font-family:var(--mono);font-size:12px;color:var(--text3);margin-top:6px}
 
-  .section-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+/* Verdict */
+.verdict-card{border-radius:16px;padding:28px;margin-bottom:16px;border:1px solid;position:relative;overflow:hidden}
+.verdict-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;opacity:.15;filter:blur(40px)}
+.verdict-card.ok{background:var(--green-dim);border-color:rgba(0,255,136,.25)}
+.verdict-card.ok::before{background:var(--green)}
+.verdict-card.warn{background:var(--amber-dim);border-color:rgba(255,184,64,.25)}
+.verdict-card.warn::before{background:var(--amber)}
+.verdict-card.fail{background:var(--red-dim);border-color:rgba(255,64,112,.25)}
+.verdict-card.fail::before{background:var(--red)}
+.verdict-inner{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.verdict-score-wrap{text-align:center}
+.verdict-score{font-size:56px;font-weight:800;line-height:1}
+.verdict-card.ok .verdict-score{color:var(--green)}
+.verdict-card.warn .verdict-score{color:var(--amber)}
+.verdict-card.fail .verdict-score{color:var(--red)}
+.verdict-of{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em}
+.verdict-info{flex:1;min-width:200px}
+.verdict-eyebrow{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px}
+.verdict-title{font-size:clamp(20px,4vw,28px);font-weight:800;margin-bottom:8px}
+.verdict-card.ok .verdict-title{color:var(--green)}
+.verdict-card.warn .verdict-title{color:var(--amber)}
+.verdict-card.fail .verdict-title{color:var(--red)}
+.verdict-desc{font-size:15px;color:var(--text2);line-height:1.7;font-weight:400}
 
-  .table-wrap{overflow-x:auto;margin-bottom:16px}
-  table{width:100%;border-collapse:collapse;min-width:500px}
-  th{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:400;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
-  td{padding:13px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
-  tr{background:var(--surface)}
-  tr:hover{background:var(--surface2)}
-  tr:last-child td{border-bottom:none}
-  .ind-name{font-weight:500;font-size:13px}
-  .ind-en{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
-  .ind-val{font-family:var(--mono);font-weight:500;font-size:15px}
-  .ind-param{font-family:var(--mono);font-size:11px;color:var(--text3)}
-  .ind-source{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px;opacity:0.7}
+/* Source bar */
+.source-bar{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:24px;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;gap:14px;flex-wrap:wrap}
+.source-bar strong{color:var(--text2)}
 
-  .badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap}
-  .badge.ok{background:var(--green-bg);color:var(--green)}
-  .badge.warn{background:var(--yellow-bg);color:var(--yellow)}
-  .badge.fail{background:var(--red-bg);color:var(--red)}
-  .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+/* INDICATOR CARDS — stacked, not table */
+.sec-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.18em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
 
-  /* Dividend yield info card */
-  .div-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-  .div-card-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
-  .div-card-val{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text)}
-  .div-card-note{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.5;flex:1;min-width:200px}
-  .div-icon{font-size:24px}
+.ind-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.ind-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;transition:border-color .15s}
+.ind-card:hover{border-color:var(--s3)}
+.ind-card.ok{border-left:3px solid var(--green)}
+.ind-card.warn{border-left:3px solid var(--amber)}
+.ind-card.fail{border-left:3px solid var(--red)}
+.ind-name{font-size:17px;font-weight:700;margin-bottom:2px}
+.ind-en{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.ind-source-tag{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px}
+.ind-center{text-align:center;padding:0 12px;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.ind-val{font-family:var(--mono);font-size:22px;font-weight:600;white-space:nowrap}
+.ind-val.nd{color:var(--text3);font-size:14px;max-width:180px;white-space:normal;line-height:1.4}
+.ind-val-note{font-family:var(--mono);font-size:10px;color:var(--amber);margin-top:3px}
+.ind-param-wrap{text-align:right}
+.ind-param{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px}
 
-  .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px}
-  @media(max-width:560px){.vgrid{grid-template-columns:1fr}}
-  .vcard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
-  .vcard-name{font-weight:500;font-size:13px;margin-bottom:4px}
-  .vcard a{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-bottom:3px}
-  .vcard a:hover{text-decoration:underline}
-  .vcard span{font-family:var(--mono);font-size:10px;color:var(--text3);display:block}
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;white-space:nowrap}
+.badge.ok{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,255,136,.25)}
+.badge.warn{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(255,184,64,.25)}
+.badge.fail{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,64,112,.25)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
 
-  /* FCF method note */
-  .fcf-note{font-family:var(--mono);font-size:9px;color:var(--text3);padding:6px 14px 10px;opacity:0.7;border-bottom:1px solid rgba(255,255,255,.03)}
+.fcf-note{font-family:var(--mono);font-size:11px;color:var(--text3);padding:6px 0 16px;opacity:.7}
 
-  .footer{text-align:center;padding:32px 0 16px;font-family:var(--mono);font-size:11px;color:var(--text3)}
+/* Dividend card */
+.div-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap}
+.div-icon{font-size:28px}
+.div-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+.div-val{font-size:28px;font-weight:800;color:var(--text)}
+.div-note{font-family:var(--mono);font-size:13px;color:var(--text2);flex:1;min-width:200px;line-height:1.7}
+
+/* Verify grid */
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:32px}
+@media(max-width:540px){.vgrid{grid-template-columns:1fr}}
+.vcard{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.vcard-name{font-size:15px;font-weight:700;margin-bottom:6px}
+.vcard a{font-family:var(--mono);font-size:11px;color:var(--green);text-decoration:none;display:block;margin-bottom:4px}
+.vcard a:hover{text-decoration:underline}
+.vcard span{font-family:var(--mono);font-size:10px;color:var(--text3);display:block;line-height:1.6}
+
+@media(max-width:600px){
+  .ind-card{grid-template-columns:1fr;gap:14px}
+  .ind-center{border:none;border-top:1px solid var(--border);padding:10px 0 0;text-align:left}
+  .ind-param-wrap{text-align:left}
+  .verdict-inner{gap:14px}
+  .verdict-score{font-size:44px}
+}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="header">
-    <div class="logo">
-      <div class="logo-icon">
-        <div class="logo-dot g"></div>
-        <div class="logo-dot y"></div>
-        <div class="logo-dot r"></div>
+    <div class="logo-row">
+      <div class="logo-lights">
+        <div class="ll g"></div>
+        <div class="ll a"></div>
+        <div class="ll r"></div>
       </div>
-      <div class="logo-text">Semáforo <span>NYSE</span></div>
+      <div class="logo-name">Semáforo <span>NYSE</span></div>
     </div>
-    <div class="tagline">Análisis de Calidad de Activos · v11.0</div>
+    <div class="logo-tag">Filtro de Calidad Institucional · v11</div>
   </div>
 
-  <div class="search-box">
-    <input class="search-input" id="tickerInput" type="text" placeholder="Ingresá el ticker (ej: AAPL, BP, GOLD)" autocomplete="off"/>
-    <button class="search-btn" id="btn" onclick="analyze()">Analizar</button>
-  </div>
-
-  <div class="examples">
-    <span class="chip" onclick="go('AAPL')">AAPL</span>
-    <span class="chip" onclick="go('BP')">BP</span>
-    <span class="chip" onclick="go('B')">B · Barrick</span>
-    <span class="chip" onclick="go('MSFT')">MSFT</span>
-    <span class="chip" onclick="go('NVDA')">NVDA</span>
-    <span class="chip" onclick="go('KO')">KO · Coca-Cola</span>
-    <span class="chip" onclick="go('JNJ')">JNJ</span>
-    <span class="chip" onclick="go('XOM')">XOM · ExxonMobil</span>
+  <div class="search-card">
+    <div class="search-label">Ticker Symbol</div>
+    <div class="search-row">
+      <input class="search-input" id="tickerInput" type="text" placeholder="ej: AAPL, MSFT, KO..." autocomplete="off"/>
+      <button class="search-btn" id="btn" onclick="analyze()">Analizar</button>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="go('AAPL')">AAPL</span>
+      <span class="chip" onclick="go('BP')">BP</span>
+      <span class="chip" onclick="go('B')">B · Barrick</span>
+      <span class="chip" onclick="go('MSFT')">MSFT</span>
+      <span class="chip" onclick="go('NVDA')">NVDA</span>
+      <span class="chip" onclick="go('KO')">KO</span>
+      <span class="chip" onclick="go('JNJ')">JNJ</span>
+      <span class="chip" onclick="go('XOM')">XOM</span>
+    </div>
   </div>
 
   <div class="error-msg" id="err"></div>
@@ -154,325 +194,132 @@
     <p id="loadTxt">Conectando con Finnhub...</p>
   </div>
   <div class="report" id="report"></div>
-  <div class="footer">© 2026 Carlos Traseira · Todos los derechos reservados</div>
 </div>
 
 <script>
-const FH = 'd72mft9r01qlfd9nph2gd72mft9r01qlfd9nph30';
-const FH_BASE = 'https://finnhub.io/api/v1';
-const CACHE_TTL = 24 * 60 * 60 * 1000;
-
-function go(t){ document.getElementById('tickerInput').value = t; analyze(); }
-document.getElementById('tickerInput').addEventListener('keydown', e => { if(e.key==='Enter') analyze(); });
-
-const msgs = ['Conectando con Finnhub...','Extrayendo indicadores fundamentales...','Procesando datos...','Generando diagnóstico...'];
+const FH='d72mft9r01qlfd9nph2gd72mft9r01qlfd9nph30';
+const FH_BASE='https://finnhub.io/api/v1';
+const CACHE_TTL=24*60*60*1000;
+function go(t){document.getElementById('tickerInput').value=t;analyze();}
+document.getElementById('tickerInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyze();});
+const msgs=['Conectando con Finnhub...','Extrayendo fundamentales...','Procesando datos...','Generando diagnóstico...'];
 let mi;
-function startLoad(){ let i=0; document.getElementById('loadTxt').textContent=msgs[0]; mi=setInterval(()=>{ i=(i+1)%msgs.length; document.getElementById('loadTxt').textContent=msgs[i]; },2000); }
-function stopLoad(){ clearInterval(mi); }
-function showErr(m){ const e=document.getElementById('err'); e.textContent=m; e.style.display='block'; }
-
-function cacheKey(t){ return `snse_v11_${t}`; }
-function getCache(t){
-  try{
-    const r=localStorage.getItem(cacheKey(t));
-    if(!r) return null;
-    const o=JSON.parse(r);
-    if(Date.now()-o.ts>CACHE_TTL){ localStorage.removeItem(cacheKey(t)); return null; }
-    return o;
-  }catch(e){ return null; }
+function startLoad(){let i=0;document.getElementById('loadTxt').textContent=msgs[0];mi=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('loadTxt').textContent=msgs[i];},2000);}
+function stopLoad(){clearInterval(mi);}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';}
+function cacheKey(t){return`snse_v11_${t}`;}
+function getCache(t){try{const r=localStorage.getItem(cacheKey(t));if(!r)return null;const o=JSON.parse(r);if(Date.now()-o.ts>CACHE_TTL){localStorage.removeItem(cacheKey(t));return null;}return o;}catch(e){return null;}}
+function setCache(t,d){try{localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d}));}catch(e){}}
+function toFloat(v){if(v==null||v==='')return null;const n=parseFloat(v);return isNaN(n)||!isFinite(n)?null:n;}
+function fmtPct(v){return v!=null?v.toFixed(2)+'%':null;}
+function fmtX(v){return v!=null?v.toFixed(2)+'x':null;}
+function fmtM(v){if(v==null)return null;const a=Math.abs(v),s=v<0?'− ':'+  ';if(a>=1e12)return s+(a/1e12).toFixed(2)+' T USD';if(a>=1e9)return s+(a/1e9).toFixed(2)+' B USD';if(a>=1e6)return s+(a/1e6).toFixed(2)+' M USD';return s+(a/1e3).toFixed(1)+' K USD';}
+function sanitizePE(v){if(v==null)return{val:null,distorted:false};if(v>500||v<0)return{val:null,distorted:true};return{val:v,distorted:false};}
+function buildIndicators(data,ticker){
+  const m=data.metrics;
+  const rawPE=toFloat(m['peBasicExclExtraTTM'])??toFloat(m['peTTM'])??toFloat(m['peNormalizedAnnual']);
+  const{val:pe,distorted:peDistorted}=sanitizePE(rawPE);
+  const roe=toFloat(m['roeTTM']);
+  const margin=toFloat(m['netProfitMarginTTM']);
+  const deRaw=toFloat(m['totalDebt/totalEquityQuarterly'])??toFloat(m['totalDebt/totalEquityAnnual']);
+  const debtEq=deRaw!=null?deRaw*100:null;
+  const cfo=toFloat(m['cashFlowFromOperationsTTM']);
+  const capex=toFloat(m['capexTTM']);
+  let fcf=null,fcfMethod='';
+  if(cfo!=null&&capex!=null){fcf=cfo+capex;fcfMethod='CFO − CapEx (TTM)';}
+  else if(cfo!=null){fcf=cfo;fcfMethod='CFO TTM (CapEx no disponible)';}
+  const divYield=toFloat(m['dividendYieldIndicatedAnnual']);
+  const inds=[
+    {nameEs:'Trailing P/E',nameEn:'Price / Earnings (TTM)',display:peDistorted?{text:'N/D',nd:true,note:'Dato distorsionado — impairment o pérdida puntual'}:{text:fmtX(pe)??'N/D',nd:pe==null},raw:pe,param:'< 25x',paramDesc:'S&P 500 hist. ~17x · Buffett compró AAPL a 10-11x',s:peDistorted?'warn':(pe==null?'warn':(pe<=25?'ok':pe<=30?'warn':'fail')),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics → Valuation → Trailing P/E'},
+    {nameEs:'ROE',nameEn:'Return on Equity (TTM)',display:{text:fmtPct(roe)??'N/D',nd:roe==null},raw:roe,param:'> 15%',paramDesc:'Umbral Buffett 1987 · KO y JNJ >25% histórico',s:roe==null?'warn':(roe>=15?'ok':roe>=12?'warn':'fail'),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics → Management Effectiveness → ROE'},
+    {nameEs:'Profit Margin',nameEn:'Net Profit Margin (TTM)',display:{text:fmtPct(margin)??'N/D',nd:margin==null},raw:margin,param:'> 10%',paramDesc:'Piso institucional · Buffett ideal >20%',s:margin==null?'warn':(margin>=10?'ok':margin>=7?'warn':'fail'),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics → Profitability → Profit Margin'},
+    {nameEs:'Deuda / Patrimonio',nameEn:'Total Debt / Equity (mrq)',display:{text:debtEq!=null?debtEq.toFixed(1)+'%':'N/D',nd:debtEq==null},raw:debtEq,param:'< 100%',paramDesc:'Buffett ideal <50% · tope institucional 100%',s:debtEq==null?'warn':(debtEq<=100?'ok':debtEq<=120?'warn':'fail'),yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,yw:'Statistics → Balance Sheet → Debt/Equity'},
+    {nameEs:'Free Cash Flow',nameEn:'Free Cash Flow (TTM)',display:{text:fmtM(fcf)??'N/D · No disponible en Finnhub para este ticker',nd:fcf==null},raw:fcf,param:'Positivo',paramDesc:'FCF = CFO − CapEx · Buffett: "el cash no se falsifica"',fcfMethod,s:fcf==null?'warn':(fcf>0?'ok':'fail'),yu:`https://finance.yahoo.com/quote/${ticker}/financials/`,yw:'Financials → Cash Flow → Free Cash Flow'}
+  ];
+  return{inds,divYield};
 }
-function setCache(t,d){ try{ localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d})); }catch(e){} }
-
-function toFloat(v){
-  if(v==null||v==='') return null;
-  const n=parseFloat(v);
-  return isNaN(n)||!isFinite(n) ? null : n;
-}
-function fmtPct(v){ return v!=null ? v.toFixed(2)+'%' : 'N/D'; }
-function fmtX(v){ return v!=null ? v.toFixed(2)+'x' : 'N/D'; }
-function fmtM(v){
-  if(v==null) return 'N/D';
-  const a=Math.abs(v), s=v<0?'– ':'+ ';
-  if(a>=1e12) return s+(a/1e12).toFixed(2)+' T USD';
-  if(a>=1e9)  return s+(a/1e9).toFixed(2)+' B USD';
-  if(a>=1e6)  return s+(a/1e6).toFixed(2)+' M USD';
-  return s+(a/1e3).toFixed(1)+' K USD';
-}
-function calcSt(val,thr,higherIsBetter,warnPct=0.2){
-  if(val==null) return 'warn';
-  if(higherIsBetter) return val>=thr ? 'ok' : val>=thr*(1-warnPct) ? 'warn' : 'fail';
-  return val<=thr ? 'ok' : val<=thr*(1+warnPct) ? 'warn' : 'fail';
-}
-function buildDiagText(inds, pass, name){
-  const failing = inds.filter(i=>i.s==='fail').map(i=>i.nameEs);
-  const warning  = inds.filter(i=>i.s==='warn').map(i=>i.nameEs);
-  if(pass===5) return `${name} supera los 5 parámetros de calidad Buffett/institucional. Negocio sólido con ventaja competitiva demostrable, apto para la estrategia de cashflow con opciones.`;
-  if(pass===4) return `${name} cumple 4 de 5 parámetros. Punto a vigilar: ${warning[0]||failing[0]||'un indicador'}. Apto con gestión de riesgo estándar.`;
-  if(pass===3) return `${name} tiene resultado mixto. ${failing.join(' y ')} no alcanzan los umbrales institucionales. Requiere gestión de riesgo estricta y análisis adicional.`;
-  return `${name} no cumple los parámetros mínimos de calidad (${failing.join(', ')}). No recomendable para la estrategia de cashflow en este momento.`;
-}
-
-async function fhGet(endpoint){
-  const sep = endpoint.includes('?') ? '&' : '?';
-  const r = await fetch(`${FH_BASE}${endpoint}${sep}token=${FH}`);
-  if(!r.ok) throw new Error(`Error ${r.status}`);
-  return r.json();
-}
-
+async function fhGet(ep){const sep=ep.includes('?')?'&':'?';const r=await fetch(`${FH_BASE}${ep}${sep}token=${FH}`);if(!r.ok)throw new Error(`Error ${r.status}`);return r.json();}
 async function analyze(){
-  const raw = document.getElementById('tickerInput').value.trim().toUpperCase();
-  if(!raw) return;
-  const ticker = raw.split(/[\s,(]/)[0];
-
-  document.getElementById('err').style.display = 'none';
-  document.getElementById('cacheNote').style.display = 'none';
-  document.getElementById('report').style.display = 'none';
-  document.getElementById('btn').disabled = true;
-
-  const cached = getCache(ticker);
-  if(cached){
-    const mins = Math.round((Date.now()-cached.ts)/60000);
-    document.getElementById('cacheNote').textContent = `Datos en caché para ${ticker} — guardados hace ${mins} min. Se actualizan cada 24 horas.`;
-    document.getElementById('cacheNote').style.display = 'block';
-    document.getElementById('btn').disabled = false;
-    renderFromData(cached.data, ticker, true);
-    return;
-  }
-
-  document.getElementById('loading').style.display = 'block';
-  startLoad();
-
+  const raw=document.getElementById('tickerInput').value.trim().toUpperCase();
+  if(!raw)return;
+  const ticker=raw.split(/[\s,(]/)[0];
+  document.getElementById('err').style.display='none';document.getElementById('cacheNote').style.display='none';document.getElementById('report').style.display='none';document.getElementById('btn').disabled=true;
+  const cached=getCache(ticker);
+  if(cached){const mins=Math.round((Date.now()-cached.ts)/60000);document.getElementById('cacheNote').textContent=`Datos en caché para ${ticker} — ${mins} min.`;document.getElementById('cacheNote').style.display='block';document.getElementById('btn').disabled=false;render(cached.data,ticker,true);return;}
+  document.getElementById('loading').style.display='block';startLoad();
   try{
-    const [profile, metrics] = await Promise.all([
-      fhGet(`/stock/profile2?symbol=${ticker}`),
-      fhGet(`/stock/metric?symbol=${ticker}&metric=all`)
-    ]);
-
-    if(!profile || !profile.name) throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
-
-    const combined = { profile, metrics: metrics.metric || {} };
-    setCache(ticker, combined);
-
-    stopLoad();
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('btn').disabled = false;
-    renderFromData(combined, ticker, false);
-
-  }catch(e){
-    stopLoad();
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('btn').disabled = false;
-    showErr(e.message || 'Error al analizar. Verificá el ticker e intentá de nuevo.');
-  }
+    const[profile,metrics]=await Promise.all([fhGet(`/stock/profile2?symbol=${ticker}`),fhGet(`/stock/metric?symbol=${ticker}&metric=all`)]);
+    if(!profile||!profile.name)throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido.`);
+    const d={profile,metrics:metrics.metric||{}};setCache(ticker,d);stopLoad();document.getElementById('loading').style.display='none';document.getElementById('btn').disabled=false;render(d,ticker,false);
+  }catch(e){stopLoad();document.getElementById('loading').style.display='none';document.getElementById('btn').disabled=false;showErr(e.message||'Error al analizar.');}
 }
-
-// ─────────────────────────────────────────────────────────────
-// INDICADORES — set v11 (Buffett/institucional, 5 filtros)
-// ─────────────────────────────────────────────────────────────
-function buildIndicators(data, ticker){
-  const m = data.metrics;
-
-  // 1. TRAILING P/E
-  // Benchmark: < 25x. S&P 500 histórico ~17x; Buffett compró AAPL a 10-11x.
-  // Zona amarilla: 25–30x. Rojo: > 30x.
-  const pe = toFloat(m['peBasicExclExtraTTM']) ?? toFloat(m['peTTM']) ?? toFloat(m['peNormalizedAnnual']);
-
-  // 2. ROE — Return on Equity (TTM)
-  // Benchmark: > 15%. Umbral Buffett (carta accionistas 1987). KO y JNJ lo sostienen >25%.
-  // Zona amarilla: 12–15%. Rojo: < 12%.
-  const roe = toFloat(m['roeTTM']);
-
-  // 3. NET PROFIT MARGIN (TTM)
-  // Benchmark: > 10%. Piso institucional aceptable; Buffett ideal >20%.
-  // Zona amarilla: 7–10%. Rojo: < 7%.
-  const margin = toFloat(m['netProfitMarginTTM']);
-
-  // 4. DEBT / EQUITY (mrq)
-  // Benchmark: < 100% (ratio 1x). Buffett ideal < 50%; consensus institucional acepta hasta 1x.
-  // Finnhub devuelve el ratio puro (ej: 1.45 = 145%). Mostramos en %.
-  // Zona amarilla: 100–120%. Rojo: > 120%.
-  const deRaw = toFloat(m['totalDebt/totalEquityQuarterly']) ?? toFloat(m['totalDebt/totalEquityAnnual']);
-  const debtEq = deRaw != null ? deRaw * 100 : null; // convertir a %
-
-  // 5. FREE CASH FLOW (TTM) — calculado: CFO - CapEx
-  // freeCashFlowTTM de Finnhub retorna null en la mayoría de tickers (bug conocido).
-  // Solución: CFO TTM - CapEx TTM. Finnhub entrega capexTTM en negativo (conv. contable),
-  // por lo que la operación correcta es CFO + capex (suma algebraica).
-  // Benchmark: Positivo (FCF > 0). Buffett: "el cash flow no se puede manipular".
-  const cfo   = toFloat(m['cashFlowFromOperationsTTM']); // en unidades absolutas (USD)
-  const capex = toFloat(m['capexTTM']);                   // usualmente negativo en Finnhub
-  let fcf = null;
-  let fcfMethod = '';
-  if(cfo != null && capex != null){
-    fcf = cfo + capex; // capex ya viene negativo → suma algebraica = CFO - |CapEx|
-    fcfMethod = 'CFO − CapEx (TTM)';
-  } else if(cfo != null){
-    fcf = cfo; // fallback: sin CapEx disponible, usamos CFO como proxy
-    fcfMethod = 'CFO TTM (CapEx no disponible)';
-  }
-
-  // DIVIDEND YIELD — dato informativo, no cuenta para el semáforo
-  const divYield = toFloat(m['dividendYieldIndicatedAnnual']);
-
-  return {
-    inds: [
-      {
-        nameEs: 'Trailing P/E', nameEn: 'Price / Earnings (TTM)',
-        value: fmtX(pe), raw: pe, param: '< 25x',
-        paramDesc: 'S&P 500 hist. ~17x · Buffett compró AAPL a 10-11x',
-        s: pe == null ? 'warn' : (pe <= 25 ? 'ok' : pe <= 30 ? 'warn' : 'fail'),
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics → Valuation Measures → Trailing P/E'
-      },
-      {
-        nameEs: 'ROE', nameEn: 'Return on Equity (TTM)',
-        value: fmtPct(roe), raw: roe, param: '> 15%',
-        paramDesc: 'Umbral Buffett 1987 · KO y JNJ sostienen >25% histórico',
-        s: roe == null ? 'warn' : (roe >= 15 ? 'ok' : roe >= 12 ? 'warn' : 'fail'),
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics → Management Effectiveness → Return on Equity (ttm)'
-      },
-      {
-        nameEs: 'Profit Margin', nameEn: 'Net Profit Margin (TTM)',
-        value: fmtPct(margin), raw: margin, param: '> 10%',
-        paramDesc: 'Piso institucional · Buffett ideal >20% · margen = moat',
-        s: margin == null ? 'warn' : (margin >= 10 ? 'ok' : margin >= 7 ? 'warn' : 'fail'),
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics → Profitability → Profit Margin'
-      },
-      {
-        nameEs: 'Deuda / Patrimonio', nameEn: 'Total Debt / Equity (mrq)',
-        value: debtEq != null ? debtEq.toFixed(1)+'%' : 'N/D', raw: debtEq, param: '< 100%',
-        paramDesc: 'Buffett ideal <50% · consensus institucional tope en 100%',
-        s: debtEq == null ? 'warn' : (debtEq <= 100 ? 'ok' : debtEq <= 120 ? 'warn' : 'fail'),
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics → Balance Sheet → Total Debt/Equity (mrq)'
-      },
-      {
-        nameEs: 'Free Cash Flow', nameEn: 'Free Cash Flow (TTM)',
-        value: fmtM(fcf), raw: fcf, param: 'Positivo',
-        paramDesc: 'FCF = CFO − CapEx · Buffett: "el cash no se puede falsificar"',
-        fcfMethod,
-        s: fcf == null ? 'warn' : (fcf > 0 ? 'ok' : 'fail'),
-        yu: `https://finance.yahoo.com/quote/${ticker}/financials/`,
-        yw: 'Financials → Cash Flow → Free Cash Flow'
-      }
-    ],
-    divYield
-  };
-}
-
-function renderFromData(data, ticker, fromCache){
-  const { inds, divYield } = buildIndicators(data, ticker);
-  const pass = inds.filter(i=>i.s==='ok').length;
-  const p = data.profile;
-  const name = p.name || ticker;
-  const fcfInd = inds.find(i=>i.nameEs==='Free Cash Flow');
-
-  let dLabel, dColor, dIcon;
-  if(pass===5){ dLabel='SÍ (A+)'; dColor='green'; dIcon='🟢'; }
-  else if(pass===4){ dLabel='SÍ (A)'; dColor='green'; dIcon='🟢'; }
-  else if(pass===3){ dLabel='CONDICIONAL'; dColor='yellow'; dIcon='🟡'; }
-  else{ dLabel='NO'; dColor='red'; dIcon='🔴'; }
-
-  const sl = { ok:'CUMPLE', warn:'LÍMITE', fail:'NO CUMPLE' };
-
-  const rows = inds.map(i=>`
-    <tr>
-      <td>
+function render(data,ticker,fromCache){
+  const{inds,divYield}=buildIndicators(data,ticker);
+  const pass=inds.filter(i=>i.s==='ok').length;
+  const p=data.profile;const name=p.name||ticker;
+  const fcfInd=inds.find(i=>i.nameEs==='Free Cash Flow');
+  let vClass,vTitle;
+  if(pass>=4){vClass='ok';vTitle=pass===5?'APTO — A+':'APTO — A';}
+  else if(pass===3){vClass='warn';vTitle='CONDICIONAL';}
+  else{vClass='fail';vTitle='NO APTO';}
+  const failing=inds.filter(i=>i.s==='fail').map(i=>i.nameEs);
+  const warning=inds.filter(i=>i.s==='warn').map(i=>i.nameEs);
+  let desc='';
+  if(pass===5)desc=`${name} supera los 5 parámetros institucionales. Negocio con ventaja competitiva demostrable, apto para la estrategia de cashflow.`;
+  else if(pass===4)desc=`${name} cumple 4 de 5 parámetros. Punto a vigilar: ${warning[0]||failing[0]||'—'}. Apto con gestión estándar.`;
+  else if(pass===3)desc=`Resultado mixto. ${failing.join(' y ')} no alcanzan los umbrales. Requiere gestión de riesgo estricta.`;
+  else desc=`${name} no cumple los parámetros mínimos (${failing.join(', ')}). No recomendable para la estrategia de cashflow.`;
+  const sl={ok:'CUMPLE',warn:'LÍMITE',fail:'NO CUMPLE'};
+  const cards=inds.map(i=>`
+    <div class="ind-card ${i.s}">
+      <div>
         <div class="ind-name">${i.nameEs}</div>
         <div class="ind-en">${i.nameEn}</div>
-      </td>
-      <td class="ind-val">${i.value}</td>
-      <td>
+        <div class="ind-source-tag">${i.paramDesc}</div>
+      </div>
+      <div class="ind-center">
+        <div class="ind-val${i.display.nd?' nd':''}">${i.display.text}</div>
+        ${i.display.note?`<div class="ind-val-note">${i.display.note}</div>`:''}
+      </div>
+      <div class="ind-param-wrap">
         <div class="ind-param">${i.param}</div>
-        <div class="ind-source">${i.paramDesc}</div>
-      </td>
-      <td><span class="badge ${i.s}"><span class="dot"></span>${sl[i.s]}</span></td>
-    </tr>`).join('');
-
-  // FCF method footnote
-  const fcfFootnote = fcfInd && fcfInd.fcfMethod
-    ? `<div class="fcf-note">⚙ FCF calculado como ${fcfInd.fcfMethod}</div>`
-    : '';
-
-  // Dividend yield card (informativo)
-  let divCard = '';
-  if(divYield != null){
-    const dyFmt = divYield.toFixed(2) + '%';
-    const dyNote = divYield < 1
-      ? 'Dividendo bajo o nulo — habitual en acciones de alto crecimiento (NVDA, AMZN, GOOGL).'
-      : divYield <= 4
-      ? 'Rango saludable (1–4%). Dividendo sostenible típico de blue chips de calidad.'
-      : divYield <= 6
-      ? 'Rendimiento elevado. Verificar que el payout ratio sea sostenible (<70%).'
-      : 'Rendimiento muy alto. Puede indicar recorte próximo. Revisar deuda y payout ratio.';
-    divCard = `
-      <div class="div-card">
-        <div class="div-icon">💵</div>
-        <div>
-          <div class="div-card-label">Dividend Yield (dato informativo · no suma al semáforo)</div>
-          <div class="div-card-val">${dyFmt}</div>
-        </div>
-        <div class="div-card-note">${dyNote}</div>
-      </div>`;
-  } else {
-    divCard = `
-      <div class="div-card">
-        <div class="div-icon">💵</div>
-        <div>
-          <div class="div-card-label">Dividend Yield (dato informativo · no suma al semáforo)</div>
-          <div class="div-card-val">N/D</div>
-        </div>
-        <div class="div-card-note">Sin datos de dividendo en Finnhub para este ticker. Verificar en Yahoo Finance → Summary.</div>
-      </div>`;
-  }
-
-  const vcards = inds.map(i=>`
-    <div class="vcard">
-      <div class="vcard-name">${i.nameEs}</div>
-      <a href="${i.yu}" target="_blank" rel="noopener">Verificar en Yahoo Finance ↗</a>
-      <span>${i.yw}</span>
+        <span class="badge ${i.s}"><span class="dot"></span>${sl[i.s]}</span>
+      </div>
     </div>`).join('');
-
-  const dateStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
-
-  document.getElementById('report').innerHTML = `
-    <div class="report-header">
-      <div class="company-name">${name} <span style="color:var(--text3);font-size:16px;font-family:var(--mono)">(${ticker})</span></div>
-      <div class="report-meta">${p.exchange||''}${p.finnhubIndustry?' · '+p.finnhubIndustry:''}${p.country?' · '+p.country:''} · ${dateStr}</div>
+  const fcfNote=fcfInd?.fcfMethod?`<div class="fcf-note">⚙ FCF calculado como: ${fcfInd.fcfMethod}</div>`:'';
+  let divCard='';
+  if(divYield!=null){const note=divYield<1?'Bajo o nulo — habitual en acciones de alto crecimiento.':divYield<=4?'Rango saludable (1–4%). Típico en blue chips de calidad.':divYield<=6?'Elevado. Verificar payout ratio (<70%).':'Muy alto — puede indicar recorte próximo.';divCard=`<div class="div-card"><div class="div-icon">💵</div><div><div class="div-label">Dividend Yield · dato informativo · no suma al semáforo</div><div class="div-val">${divYield.toFixed(2)}%</div></div><div class="div-note">${note}</div></div>`;}
+  else{divCard=`<div class="div-card"><div class="div-icon">💵</div><div><div class="div-label">Dividend Yield · dato informativo</div><div class="div-val" style="color:var(--text3)">N/D</div></div><div class="div-note" style="font-family:var(--mono)">Sin datos en Finnhub. Verificar en Yahoo Finance → Summary.</div></div>`;}
+  const vcards=inds.map(i=>`<div class="vcard"><div class="vcard-name">${i.nameEs}</div><a href="${i.yu}" target="_blank" rel="noopener">Verificar en Yahoo Finance ↗</a><span>${i.yw}</span></div>`).join('');
+  const dateStr=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  document.getElementById('report').innerHTML=`
+    <div class="co-card">
+      <div class="co-eyebrow">Reporte · ${dateStr}${fromCache?' · datos en caché':''}</div>
+      <div class="co-name">${name} <span class="co-ticker">(${ticker})</span></div>
+      <div class="co-meta">${p.exchange||''}${p.finnhubIndustry?' · '+p.finnhubIndustry:''}${p.country?' · '+p.country:''}</div>
     </div>
-
-    <div class="diag-banner ${dColor}">
-      <div class="diag-icon">${dIcon}</div>
-      <div>
-        <div class="diag-label">Diagnóstico final · ${pass}/5 indicadores cumplen</div>
-        <div class="diag-value">${dLabel}</div>
-        <div class="diag-text">${buildDiagText(inds,pass,name)}</div>
+    <div class="verdict-card ${vClass}">
+      <div class="verdict-inner">
+        <div class="verdict-score-wrap">
+          <div class="verdict-score">${pass}/5</div>
+          <div class="verdict-of">indicadores</div>
+        </div>
+        <div class="verdict-info">
+          <div class="verdict-eyebrow">Diagnóstico final</div>
+          <div class="verdict-title">${vTitle}</div>
+          <div class="verdict-desc">${desc}</div>
+        </div>
       </div>
     </div>
-
-    <div class="data-note">
-      📡 <span>Datos: <strong>Finnhub API</strong> · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong>${fromCache?' · <em>Datos en caché</em>':''}</span>
-    </div>
-
-    <div class="section-label">Filtro de Calidad — 5 Indicadores Fundamentales</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Indicador</th><th>Valor actual</th><th>Parámetro institucional</th><th>Estado</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-      ${fcfFootnote}
-    </div>
-
+    <div class="source-bar">📡 Datos: <strong>Finnhub API</strong> · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong></div>
+    <div class="sec-label">5 Filtros de Calidad Institucional</div>
+    <div class="ind-cards">${cards}</div>
+    ${fcfNote}
     ${divCard}
-
-    <div class="section-label">Guía de Verificación en Yahoo Finance</div>
-    <div class="vgrid">${vcards}</div>
-  `;
-
-  document.getElementById('report').style.display = 'block';
-  document.getElementById('report').scrollIntoView({behavior:'smooth', block:'start'});
+    <div class="sec-label">Verificación en Yahoo Finance</div>
+    <div class="vgrid">${vcards}</div>`;
+  document.getElementById('report').style.display='block';
+  document.getElementById('report').scrollIntoView({behavior:'smooth',block:'start'});
 }
 </script>
 </body>
