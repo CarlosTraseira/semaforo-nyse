@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Semáforo NYSE</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0f'/><rect x='10' y='4' width='12' height='7' rx='2' fill='%2300e87a'/><rect x='10' y='13' width='9' height='7' rx='2' fill='%23f5c842'/><rect x='10' y='22' width='6' height='6' rx='2' fill='%23ff4466'/></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
   :root {
@@ -18,9 +19,8 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
   body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-  .app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 20px}
+  .app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px}
 
-  /* Header */
   .header{text-align:center;margin-bottom:48px}
   .logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
   .logo-icon{width:32px;height:32px;display:flex;flex-direction:column;gap:4px;justify-content:center}
@@ -32,7 +32,6 @@
   .logo-text span{color:var(--accent)}
   .tagline{font-size:12px;color:var(--text3);font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
 
-  /* Search */
   .search-box{display:flex;gap:10px;margin-bottom:12px}
   .search-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-family:var(--mono);font-size:15px;color:var(--text);outline:none;transition:border-color .2s;text-transform:uppercase}
   .search-input::placeholder{color:var(--text3);text-transform:none}
@@ -42,28 +41,24 @@
   .search-btn:active{transform:scale(.98)}
   .search-btn:disabled{opacity:.4;cursor:not-allowed}
 
-  /* Chips */
   .examples{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}
   .chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;transition:all .15s}
   .chip:hover{border-color:var(--accent);color:var(--text)}
 
-  /* Loading */
   .loading{text-align:center;padding:60px 20px;display:none}
   .spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
   @keyframes spin{to{transform:rotate(360deg)}}
   .loading p{color:var(--text2);font-size:13px;font-family:var(--mono)}
 
-  /* Error */
   .error-msg{background:var(--red-bg);border:1px solid rgba(255,68,102,.25);border-radius:10px;padding:14px 18px;color:var(--red);font-size:13px;margin-bottom:20px;display:none;font-family:var(--mono);line-height:1.6}
+  .cache-note{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 14px;margin-bottom:16px;font-family:var(--mono);font-size:11px;color:var(--text3);display:none}
 
-  /* Report */
   .report{display:none;animation:fadeUp .4s ease}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
   .report-header{margin-bottom:24px}
   .company-name{font-size:26px;font-weight:600;margin-bottom:4px}
   .report-meta{font-family:var(--mono);font-size:12px;color:var(--text3)}
 
-  /* Diagnosis banner */
   .diag-banner{border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:16px;border:1px solid}
   .diag-banner.green{background:var(--green-bg);border-color:rgba(0,232,122,.2)}
   .diag-banner.yellow{background:var(--yellow-bg);border-color:rgba(245,200,66,.2)}
@@ -76,16 +71,14 @@
   .diag-banner.red .diag-value{color:var(--red)}
   .diag-text{font-size:13px;color:var(--text2);line-height:1.6}
 
-  /* Data note */
   .data-note{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 16px;margin-bottom:24px;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .data-note strong{color:var(--text2)}
 
-  /* Section label */
   .section-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
 
-  /* Table */
+  /* Table — 4 columns only, no verify column */
   .table-wrap{overflow-x:auto;margin-bottom:32px}
-  table{width:100%;border-collapse:collapse;min-width:620px}
+  table{width:100%;border-collapse:collapse;min-width:440px}
   th{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:400;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
   td{padding:13px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
   tr{background:var(--surface)}
@@ -96,27 +89,21 @@
   .ind-val{font-family:var(--mono);font-weight:500;font-size:15px}
   .ind-param{font-family:var(--mono);font-size:11px;color:var(--text3)}
 
-  /* Badges */
   .badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap}
   .badge.ok{background:var(--green-bg);color:var(--green)}
   .badge.warn{background:var(--yellow-bg);color:var(--yellow)}
   .badge.fail{background:var(--red-bg);color:var(--red)}
   .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
 
-  /* Verify links */
-  .vlink{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-bottom:2px}
-  .vlink:hover{text-decoration:underline}
-  .vwhere{font-family:var(--mono);font-size:10px;color:var(--text3)}
-
-  /* Verify grid */
+  /* Verification guide — cards only */
   .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px}
   @media(max-width:560px){.vgrid{grid-template-columns:1fr}}
-  .vcard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+  .vcard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .vcard-name{font-weight:500;font-size:13px;margin-bottom:4px}
   .vcard a{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-bottom:3px}
   .vcard a:hover{text-decoration:underline}
-  .vcard span{font-family:var(--mono);font-size:10px;color:var(--text3)}
+  .vcard span{font-family:var(--mono);font-size:10px;color:var(--text3);display:block}
 
-  /* Footer */
   .footer{text-align:center;padding:32px 0 16px;font-family:var(--mono);font-size:11px;color:var(--text3)}
 </style>
 </head>
@@ -132,7 +119,7 @@
       </div>
       <div class="logo-text">Semáforo <span>NYSE</span></div>
     </div>
-    <div class="tagline">Análisis de Calidad de Activos · v7.0</div>
+    <div class="tagline">Análisis de Calidad de Activos · v8.0</div>
   </div>
 
   <div class="search-box">
@@ -152,6 +139,7 @@
   </div>
 
   <div class="error-msg" id="err"></div>
+  <div class="cache-note" id="cacheNote"></div>
   <div class="loading" id="loading">
     <div class="spinner"></div>
     <p id="loadTxt">Conectando con Alpha Vantage...</p>
@@ -162,7 +150,7 @@
 
 <script>
 const AV = 'TTJPEOBF6QOVHEV8';
-const AV_BASE = 'https://www.alphavantage.co/query';
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 horas en ms
 
 function go(t){ document.getElementById('tickerInput').value = t; analyze(); }
 document.getElementById('tickerInput').addEventListener('keydown', e => { if(e.key==='Enter') analyze(); });
@@ -173,8 +161,25 @@ function startLoad(){ let i=0; document.getElementById('loadTxt').textContent=ms
 function stopLoad(){ clearInterval(mi); }
 function showErr(m){ const e=document.getElementById('err'); e.textContent=m; e.style.display='block'; }
 
+// Cache helpers using localStorage
+function cacheKey(ticker){ return `snse_v8_${ticker}`; }
+
+function getCache(ticker){
+  try {
+    const raw = localStorage.getItem(cacheKey(ticker));
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if(Date.now() - obj.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(ticker)); return null; }
+    return obj;
+  } catch(e){ return null; }
+}
+
+function setCache(ticker, data){
+  try { localStorage.setItem(cacheKey(ticker), JSON.stringify({ ts: Date.now(), data })); } catch(e){}
+}
+
 function toFloat(v){
-  if(v==null||v===''||v==='None'||v==='-') return null;
+  if(v==null||v===''||v==='None'||v==='-'||v==='N/A') return null;
   const n = parseFloat(v);
   return isNaN(n) ? null : n;
 }
@@ -195,12 +200,71 @@ function calcSt(val, thr, hib, wp=0.2){
   return val<=thr ? 'ok' : val<=thr*(1+wp) ? 'warn' : 'fail';
 }
 
-function diagText(inds, pass, name){
+function buildDiagText(inds, pass, name){
   const fail = inds.filter(i=>i.s==='fail').map(i=>i.nameEs);
   if(pass===5) return `${name} supera todos los parámetros de calidad. Es un negocio sólido, apto para una estrategia de generación de cashflow con opciones.`;
   if(pass===4) return `${name} cumple 4 de 5 parámetros. El punto débil es ${fail[0]||'un indicador'}, pero el negocio es sólido y apto para operar con cautela.`;
   if(pass===3) return `${name} tiene resultado mixto. ${fail.join(' y ')} no alcanzan los parámetros mínimos. Requiere gestión de riesgo estricta.`;
   return `${name} no cumple los parámetros mínimos (${fail.join(', ')}). No es recomendable para la estrategia de cashflow en este momento.`;
+}
+
+function buildIndicators(d, ticker){
+  // Trailing P/E — Alpha Vantage sometimes returns absurd values for ADRs
+  // Use ForwardPE as fallback if TrailingPE > 500 (distortion)
+  let peRaw = toFloat(d['TrailingPE']);
+  if(peRaw != null && peRaw > 500) peRaw = null; // flag as N/D if clearly distorted
+
+  // ROE comes as decimal (0.017 = 1.7%)
+  const roeRaw = toFloat(d['ReturnOnEquityTTM']);
+  const roe = roeRaw != null ? roeRaw * 100 : null;
+
+  // Profit Margin comes as decimal (0.0003 = 0.03%)
+  const marginRaw = toFloat(d['ProfitMargin']);
+  const margin = marginRaw != null ? marginRaw * 100 : null;
+
+  // Debt/Equity — Alpha Vantage field is already a ratio (98.01 for BP)
+  const debtEq = toFloat(d['DebtEquityRatio']);
+
+  // Free Cash Flow — direct field in Alpha Vantage (in USD units)
+  const fcf = toFloat(d['FreeCashflow'] || d['OperatingCashflowTTM']);
+
+  return [
+    {
+      nameEs: 'Trailing P/E', nameEn: 'Price/Earnings (ttm)',
+      value: fmtX(peRaw), raw: peRaw, param: '< 30x',
+      s: peRaw==null ? 'warn' : calcSt(peRaw, 30, false),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Valuation Measures → Trailing P/E'
+    },
+    {
+      nameEs: 'ROE', nameEn: 'Return on Equity (ttm)',
+      value: fmtPct(roe), raw: roe, param: '> 15%',
+      s: calcSt(roe, 15, true),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Management Effectiveness → Return on Equity (ttm)'
+    },
+    {
+      nameEs: 'Profit Margin', nameEn: 'Net Profit Margin (ttm)',
+      value: fmtPct(margin), raw: margin, param: '> 10%',
+      s: calcSt(margin, 10, true),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Profitability → Profit Margin'
+    },
+    {
+      nameEs: 'Deuda / Patrimonio', nameEn: 'Total Debt/Equity (mrq)',
+      value: debtEq != null ? debtEq.toFixed(2)+'%' : 'N/D', raw: debtEq, param: '< 100%',
+      s: calcSt(debtEq, 100, false),
+      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+      yw: 'Statistics → Balance Sheet → Total Debt/Equity (mrq)'
+    },
+    {
+      nameEs: 'Free Cash Flow', nameEn: 'Free Cash Flow (ttm)',
+      value: fmtM(fcf), raw: fcf, param: 'Positivo',
+      s: fcf==null ? 'warn' : (fcf>0 ? 'ok' : 'fail'),
+      yu: `https://finance.yahoo.com/quote/${ticker}/financials/`,
+      yw: 'Financials → Cash Flow → Free Cash Flow (TTM)'
+    }
+  ];
 }
 
 async function analyze(){
@@ -209,93 +273,39 @@ async function analyze(){
   const ticker = raw.split(/[\s,(]/)[0];
 
   document.getElementById('err').style.display = 'none';
+  document.getElementById('cacheNote').style.display = 'none';
   document.getElementById('report').style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
   document.getElementById('btn').disabled = true;
+
+  // Check cache first
+  const cached = getCache(ticker);
+  if(cached){
+    document.getElementById('cacheNote').textContent = `Datos en caché para ${ticker} — guardados hace ${Math.round((Date.now()-cached.ts)/60000)} min. Los datos se actualizan cada 24 horas.`;
+    document.getElementById('cacheNote').style.display = 'block';
+    document.getElementById('btn').disabled = false;
+    renderFromData(cached.data, ticker, true);
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'block';
   startLoad();
 
   try {
-    // Single call to Alpha Vantage OVERVIEW — returns all fundamentals
-    const url = `${AV_BASE}?function=OVERVIEW&symbol=${ticker}&apikey=${AV}`;
+    const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=${AV}`;
     const res = await fetch(url);
     if(!res.ok) throw new Error(`Error de conexión (${res.status})`);
     const d = await res.json();
 
-    if(d['Information']) throw new Error('Límite de consultas alcanzado. Alpha Vantage permite 25 consultas por día en el plan gratuito. Intentá más tarde.');
+    if(d['Information']) throw new Error('Límite diario de consultas alcanzado (25/día en el plan gratuito). Los datos en caché siguen disponibles para tickers ya consultados hoy.');
     if(d['Error Message'] || !d['Symbol']) throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
 
-    // Extract values from Alpha Vantage OVERVIEW fields
-    const pe       = toFloat(d['TrailingPE']);
-    const roe      = toFloat(d['ReturnOnEquityTTM']) != null ? toFloat(d['ReturnOnEquityTTM']) * 100 : null;
-    const margin   = toFloat(d['ProfitMargin']) != null ? toFloat(d['ProfitMargin']) * 100 : null;
-    const debtEq   = toFloat(d['DebtEquityRatio']) != null ? toFloat(d['DebtEquityRatio']) * 100 : null;
-    // FCF = Operating Cash Flow - CapEx (from AV fields)
-    const ocf      = toFloat(d['OperatingCashflowTTM']);
-    const capex    = toFloat(d['CapitalExpendituresTTM']);
-    const fcf      = (ocf!=null && capex!=null) ? ocf + capex : (ocf!=null ? ocf : null); // capex is negative in AV
-
-    const companyName = d['Name'] || ticker;
-    const exchange    = d['Exchange'] || '';
-    const sector      = d['Sector'] || '';
-    const country     = d['Country'] || '';
-
-    const inds = [
-      {
-        nameEs: 'Trailing P/E', nameEn: 'Price/Earnings (ttm)',
-        value: fmtX(pe), raw: pe, param: '< 30x',
-        s: calcSt(pe, 30, false),
-        avField: 'TrailingPE',
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics › Valuation Measures › Trailing P/E'
-      },
-      {
-        nameEs: 'ROE', nameEn: 'Return on Equity (ttm)',
-        value: fmtPct(roe), raw: roe, param: '> 15%',
-        s: calcSt(roe, 15, true),
-        avField: 'ReturnOnEquityTTM',
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics › Management Effectiveness › Return on Equity'
-      },
-      {
-        nameEs: 'Profit Margin', nameEn: 'Net Profit Margin (ttm)',
-        value: fmtPct(margin), raw: margin, param: '> 10%',
-        s: calcSt(margin, 10, true),
-        avField: 'ProfitMargin',
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics › Profitability › Profit Margin'
-      },
-      {
-        nameEs: 'Deuda / Patrimonio', nameEn: 'Total Debt/Equity (mrq)',
-        value: fmtPct(debtEq), raw: debtEq, param: '< 100%',
-        s: calcSt(debtEq, 100, false),
-        avField: 'DebtEquityRatio',
-        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-        yw: 'Statistics › Balance Sheet › Total Debt/Equity'
-      },
-      {
-        nameEs: 'Free Cash Flow', nameEn: 'Operating Cash Flow – CapEx (ttm)',
-        value: fmtM(fcf), raw: fcf, param: 'Positivo',
-        s: fcf==null ? 'warn' : (fcf>0 ? 'ok' : 'fail'),
-        avField: 'OperatingCashflowTTM',
-        yu: `https://finance.yahoo.com/quote/${ticker}/financials/`,
-        yw: 'Financials › Cash Flow Statement'
-      }
-    ];
-
-    const pass = inds.filter(i=>i.s==='ok').length;
-    let dLabel, dColor, dIcon;
-    if(pass===5){ dLabel='SÍ (A+)'; dColor='green'; dIcon='🟢'; }
-    else if(pass===4){ dLabel='SÍ (A)'; dColor='green'; dIcon='🟢'; }
-    else if(pass===3){ dLabel='CONDICIONAL'; dColor='yellow'; dIcon='🟡'; }
-    else{ dLabel='NO'; dColor='red'; dIcon='🔴'; }
-
+    setCache(ticker, d);
     stopLoad();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('btn').disabled = false;
+    renderFromData(d, ticker, false);
 
-    render({ ticker, companyName, exchange, sector, country, inds, pass, dLabel, dColor, dIcon, diagnosisText: diagText(inds, pass, companyName) });
-
-  } catch(e) {
+  } catch(e){
     stopLoad();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('btn').disabled = false;
@@ -303,54 +313,57 @@ async function analyze(){
   }
 }
 
-function render(d){
+function renderFromData(d, ticker, fromCache){
+  const inds = buildIndicators(d, ticker);
+  const pass = inds.filter(i=>i.s==='ok').length;
+  const companyName = d['Name'] || ticker;
+  const exchange = d['Exchange'] || '';
+  const sector = d['Sector'] || '';
+  const country = d['Country'] || '';
+
+  let dLabel, dColor, dIcon;
+  if(pass===5){ dLabel='SÍ (A+)'; dColor='green'; dIcon='🟢'; }
+  else if(pass===4){ dLabel='SÍ (A)'; dColor='green'; dIcon='🟢'; }
+  else if(pass===3){ dLabel='CONDICIONAL'; dColor='yellow'; dIcon='🟡'; }
+  else{ dLabel='NO'; dColor='red'; dIcon='🔴'; }
+
   const sl = { ok:'CUMPLE', warn:'LÍMITE', fail:'NO CUMPLE' };
 
-  const rows = d.inds.map(i => `
+  const rows = inds.map(i => `
     <tr>
-      <td>
-        <div class="ind-name">${i.nameEs}</div>
-        <div class="ind-en">${i.nameEn}</div>
-      </td>
+      <td><div class="ind-name">${i.nameEs}</div><div class="ind-en">${i.nameEn}</div></td>
       <td class="ind-val">${i.value}</td>
       <td class="ind-param">${i.param}</td>
       <td><span class="badge ${i.s}"><span class="dot"></span>${sl[i.s]}</span></td>
-      <td>
-        <a class="vlink" href="${i.yu}" target="_blank" rel="noopener">Verificar en Yahoo Finance ↗</a>
-        <div class="vwhere">${i.yw}</div>
-      </td>
     </tr>`).join('');
 
-  const vcards = d.inds.map(i => `
+  const vcards = inds.map(i => `
     <div class="vcard">
-      <a href="${i.yu}" target="_blank" rel="noopener">${i.nameEs} ↗</a>
+      <div class="vcard-name">${i.nameEs}</div>
+      <a href="${i.yu}" target="_blank" rel="noopener">Verificar en Yahoo Finance ↗</a>
       <span>${i.yw}</span>
     </div>`).join('');
 
+  const dateStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+
   document.getElementById('report').innerHTML = `
     <div class="report-header">
-      <div class="company-name">
-        ${d.companyName}
-        <span style="color:var(--text3);font-size:16px;font-family:var(--mono)">(${d.ticker})</span>
-      </div>
-      <div class="report-meta">${d.exchange} · ${d.sector} · ${d.country} · ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})}</div>
+      <div class="company-name">${companyName} <span style="color:var(--text3);font-size:16px;font-family:var(--mono)">(${ticker})</span></div>
+      <div class="report-meta">${exchange}${sector?' · '+sector:''}${country?' · '+country:''} · ${dateStr}</div>
     </div>
 
-    <div class="diag-banner ${d.dColor}">
-      <div class="diag-icon">${d.dIcon}</div>
+    <div class="diag-banner ${dColor}">
+      <div class="diag-icon">${dIcon}</div>
       <div>
-        <div class="diag-label">Diagnóstico final · ${d.pass}/5 indicadores cumplen</div>
-        <div class="diag-value">${d.dLabel}</div>
-        <div class="diag-text">${d.diagnosisText}</div>
+        <div class="diag-label">Diagnóstico final · ${pass}/5 indicadores cumplen</div>
+        <div class="diag-value">${dLabel}</div>
+        <div class="diag-text">${buildDiagText(inds, pass, companyName)}</div>
       </div>
     </div>
 
     <div class="data-note">
       📡
-      <span>
-        Datos: <strong>Alpha Vantage API</strong> (fuente institucional) ·
-        Verificación independiente: <strong>Yahoo Finance</strong> · Hacé clic en cada indicador para confirmar el dato.
-      </span>
+      <span>Datos: <strong>Alpha Vantage API</strong> · Verificación: <strong>Yahoo Finance</strong> (ver guía abajo)${fromCache?' · <em>Datos en caché</em>':''}</span>
     </div>
 
     <div class="section-label">Filtro de Calidad — 5 Indicadores Fundamentales</div>
@@ -362,7 +375,6 @@ function render(d){
             <th>Valor actual</th>
             <th>Parámetro</th>
             <th>Estado</th>
-            <th>Verificación</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
