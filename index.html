@@ -19,7 +19,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
   body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-  .app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px}
+  .app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 20px}
 
   .header{text-align:center;margin-bottom:48px}
   .logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
@@ -77,8 +77,8 @@
 
   .section-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
 
-  .table-wrap{overflow-x:auto;margin-bottom:32px}
-  table{width:100%;border-collapse:collapse;min-width:440px}
+  .table-wrap{overflow-x:auto;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;min-width:500px}
   th{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:400;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
   td{padding:13px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
   tr{background:var(--surface)}
@@ -88,12 +88,20 @@
   .ind-en{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px}
   .ind-val{font-family:var(--mono);font-weight:500;font-size:15px}
   .ind-param{font-family:var(--mono);font-size:11px;color:var(--text3)}
+  .ind-source{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px;opacity:0.7}
 
   .badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap}
   .badge.ok{background:var(--green-bg);color:var(--green)}
   .badge.warn{background:var(--yellow-bg);color:var(--yellow)}
   .badge.fail{background:var(--red-bg);color:var(--red)}
   .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+  /* Dividend yield info card */
+  .div-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .div-card-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+  .div-card-val{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text)}
+  .div-card-note{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.5;flex:1;min-width:200px}
+  .div-icon{font-size:24px}
 
   .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px}
   @media(max-width:560px){.vgrid{grid-template-columns:1fr}}
@@ -102,6 +110,9 @@
   .vcard a{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;display:block;margin-bottom:3px}
   .vcard a:hover{text-decoration:underline}
   .vcard span{font-family:var(--mono);font-size:10px;color:var(--text3);display:block}
+
+  /* FCF method note */
+  .fcf-note{font-family:var(--mono);font-size:9px;color:var(--text3);padding:6px 14px 10px;opacity:0.7;border-bottom:1px solid rgba(255,255,255,.03)}
 
   .footer{text-align:center;padding:32px 0 16px;font-family:var(--mono);font-size:11px;color:var(--text3)}
 </style>
@@ -117,7 +128,7 @@
       </div>
       <div class="logo-text">Semáforo <span>NYSE</span></div>
     </div>
-    <div class="tagline">Análisis de Calidad de Activos · v10.0</div>
+    <div class="tagline">Análisis de Calidad de Activos · v11.0</div>
   </div>
 
   <div class="search-box">
@@ -160,7 +171,7 @@ function startLoad(){ let i=0; document.getElementById('loadTxt').textContent=ms
 function stopLoad(){ clearInterval(mi); }
 function showErr(m){ const e=document.getElementById('err'); e.textContent=m; e.style.display='block'; }
 
-function cacheKey(t){ return `snse_v10_${t}`; }
+function cacheKey(t){ return `snse_v11_${t}`; }
 function getCache(t){
   try{
     const r=localStorage.getItem(cacheKey(t));
@@ -173,7 +184,7 @@ function getCache(t){
 function setCache(t,d){ try{ localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d})); }catch(e){} }
 
 function toFloat(v){
-  if(v==null||v===''||v===0) return null;
+  if(v==null||v==='') return null;
   const n=parseFloat(v);
   return isNaN(n)||!isFinite(n) ? null : n;
 }
@@ -181,22 +192,24 @@ function fmtPct(v){ return v!=null ? v.toFixed(2)+'%' : 'N/D'; }
 function fmtX(v){ return v!=null ? v.toFixed(2)+'x' : 'N/D'; }
 function fmtM(v){
   if(v==null) return 'N/D';
-  const a=Math.abs(v), s=v<0?'– ':'';
-  if(a>=1e9) return s+(a/1e9).toFixed(2)+' mil mill. USD';
-  if(a>=1e6) return s+(a/1e6).toFixed(2)+' mill. USD';
-  return s+(a/1e3).toFixed(1)+' mil USD';
+  const a=Math.abs(v), s=v<0?'– ':'+ ';
+  if(a>=1e12) return s+(a/1e12).toFixed(2)+' T USD';
+  if(a>=1e9)  return s+(a/1e9).toFixed(2)+' B USD';
+  if(a>=1e6)  return s+(a/1e6).toFixed(2)+' M USD';
+  return s+(a/1e3).toFixed(1)+' K USD';
 }
-function calcSt(val,thr,hib,wp=0.2){
+function calcSt(val,thr,higherIsBetter,warnPct=0.2){
   if(val==null) return 'warn';
-  if(hib) return val>=thr ? 'ok' : val>=thr*(1-wp) ? 'warn' : 'fail';
-  return val<=thr ? 'ok' : val<=thr*(1+wp) ? 'warn' : 'fail';
+  if(higherIsBetter) return val>=thr ? 'ok' : val>=thr*(1-warnPct) ? 'warn' : 'fail';
+  return val<=thr ? 'ok' : val<=thr*(1+warnPct) ? 'warn' : 'fail';
 }
-function buildDiagText(inds,pass,name){
-  const fail=inds.filter(i=>i.s==='fail').map(i=>i.nameEs);
-  if(pass===5) return `${name} supera todos los parámetros de calidad. Negocio sólido, apto para la estrategia de cashflow con opciones.`;
-  if(pass===4) return `${name} cumple 4 de 5 parámetros. Punto débil: ${fail[0]||'un indicador'}. Apto para operar con cautela.`;
-  if(pass===3) return `${name} tiene resultado mixto. ${fail.join(' y ')} no alcanzan los parámetros mínimos. Requiere gestión de riesgo estricta.`;
-  return `${name} no cumple los parámetros mínimos (${fail.join(', ')}). No recomendable para la estrategia de cashflow en este momento.`;
+function buildDiagText(inds, pass, name){
+  const failing = inds.filter(i=>i.s==='fail').map(i=>i.nameEs);
+  const warning  = inds.filter(i=>i.s==='warn').map(i=>i.nameEs);
+  if(pass===5) return `${name} supera los 5 parámetros de calidad Buffett/institucional. Negocio sólido con ventaja competitiva demostrable, apto para la estrategia de cashflow con opciones.`;
+  if(pass===4) return `${name} cumple 4 de 5 parámetros. Punto a vigilar: ${warning[0]||failing[0]||'un indicador'}. Apto con gestión de riesgo estándar.`;
+  if(pass===3) return `${name} tiene resultado mixto. ${failing.join(' y ')} no alcanzan los umbrales institucionales. Requiere gestión de riesgo estricta y análisis adicional.`;
+  return `${name} no cumple los parámetros mínimos de calidad (${failing.join(', ')}). No recomendable para la estrategia de cashflow en este momento.`;
 }
 
 async function fhGet(endpoint){
@@ -216,7 +229,6 @@ async function analyze(){
   document.getElementById('report').style.display = 'none';
   document.getElementById('btn').disabled = true;
 
-  // Check cache
   const cached = getCache(ticker);
   if(cached){
     const mins = Math.round((Date.now()-cached.ts)/60000);
@@ -231,7 +243,6 @@ async function analyze(){
   startLoad();
 
   try{
-    // Two parallel calls: profile + basic financials
     const [profile, metrics] = await Promise.all([
       fhGet(`/stock/profile2?symbol=${ticker}`),
       fhGet(`/stock/metric?symbol=${ticker}&metric=all`)
@@ -255,70 +266,108 @@ async function analyze(){
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// INDICADORES — set v11 (Buffett/institucional, 5 filtros)
+// ─────────────────────────────────────────────────────────────
 function buildIndicators(data, ticker){
   const m = data.metrics;
 
-  // P/E — Finnhub field: peBasicExclExtraTTM or peTTM
-  const pe = toFloat(m['peBasicExclExtraTTM']) || toFloat(m['peTTM']) || toFloat(m['peNormalizedAnnual']);
+  // 1. TRAILING P/E
+  // Benchmark: < 25x. S&P 500 histórico ~17x; Buffett compró AAPL a 10-11x.
+  // Zona amarilla: 25–30x. Rojo: > 30x.
+  const pe = toFloat(m['peBasicExclExtraTTM']) ?? toFloat(m['peTTM']) ?? toFloat(m['peNormalizedAnnual']);
 
-  // ROE — Finnhub field: roeTTM (as percentage, e.g. 152.0)
+  // 2. ROE — Return on Equity (TTM)
+  // Benchmark: > 15%. Umbral Buffett (carta accionistas 1987). KO y JNJ lo sostienen >25%.
+  // Zona amarilla: 12–15%. Rojo: < 12%.
   const roe = toFloat(m['roeTTM']);
 
-  // Net Profit Margin — Finnhub: netProfitMarginTTM (as percentage, e.g. 27.0)
+  // 3. NET PROFIT MARGIN (TTM)
+  // Benchmark: > 10%. Piso institucional aceptable; Buffett ideal >20%.
+  // Zona amarilla: 7–10%. Rojo: < 7%.
   const margin = toFloat(m['netProfitMarginTTM']);
 
-  // Debt/Equity — Finnhub: totalDebt/totalEquityQuarterly (as ratio, e.g. 1.45 = 145%)
-  const deRaw = toFloat(m['totalDebt/totalEquityQuarterly']) || toFloat(m['totalDebt/totalEquityAnnual']);
-  const debtEq = deRaw != null ? deRaw * 100 : null;
+  // 4. DEBT / EQUITY (mrq)
+  // Benchmark: < 100% (ratio 1x). Buffett ideal < 50%; consensus institucional acepta hasta 1x.
+  // Finnhub devuelve el ratio puro (ej: 1.45 = 145%). Mostramos en %.
+  // Zona amarilla: 100–120%. Rojo: > 120%.
+  const deRaw = toFloat(m['totalDebt/totalEquityQuarterly']) ?? toFloat(m['totalDebt/totalEquityAnnual']);
+  const debtEq = deRaw != null ? deRaw * 100 : null; // convertir a %
 
-  // Free Cash Flow — Finnhub: freeCashFlowTTM (in millions) or freeCashFlowPerShareTTM
-  const fcfRaw = toFloat(m['freeCashFlowTTM']);
-  const fcf = fcfRaw != null ? fcfRaw * 1e6 : null; // convert millions to units
+  // 5. FREE CASH FLOW (TTM) — calculado: CFO - CapEx
+  // freeCashFlowTTM de Finnhub retorna null en la mayoría de tickers (bug conocido).
+  // Solución: CFO TTM - CapEx TTM. Finnhub entrega capexTTM en negativo (conv. contable),
+  // por lo que la operación correcta es CFO + capex (suma algebraica).
+  // Benchmark: Positivo (FCF > 0). Buffett: "el cash flow no se puede manipular".
+  const cfo   = toFloat(m['cashFlowFromOperationsTTM']); // en unidades absolutas (USD)
+  const capex = toFloat(m['capexTTM']);                   // usualmente negativo en Finnhub
+  let fcf = null;
+  let fcfMethod = '';
+  if(cfo != null && capex != null){
+    fcf = cfo + capex; // capex ya viene negativo → suma algebraica = CFO - |CapEx|
+    fcfMethod = 'CFO − CapEx (TTM)';
+  } else if(cfo != null){
+    fcf = cfo; // fallback: sin CapEx disponible, usamos CFO como proxy
+    fcfMethod = 'CFO TTM (CapEx no disponible)';
+  }
 
-  return [
-    {
-      nameEs: 'Trailing P/E', nameEn: 'Price/Earnings (ttm)',
-      value: fmtX(pe), raw: pe, param: '< 30x',
-      s: pe==null ? 'warn' : calcSt(pe, 30, false),
-      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw: 'Statistics → Valuation Measures → Trailing P/E'
-    },
-    {
-      nameEs: 'ROE', nameEn: 'Return on Equity (ttm)',
-      value: fmtPct(roe), raw: roe, param: '> 15%',
-      s: calcSt(roe, 15, true),
-      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw: 'Statistics → Management Effectiveness → Return on Equity (ttm)'
-    },
-    {
-      nameEs: 'Profit Margin', nameEn: 'Net Profit Margin (ttm)',
-      value: fmtPct(margin), raw: margin, param: '> 10%',
-      s: calcSt(margin, 10, true),
-      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw: 'Statistics → Profitability → Profit Margin'
-    },
-    {
-      nameEs: 'Deuda / Patrimonio', nameEn: 'Total Debt/Equity (mrq)',
-      value: debtEq != null ? debtEq.toFixed(2)+'%' : 'N/D', raw: debtEq, param: '< 100%',
-      s: calcSt(debtEq, 100, false),
-      yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw: 'Statistics → Balance Sheet → Total Debt/Equity (mrq)'
-    },
-    {
-      nameEs: 'Free Cash Flow', nameEn: 'Free Cash Flow (ttm)',
-      value: fmtM(fcf), raw: fcf, param: 'Positivo',
-      s: fcf==null ? 'warn' : (fcf>0 ? 'ok' : 'fail'),
-      yu: `https://finance.yahoo.com/quote/${ticker}/financials/`,
-      yw: 'Financials → Cash Flow → Free Cash Flow (TTM)'
-    }
-  ];
+  // DIVIDEND YIELD — dato informativo, no cuenta para el semáforo
+  const divYield = toFloat(m['dividendYieldIndicatedAnnual']);
+
+  return {
+    inds: [
+      {
+        nameEs: 'Trailing P/E', nameEn: 'Price / Earnings (TTM)',
+        value: fmtX(pe), raw: pe, param: '< 25x',
+        paramDesc: 'S&P 500 hist. ~17x · Buffett compró AAPL a 10-11x',
+        s: pe == null ? 'warn' : (pe <= 25 ? 'ok' : pe <= 30 ? 'warn' : 'fail'),
+        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+        yw: 'Statistics → Valuation Measures → Trailing P/E'
+      },
+      {
+        nameEs: 'ROE', nameEn: 'Return on Equity (TTM)',
+        value: fmtPct(roe), raw: roe, param: '> 15%',
+        paramDesc: 'Umbral Buffett 1987 · KO y JNJ sostienen >25% histórico',
+        s: roe == null ? 'warn' : (roe >= 15 ? 'ok' : roe >= 12 ? 'warn' : 'fail'),
+        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+        yw: 'Statistics → Management Effectiveness → Return on Equity (ttm)'
+      },
+      {
+        nameEs: 'Profit Margin', nameEn: 'Net Profit Margin (TTM)',
+        value: fmtPct(margin), raw: margin, param: '> 10%',
+        paramDesc: 'Piso institucional · Buffett ideal >20% · margen = moat',
+        s: margin == null ? 'warn' : (margin >= 10 ? 'ok' : margin >= 7 ? 'warn' : 'fail'),
+        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+        yw: 'Statistics → Profitability → Profit Margin'
+      },
+      {
+        nameEs: 'Deuda / Patrimonio', nameEn: 'Total Debt / Equity (mrq)',
+        value: debtEq != null ? debtEq.toFixed(1)+'%' : 'N/D', raw: debtEq, param: '< 100%',
+        paramDesc: 'Buffett ideal <50% · consensus institucional tope en 100%',
+        s: debtEq == null ? 'warn' : (debtEq <= 100 ? 'ok' : debtEq <= 120 ? 'warn' : 'fail'),
+        yu: `https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
+        yw: 'Statistics → Balance Sheet → Total Debt/Equity (mrq)'
+      },
+      {
+        nameEs: 'Free Cash Flow', nameEn: 'Free Cash Flow (TTM)',
+        value: fmtM(fcf), raw: fcf, param: 'Positivo',
+        paramDesc: 'FCF = CFO − CapEx · Buffett: "el cash no se puede falsificar"',
+        fcfMethod,
+        s: fcf == null ? 'warn' : (fcf > 0 ? 'ok' : 'fail'),
+        yu: `https://finance.yahoo.com/quote/${ticker}/financials/`,
+        yw: 'Financials → Cash Flow → Free Cash Flow'
+      }
+    ],
+    divYield
+  };
 }
 
 function renderFromData(data, ticker, fromCache){
-  const inds = buildIndicators(data, ticker);
+  const { inds, divYield } = buildIndicators(data, ticker);
   const pass = inds.filter(i=>i.s==='ok').length;
   const p = data.profile;
   const name = p.name || ticker;
+  const fcfInd = inds.find(i=>i.nameEs==='Free Cash Flow');
 
   let dLabel, dColor, dIcon;
   if(pass===5){ dLabel='SÍ (A+)'; dColor='green'; dIcon='🟢'; }
@@ -330,11 +379,54 @@ function renderFromData(data, ticker, fromCache){
 
   const rows = inds.map(i=>`
     <tr>
-      <td><div class="ind-name">${i.nameEs}</div><div class="ind-en">${i.nameEn}</div></td>
+      <td>
+        <div class="ind-name">${i.nameEs}</div>
+        <div class="ind-en">${i.nameEn}</div>
+      </td>
       <td class="ind-val">${i.value}</td>
-      <td class="ind-param">${i.param}</td>
+      <td>
+        <div class="ind-param">${i.param}</div>
+        <div class="ind-source">${i.paramDesc}</div>
+      </td>
       <td><span class="badge ${i.s}"><span class="dot"></span>${sl[i.s]}</span></td>
     </tr>`).join('');
+
+  // FCF method footnote
+  const fcfFootnote = fcfInd && fcfInd.fcfMethod
+    ? `<div class="fcf-note">⚙ FCF calculado como ${fcfInd.fcfMethod}</div>`
+    : '';
+
+  // Dividend yield card (informativo)
+  let divCard = '';
+  if(divYield != null){
+    const dyFmt = divYield.toFixed(2) + '%';
+    const dyNote = divYield < 1
+      ? 'Dividendo bajo o nulo — habitual en acciones de alto crecimiento (NVDA, AMZN, GOOGL).'
+      : divYield <= 4
+      ? 'Rango saludable (1–4%). Dividendo sostenible típico de blue chips de calidad.'
+      : divYield <= 6
+      ? 'Rendimiento elevado. Verificar que el payout ratio sea sostenible (<70%).'
+      : 'Rendimiento muy alto. Puede indicar recorte próximo. Revisar deuda y payout ratio.';
+    divCard = `
+      <div class="div-card">
+        <div class="div-icon">💵</div>
+        <div>
+          <div class="div-card-label">Dividend Yield (dato informativo · no suma al semáforo)</div>
+          <div class="div-card-val">${dyFmt}</div>
+        </div>
+        <div class="div-card-note">${dyNote}</div>
+      </div>`;
+  } else {
+    divCard = `
+      <div class="div-card">
+        <div class="div-icon">💵</div>
+        <div>
+          <div class="div-card-label">Dividend Yield (dato informativo · no suma al semáforo)</div>
+          <div class="div-card-val">N/D</div>
+        </div>
+        <div class="div-card-note">Sin datos de dividendo en Finnhub para este ticker. Verificar en Yahoo Finance → Summary.</div>
+      </div>`;
+  }
 
   const vcards = inds.map(i=>`
     <div class="vcard">
@@ -361,16 +453,19 @@ function renderFromData(data, ticker, fromCache){
     </div>
 
     <div class="data-note">
-      📡 <span>Datos: <strong>Finnhub API</strong> · Verificación: <strong>Yahoo Finance</strong> (ver guía abajo)${fromCache?' · <em>Datos en caché</em>':''}</span>
+      📡 <span>Datos: <strong>Finnhub API</strong> · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong>${fromCache?' · <em>Datos en caché</em>':''}</span>
     </div>
 
     <div class="section-label">Filtro de Calidad — 5 Indicadores Fundamentales</div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Indicador</th><th>Valor actual</th><th>Parámetro</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Indicador</th><th>Valor actual</th><th>Parámetro institucional</th><th>Estado</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
+      ${fcfFootnote}
     </div>
+
+    ${divCard}
 
     <div class="section-label">Guía de Verificación en Yahoo Finance</div>
     <div class="vgrid">${vcards}</div>
