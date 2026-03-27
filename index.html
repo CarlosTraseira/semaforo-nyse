@@ -217,6 +217,8 @@ footer span{color:var(--text2)}
 <script>
 const FH='d72mft9r01qlfd9nph2gd72mft9r01qlfd9nph30';
 const FH_BASE='https://finnhub.io/api/v1';
+const FMP_KEY='PdXJWoiZsKAcIeUbBW2lGoN5vz7chrNx';
+const FMP_BASE='https://financialmodelingprep.com/api/v3';
 const CACHE_TTL=24*60*60*1000;
 
 function go(t){document.getElementById('tickerInput').value=t;analyze();}
@@ -249,23 +251,14 @@ function sanitizePE(v){
   return{val:v,distorted:false};
 }
 
-// Extrae FCF del endpoint /stock/financials (estado de flujo de caja estandarizado)
-function extractFCFFromFinancials(finData){
-  if(!finData||!finData.data||!finData.data.length)return null;
-  for(const period of finData.data){
-    // Finnhub puede usar distintos nombres según versión
-    const cfo=toFloat(period['operatingCashFlow'])??toFloat(period['netCashProvidedByOperatingActivities']);
-    const capex=toFloat(period['capitalExpenditures'])??toFloat(period['purchasesOfPropertyPlantAndEquipment']);
-    if(cfo!=null){
-      if(capex!=null){
-        // CapEx puede venir positivo o negativo; normalizamos a positivo para restar
-        const fcf=cfo-Math.abs(capex);
-        return{fcf,period:period['period']||period['endDate']||''};
-      }
-      return{fcf:cfo,period:period['period']||''};
-    }
-  }
-  return null;
+// Extrae FCF del endpoint FMP /key-metrics-ttm
+// FMP devuelve freeCashFlow directamente en dólares absolutos TTM
+function extractFCFFromFMP(fmpData){
+  if(!fmpData||!Array.isArray(fmpData)||!fmpData.length)return null;
+  const d=fmpData[0];
+  const fcf=toFloat(d['freeCashFlowTTM'])??toFloat(d['freeCashFlow']);
+  if(fcf==null)return null;
+  return{fcf,period:'TTM'};
 }
 
 function buildIndicators(data,ticker){
@@ -285,25 +278,25 @@ function buildIndicators(data,ticker){
   const deRaw=toFloat(m['totalDebt/totalEquityQuarterly'])??toFloat(m['totalDebt/totalEquityAnnual']);
   const debtEq=deRaw!=null?deRaw*100:null;
 
-  // 5. Flujo de Caja Libre — tres capas de fallback
+  // 5. Flujo de Caja Libre — dos capas
+  // Capa A: FMP /key-metrics-ttm → freeCashFlow (campo directo, más confiable)
+  // Capa B: Finnhub /stock/metric campos cashFlowFromOperationsTTM + capexTTM
   let fcf=null,fcfPeriod='',fcfMethod='';
 
-  // Capa A: endpoint /stock/financials con estado de flujo de caja TTM
-  if(data.financialsCF){
-    const result=extractFCFFromFinancials(data.financialsCF);
-    if(result){fcf=result.fcf;fcfPeriod=result.period;fcfMethod='Estados financieros — Flujo Operativo − CapEx';}
+  if(data.fmpMetrics){
+    const result=extractFCFFromFMP(data.fmpMetrics);
+    if(result){fcf=result.fcf;fcfPeriod=result.period;fcfMethod='Financial Modeling Prep — TTM';}
   }
-
-  // Capa B: campos directos en /stock/metric
   if(fcf==null){
+    // Fallback Finnhub
     const cfo=toFloat(m['cashFlowFromOperationsTTM']);
     const capex=toFloat(m['capexTTM']);
     if(cfo!=null&&capex!=null){
       fcf=cfo-Math.abs(capex);
-      fcfMethod='Métricas TTM — Flujo Operativo − CapEx';
+      fcfMethod='Finnhub — Flujo Operativo − CapEx (TTM)';
     }else if(cfo!=null){
       fcf=cfo;
-      fcfMethod='Flujo Operativo TTM (CapEx no disponible en Finnhub)';
+      fcfMethod='Finnhub — Flujo Operativo TTM';
     }
   }
 
@@ -374,6 +367,16 @@ async function fhGet(ep){
   return r.json();
 }
 
+async function fmpGet(ep){
+  // FMP key-metrics-ttm devuelve freeCashFlow directamente en dólares TTM
+  const sep=ep.includes('?')?'&':'?';
+  try{
+    const r=await fetch(`${FMP_BASE}${ep}${sep}apikey=${FMP_KEY}`);
+    if(!r.ok)return null;
+    return r.json();
+  }catch(e){return null;}
+}
+
 async function analyze(){
   const raw=document.getElementById('tickerInput').value.trim().toUpperCase();
   if(!raw)return;
@@ -395,13 +398,17 @@ async function analyze(){
   document.getElementById('loading').style.display='block';
   startLoad();
   try{
-    const[profile,metrics,financialsCF]=await Promise.all([
+    // Tres llamadas en paralelo:
+    // 1. Finnhub: perfil de empresa
+    // 2. Finnhub: métricas (P/E, ROE, Margin, D/E, Dividend Yield)
+    // 3. FMP: key-metrics-ttm → freeCashFlow (campo directo, confiable)
+    const[profile,metrics,fmpMetrics]=await Promise.all([
       fhGet(`/stock/profile2?symbol=${ticker}`),
       fhGet(`/stock/metric?symbol=${ticker}&metric=all`),
-      fhGet(`/stock/financials?symbol=${ticker}&statement=cf&freq=ttm`).catch(()=>null)
+      fmpGet(`/key-metrics-ttm/${ticker}`)
     ]);
     if(!profile||!profile.name)throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
-    const d={profile,metrics:metrics.metric||{},financialsCF};
+    const d={profile,metrics:metrics.metric||{},fmpMetrics};
     setCache(ticker,d);
     stopLoad();
     document.getElementById('loading').style.display='none';
@@ -499,7 +506,7 @@ function render(data,ticker,fromCache){
     </div>
 
     <div class="source-bar">
-      📡 Datos: <strong>Finnhub API</strong> · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong>
+      📡 Datos: <strong>Finnhub API</strong> (P/E, ROE, Margen, Deuda) · <strong>Financial Modeling Prep</strong> (FCF) · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong>
     </div>
 
     <div class="sec-label">5 Filtros de Calidad Institucional</div>
@@ -514,7 +521,7 @@ function render(data,ticker,fromCache){
     <div class="sec-label">Aviso Legal</div>
     <div class="disclaimer">
       <div class="disclaimer-title">Disclaimer — Aviso importante</div>
-      <p>La información presentada en esta aplicación proviene de <strong>Finnhub API</strong>, fuente de datos financieros pública, y se utiliza exclusivamente con fines <strong>educativos e informativos</strong>. Los datos pueden contener demoras, errores u omisiones inherentes a la fuente original.<br><br>
+      <p>La información presentada en esta aplicación proviene de <strong>Finnhub API</strong> y <strong>Financial Modeling Prep (FMP)</strong>, fuentes de datos financieros públicas, y se utiliza exclusivamente con fines <strong>educativos e informativos</strong>. Los datos pueden contener demoras, errores u omisiones inherentes a las fuentes originales.<br><br>
       Este análisis <strong>no constituye una recomendación de compra, venta o tenencia</strong> de ningún instrumento financiero. No es asesoramiento de inversión personalizado ni debe ser interpretado como tal. Los indicadores aquí presentados son herramientas de análisis fundamental y no garantizan rendimientos futuros. El desempeño pasado no es garantía de resultados futuros.<br><br>
       Toda decisión de inversión debe ser tomada con la orientación de un asesor financiero habilitado, considerando el perfil de riesgo, el horizonte temporal y los objetivos personales de cada inversor.<br><br>
       <strong>Carlos Traseira</strong> no es responsable de ninguna decisión de inversión tomada con base en la información aquí presentada.</p>
