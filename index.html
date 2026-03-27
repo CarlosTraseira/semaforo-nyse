@@ -230,7 +230,7 @@ function startLoad(){let i=0;document.getElementById('loadTxt').textContent=msgs
 function stopLoad(){clearInterval(mi);}
 function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';}
 
-function cacheKey(t){return`snse_v12_${t}`;}
+function cacheKey(t){return`snse_v13_${t}`;}
 function getCache(t){try{const r=localStorage.getItem(cacheKey(t));if(!r)return null;const o=JSON.parse(r);if(Date.now()-o.ts>CACHE_TTL){localStorage.removeItem(cacheKey(t));return null;}return o;}catch(e){return null;}}
 function setCache(t,d){try{localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d}));}catch(e){}}
 
@@ -252,13 +252,20 @@ function sanitizePE(v){
 }
 
 // Extrae FCF del endpoint FMP /key-metrics-ttm
-// FMP devuelve freeCashFlow directamente en dólares absolutos TTM
+// FMP puede devolver el campo con distintos nombres según versión de API
 function extractFCFFromFMP(fmpData){
-  if(!fmpData||!Array.isArray(fmpData)||!fmpData.length)return null;
-  const d=fmpData[0];
-  const fcf=toFloat(d['freeCashFlowTTM'])??toFloat(d['freeCashFlow']);
-  if(fcf==null)return null;
-  return{fcf,period:'TTM'};
+  if(!fmpData) return null;
+  // FMP devuelve un array con un objeto, o directamente un objeto según endpoint
+  const d = Array.isArray(fmpData) ? fmpData[0] : fmpData;
+  if(!d) return null;
+  // Probar todos los nombres posibles que FMP usa según versión
+  const fcf = toFloat(d['freeCashFlowTTM'])
+            ?? toFloat(d['freeCashFlow'])
+            ?? toFloat(d['FreeCashFlowTTM'])
+            ?? toFloat(d['free_cash_flow_ttm'])
+            ?? toFloat(d['free_cash_flow']);
+  if(fcf == null) return null;
+  return { fcf, period: 'TTM' };
 }
 
 function buildIndicators(data,ticker){
@@ -278,22 +285,42 @@ function buildIndicators(data,ticker){
   const deRaw=toFloat(m['totalDebt/totalEquityQuarterly'])??toFloat(m['totalDebt/totalEquityAnnual']);
   const debtEq=deRaw!=null?deRaw*100:null;
 
-  // 5. Flujo de Caja Libre — dos capas
-  // Capa A: FMP /key-metrics-ttm → freeCashFlow (campo directo, más confiable)
-  // Capa B: Finnhub /stock/metric campos cashFlowFromOperationsTTM + capexTTM
+  // 5. Flujo de Caja Libre — tres capas
+  // Capa A: FMP /key-metrics-ttm → freeCashFlow (campo directo)
+  // Capa B: FMP /cash-flow-statement TTM → operatingCashFlow - capitalExpenditure
+  // Capa C: Finnhub campos cashFlowFromOperationsTTM + capexTTM
   let fcf=null,fcfPeriod='',fcfMethod='';
 
+  // Capa A
   if(data.fmpMetrics){
     const result=extractFCFFromFMP(data.fmpMetrics);
-    if(result){fcf=result.fcf;fcfPeriod=result.period;fcfMethod='Financial Modeling Prep — TTM';}
+    if(result){fcf=result.fcf;fcfPeriod=result.period;fcfMethod='FMP — key-metrics TTM';}
   }
+
+  // Capa B: cash-flow-statement TTM de FMP
+  if(fcf==null && data.fmpCashflow){
+    const cf=Array.isArray(data.fmpCashflow)?data.fmpCashflow[0]:data.fmpCashflow;
+    if(cf){
+      const directFCF=toFloat(cf['freeCashFlow'])??toFloat(cf['freeCashFlowTTM']);
+      if(directFCF!=null){
+        fcf=directFCF;fcfMethod='FMP — Cash Flow Statement TTM';
+      } else {
+        const cfo=toFloat(cf['operatingCashFlow'])??toFloat(cf['netCashProvidedByOperatingActivities']);
+        const capex=toFloat(cf['capitalExpenditure'])??toFloat(cf['capitalExpenditures'])??toFloat(cf['purchasesOfPropertyPlantAndEquipmentNet']);
+        if(cfo!=null&&capex!=null){fcf=cfo-Math.abs(capex);fcfMethod='FMP — CFO − CapEx (TTM)';}
+        else if(cfo!=null){fcf=cfo;fcfMethod='FMP — Flujo Operativo TTM';}
+      }
+      if(fcf!=null)fcfPeriod=cf['period']||cf['date']||'TTM';
+    }
+  }
+
+  // Capa C: Finnhub fallback
   if(fcf==null){
-    // Fallback Finnhub
     const cfo=toFloat(m['cashFlowFromOperationsTTM']);
     const capex=toFloat(m['capexTTM']);
     if(cfo!=null&&capex!=null){
       fcf=cfo-Math.abs(capex);
-      fcfMethod='Finnhub — Flujo Operativo − CapEx (TTM)';
+      fcfMethod='Finnhub — CFO − CapEx (TTM)';
     }else if(cfo!=null){
       fcf=cfo;
       fcfMethod='Finnhub — Flujo Operativo TTM';
@@ -402,13 +429,15 @@ async function analyze(){
     // 1. Finnhub: perfil de empresa
     // 2. Finnhub: métricas (P/E, ROE, Margin, D/E, Dividend Yield)
     // 3. FMP: key-metrics-ttm → freeCashFlow (campo directo, confiable)
-    const[profile,metrics,fmpMetrics]=await Promise.all([
+    // 4. FMP: cash-flow-statement TTM como segundo fallback para FCF
+    const[profile,metrics,fmpMetrics,fmpCashflow]=await Promise.all([
       fhGet(`/stock/profile2?symbol=${ticker}`),
       fhGet(`/stock/metric?symbol=${ticker}&metric=all`),
-      fmpGet(`/key-metrics-ttm/${ticker}`)
+      fmpGet(`/key-metrics-ttm/${ticker}`),
+      fmpGet(`/cash-flow-statement/${ticker}?period=ttm&limit=1`)
     ]);
     if(!profile||!profile.name)throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
-    const d={profile,metrics:metrics.metric||{},fmpMetrics};
+    const d={profile,metrics:metrics.metric||{},fmpMetrics,fmpCashflow};
     setCache(ticker,d);
     stopLoad();
     document.getElementById('loading').style.display='none';
