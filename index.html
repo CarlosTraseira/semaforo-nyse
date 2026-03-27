@@ -148,6 +148,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* Disclaimer */
 .disclaimer{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:28px}
 .disclaimer-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.16em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.disclaimer-title.amber{color:var(--amber)}
 .disclaimer p{font-family:var(--mono);font-size:12px;color:var(--text3);line-height:1.85}
 .disclaimer strong{color:var(--text2)}
 
@@ -217,8 +218,6 @@ footer span{color:var(--text2)}
 <script>
 const FH='d72mft9r01qlfd9nph2gd72mft9r01qlfd9nph30';
 const FH_BASE='https://finnhub.io/api/v1';
-const FMP_KEY='PdXJWoiZsKAcIeUbBW2lGoN5vz7chrNx';
-const FMP_BASE='https://financialmodelingprep.com/api/v3';
 const CACHE_TTL=24*60*60*1000;
 
 function go(t){document.getElementById('tickerInput').value=t;analyze();}
@@ -230,7 +229,7 @@ function startLoad(){let i=0;document.getElementById('loadTxt').textContent=msgs
 function stopLoad(){clearInterval(mi);}
 function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';}
 
-function cacheKey(t){return`snse_v13_${t}`;}
+function cacheKey(t){return`snse_v15_${t}`;}
 function getCache(t){try{const r=localStorage.getItem(cacheKey(t));if(!r)return null;const o=JSON.parse(r);if(Date.now()-o.ts>CACHE_TTL){localStorage.removeItem(cacheKey(t));return null;}return o;}catch(e){return null;}}
 function setCache(t,d){try{localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d}));}catch(e){}}
 
@@ -251,21 +250,35 @@ function sanitizePE(v){
   return{val:v,distorted:false};
 }
 
-// Extrae FCF del endpoint FMP /key-metrics-ttm
-// FMP puede devolver el campo con distintos nombres según versión de API
-function extractFCFFromFMP(fmpData){
-  if(!fmpData) return null;
-  // FMP devuelve un array con un objeto, o directamente un objeto según endpoint
-  const d = Array.isArray(fmpData) ? fmpData[0] : fmpData;
-  if(!d) return null;
-  // Probar todos los nombres posibles que FMP usa según versión
-  const fcf = toFloat(d['freeCashFlowTTM'])
-            ?? toFloat(d['freeCashFlow'])
-            ?? toFloat(d['FreeCashFlowTTM'])
-            ?? toFloat(d['free_cash_flow_ttm'])
-            ?? toFloat(d['free_cash_flow']);
-  if(fcf == null) return null;
-  return { fcf, period: 'TTM' };
+// Calcula FCF total desde campos per-share que Finnhub SÍ provee en free tier:
+// FCF = cashFlowPerShareTTM × sharesOutstanding
+// sharesOutstanding = marketCapitalization (en millones USD) × 1e6 / precio
+// Pero más directo: FCF total = marketCap / (currentEv/freeCashFlowTTM)
+// ya que EV ≈ marketCap para empresas sin deuda neta significativa,
+// y el ratio EV/FCF = precio/FCF_por_acción cuando no hay deuda neta.
+// El método más preciso disponible: usar pfcfShareTTM (Price/FCF per share)
+// FCF por acción = precio / pfcfShareTTM
+// FCF total = (precio / pfcfShareTTM) × sharesOutstanding
+//           = marketCap / pfcfShareTTM
+function calcFCFFromMetrics(m){
+  // marketCapitalization viene en millones USD en Finnhub
+  const mktCap = toFloat(m['marketCapitalization']);
+  
+  // Método 1: usar pfcfShareTTM (Price to Free Cash Flow per share TTM)
+  // FCF_total = mktCap_USD / pfcfShareTTM
+  const pfcf = toFloat(m['pfcfShareTTM']);
+  if(mktCap!=null && pfcf!=null && pfcf!==0){
+    return { fcf: (mktCap * 1e6) / pfcf, method:'Calculado: Mkt Cap / P/FCF (TTM)' };
+  }
+
+  // Método 2: usar currentEv/freeCashFlowTTM
+  // FCF_total ≈ mktCap_USD / (EV/FCF_TTM)  [aproximación, EV≈mktCap]
+  const evFcf = toFloat(m['currentEv/freeCashFlowTTM']);
+  if(mktCap!=null && evFcf!=null && evFcf!==0){
+    return { fcf: (mktCap * 1e6) / evFcf, method:'Calculado: Mkt Cap / EV/FCF (TTM)' };
+  }
+
+  return null;
 }
 
 function buildIndicators(data,ticker){
@@ -285,47 +298,14 @@ function buildIndicators(data,ticker){
   const deRaw=toFloat(m['totalDebt/totalEquityQuarterly'])??toFloat(m['totalDebt/totalEquityAnnual']);
   const debtEq=deRaw!=null?deRaw*100:null;
 
-  // 5. Flujo de Caja Libre — tres capas
-  // Capa A: FMP /key-metrics-ttm → freeCashFlow (campo directo)
-  // Capa B: FMP /cash-flow-statement TTM → operatingCashFlow - capitalExpenditure
-  // Capa C: Finnhub campos cashFlowFromOperationsTTM + capexTTM
-  let fcf=null,fcfPeriod='',fcfMethod='';
+  // 5. Flujo de Caja Libre — calculado desde métricas per-share que Finnhub sí provee
+  // Todos los campos están en /stock/metric (misma llamada que ya hacemos, sin llamadas extra)
+  // Método principal: mktCap / pfcfShareTTM (Price to Free Cash Flow per share TTM)
+  // Fallback: mktCap / (currentEv/freeCashFlowTTM)
+  let fcf=null,fcfPeriod='TTM',fcfMethod='';
 
-  // Capa A
-  if(data.fmpMetrics){
-    const result=extractFCFFromFMP(data.fmpMetrics);
-    if(result){fcf=result.fcf;fcfPeriod=result.period;fcfMethod='FMP — key-metrics TTM';}
-  }
-
-  // Capa B: cash-flow-statement TTM de FMP
-  if(fcf==null && data.fmpCashflow){
-    const cf=Array.isArray(data.fmpCashflow)?data.fmpCashflow[0]:data.fmpCashflow;
-    if(cf){
-      const directFCF=toFloat(cf['freeCashFlow'])??toFloat(cf['freeCashFlowTTM']);
-      if(directFCF!=null){
-        fcf=directFCF;fcfMethod='FMP — Cash Flow Statement TTM';
-      } else {
-        const cfo=toFloat(cf['operatingCashFlow'])??toFloat(cf['netCashProvidedByOperatingActivities']);
-        const capex=toFloat(cf['capitalExpenditure'])??toFloat(cf['capitalExpenditures'])??toFloat(cf['purchasesOfPropertyPlantAndEquipmentNet']);
-        if(cfo!=null&&capex!=null){fcf=cfo-Math.abs(capex);fcfMethod='FMP — CFO − CapEx (TTM)';}
-        else if(cfo!=null){fcf=cfo;fcfMethod='FMP — Flujo Operativo TTM';}
-      }
-      if(fcf!=null)fcfPeriod=cf['period']||cf['date']||'TTM';
-    }
-  }
-
-  // Capa C: Finnhub fallback
-  if(fcf==null){
-    const cfo=toFloat(m['cashFlowFromOperationsTTM']);
-    const capex=toFloat(m['capexTTM']);
-    if(cfo!=null&&capex!=null){
-      fcf=cfo-Math.abs(capex);
-      fcfMethod='Finnhub — CFO − CapEx (TTM)';
-    }else if(cfo!=null){
-      fcf=cfo;
-      fcfMethod='Finnhub — Flujo Operativo TTM';
-    }
-  }
+  const fcfResult = calcFCFFromMetrics(m);
+  if(fcfResult){ fcf=fcfResult.fcf; fcfMethod=fcfResult.method; }
 
   const divYield=toFloat(m['dividendYieldIndicatedAnnual']);
 
@@ -394,16 +374,6 @@ async function fhGet(ep){
   return r.json();
 }
 
-async function fmpGet(ep){
-  // FMP key-metrics-ttm devuelve freeCashFlow directamente en dólares TTM
-  const sep=ep.includes('?')?'&':'?';
-  try{
-    const r=await fetch(`${FMP_BASE}${ep}${sep}apikey=${FMP_KEY}`);
-    if(!r.ok)return null;
-    return r.json();
-  }catch(e){return null;}
-}
-
 async function analyze(){
   const raw=document.getElementById('tickerInput').value.trim().toUpperCase();
   if(!raw)return;
@@ -425,19 +395,15 @@ async function analyze(){
   document.getElementById('loading').style.display='block';
   startLoad();
   try{
-    // Tres llamadas en paralelo:
-    // 1. Finnhub: perfil de empresa
-    // 2. Finnhub: métricas (P/E, ROE, Margin, D/E, Dividend Yield)
-    // 3. FMP: key-metrics-ttm → freeCashFlow (campo directo, confiable)
-    // 4. FMP: cash-flow-statement TTM como segundo fallback para FCF
-    const[profile,metrics,fmpMetrics,fmpCashflow]=await Promise.all([
+    // Dos llamadas en paralelo — todo desde Finnhub /stock/metric:
+    // El FCF se calcula desde campos per-share que Finnhub sí incluye en el free tier
+    // (pfcfShareTTM, currentEv/freeCashFlowTTM, marketCapitalization)
+    const[profile,metrics]=await Promise.all([
       fhGet(`/stock/profile2?symbol=${ticker}`),
-      fhGet(`/stock/metric?symbol=${ticker}&metric=all`),
-      fmpGet(`/key-metrics-ttm/${ticker}`),
-      fmpGet(`/cash-flow-statement/${ticker}?period=ttm&limit=1`)
+      fhGet(`/stock/metric?symbol=${ticker}&metric=all`)
     ]);
     if(!profile||!profile.name)throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
-    const d={profile,metrics:metrics.metric||{},fmpMetrics,fmpCashflow};
+    const d={profile,metrics:metrics.metric||{}};
     setCache(ticker,d);
     stopLoad();
     document.getElementById('loading').style.display='none';
@@ -535,7 +501,7 @@ function render(data,ticker,fromCache){
     </div>
 
     <div class="source-bar">
-      📡 Datos: <strong>Finnhub API</strong> (P/E, ROE, Margen, Deuda) · <strong>Financial Modeling Prep</strong> (FCF) · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong>
+      📡 Datos: <strong>Finnhub API</strong> · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong>
     </div>
 
     <div class="sec-label">5 Filtros de Calidad Institucional</div>
@@ -547,10 +513,19 @@ function render(data,ticker,fromCache){
     <div class="sec-label">Guía de Verificación en Yahoo Finance</div>
     <div class="vgrid">${vcards}</div>
 
+    <div class="disclaimer" style="margin-bottom:22px">
+      <div class="disclaimer-title" style="color:var(--amber);border-color:var(--amber)">⚠ Sobre las diferencias entre fuentes</div>
+      <p>Es normal que los valores mostrados aquí difieran levemente de los que aparecen en Yahoo Finance u otras plataformas. Estas diferencias no son errores — reflejan criterios distintos en el cálculo de cada proveedor de datos.<br><br>
+      <strong>P/E Trailing:</strong> el ratio Precio/Ganancias cambia con cada movimiento del precio de la acción. Finnhub y Yahoo pueden usar el precio de momentos distintos del día (cierre anterior vs. tiempo real), lo que genera diferencias de 1–3% en el valor final.<br><br>
+      <strong>ROE y otros ratios de rentabilidad:</strong> algunos proveedores calculan el patrimonio neto promediando inicio y fin del período; otros usan solo el valor al cierre del último trimestre. Además, si una empresa acaba de publicar resultados trimestrales, es posible que una fuente ya los incorpore y la otra todavía no.<br><br>
+      <strong>Free Cash Flow:</strong> no existe una definición universal de FCF. Distintas fuentes incluyen o excluyen conceptos como stock-based compensation, lease payments o working capital changes. El valor aquí calculado sigue la fórmula estándar: Flujo Operativo − CapEx.<br><br>
+      Lo que importa para el análisis es la <strong>señal</strong>, no el número exacto. Un ROE de 150% y uno de 160% llevan a la misma conclusión. La habilidad del inversor está en interpretar la tendencia y el orden de magnitud, no en buscar coincidencia decimal entre plataformas.</p>
+    </div>
+
     <div class="sec-label">Aviso Legal</div>
     <div class="disclaimer">
       <div class="disclaimer-title">Disclaimer — Aviso importante</div>
-      <p>La información presentada en esta aplicación proviene de <strong>Finnhub API</strong> y <strong>Financial Modeling Prep (FMP)</strong>, fuentes de datos financieros públicas, y se utiliza exclusivamente con fines <strong>educativos e informativos</strong>. Los datos pueden contener demoras, errores u omisiones inherentes a las fuentes originales.<br><br>
+      <p>La información presentada en esta aplicación proviene de <strong>Finnhub API</strong>, fuente de datos financieros pública, y se utiliza exclusivamente con fines <strong>educativos e informativos</strong>. Los datos pueden contener demoras, errores u omisiones inherentes a la fuente original.<br><br>
       Este análisis <strong>no constituye una recomendación de compra, venta o tenencia</strong> de ningún instrumento financiero. No es asesoramiento de inversión personalizado ni debe ser interpretado como tal. Los indicadores aquí presentados son herramientas de análisis fundamental y no garantizan rendimientos futuros. El desempeño pasado no es garantía de resultados futuros.<br><br>
       Toda decisión de inversión debe ser tomada con la orientación de un asesor financiero habilitado, considerando el perfil de riesgo, el horizonte temporal y los objetivos personales de cada inversor.<br><br>
       <strong>Carlos Traseira</strong> no es responsable de ninguna decisión de inversión tomada con base en la información aquí presentada.</p>
