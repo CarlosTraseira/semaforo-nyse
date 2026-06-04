@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -117,6 +116,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .ind-val{font-family:var(--mono);font-size:clamp(17px,4vw,21px);font-weight:600;margin-top:4px;word-break:break-word}
 .ind-val.nd{color:var(--text3);font-size:13px;line-height:1.5}
 .ind-val-note{font-family:var(--mono);font-size:10px;color:var(--amber);margin-top:2px}
+.ind-src{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:5px;letter-spacing:.03em}
+.ind-src b{font-weight:600}
+.ind-src .y{color:var(--green)}
+.ind-src .f{color:var(--amber)}
 .ind-source{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:5px;line-height:1.5}
 .ind-right{text-align:right;flex-shrink:0}
 .ind-param{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text2);margin-bottom:8px;white-space:nowrap}
@@ -152,6 +155,24 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .disclaimer p{font-family:var(--mono);font-size:12px;color:var(--text3);line-height:1.85}
 .disclaimer strong{color:var(--text2)}
 
+/* Gate — pantalla de bloqueo */
+.gate{position:fixed;inset:0;z-index:50;background:rgba(8,8,12,0.94);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.gate.show{display:flex}
+.gate-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:34px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.gate-lock{font-size:34px;margin-bottom:14px}
+.gate-title{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.gate-title span{color:var(--green)}
+.gate-sub{font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:22px}
+.gate-input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:16px;font-weight:500;color:var(--text);outline:none;letter-spacing:.08em;text-align:center;text-transform:uppercase;transition:border-color .2s,box-shadow .2s;margin-bottom:12px}
+.gate-input::placeholder{color:var(--text3);text-transform:none;letter-spacing:.02em}
+.gate-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+.gate-btn{width:100%;background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:14px 24px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
+.gate-btn:hover{opacity:.88}
+.gate-btn:active{transform:scale(.98)}
+.gate-btn:disabled{opacity:.4;cursor:not-allowed}
+.gate-err{font-family:var(--mono);font-size:12px;color:var(--red);margin-top:14px;min-height:16px;line-height:1.5}
+.gate-foot{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:20px;line-height:1.6}
+
 /* Footer */
 footer{position:relative;z-index:1;text-align:center;padding:24px 20px 32px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:32px}
 footer span{color:var(--text2)}
@@ -168,6 +189,19 @@ footer span{color:var(--text2)}
 </style>
 </head>
 <body>
+
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-lock">🔒</div>
+    <div class="gate-title">Semáforo <span>NYSE</span></div>
+    <div class="gate-sub">Herramienta exclusiva para alumnos.<br>Ingresá el código de acceso que figura en tu área de miembros.</div>
+    <input class="gate-input" id="gateInput" type="text" placeholder="Código de acceso" autocomplete="off" autocapitalize="characters"/>
+    <button class="gate-btn" id="gateBtn" onclick="submitGate()">Desbloquear</button>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-foot">© 2026 Carlos Traseira</div>
+  </div>
+</div>
+
 <div class="app">
 
   <div class="header">
@@ -179,7 +213,7 @@ footer span{color:var(--text2)}
       </div>
       <div class="logo-name">Semáforo <span>NYSE</span></div>
     </div>
-    <div class="logo-tag">Filtro de Calidad Institucional · v12</div>
+    <div class="logo-tag">Filtro de Calidad Institucional · v16</div>
   </div>
 
   <div class="search-card">
@@ -205,7 +239,7 @@ footer span{color:var(--text2)}
   <div class="cache-note" id="cacheNote"></div>
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p id="loadTxt">Conectando con Finnhub...</p>
+    <p id="loadTxt">Conectando...</p>
   </div>
   <div class="report" id="report"></div>
 
@@ -216,23 +250,98 @@ footer span{color:var(--text2)}
 </footer>
 
 <script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
 const FH='d72mft9r01qlfd9nph2gd72mft9r01qlfd9nph30';
 const FH_BASE='https://finnhub.io/api/v1';
+
+// ▼▼▼ PEGÁ ACÁ LA URL DE TU WORKER DE CLOUDFLARE ▼▼▼
+// Ej: 'https://yahoo-proxy.tucuenta.workers.dev'
+// Si la dejás vacía, la app funciona igual usando solo Finnhub (fallback).
+const YAHOO_PROXY='https://yahoo-proxy.webmaster-c89.workers.dev';
+// ▲▲▲ ------------------------------------------- ▲▲▲
+
 const CACHE_TTL=24*60*60*1000;
 
+/* ============================================================
+   PUERTA DE ACCESO (código de alumno)
+   El código se valida en el Worker; nunca está en este HTML.
+   ============================================================ */
+const ACCESS_LS='snse_access_code';
+let CLIENT_CODE='';
+
+function storedCode(){try{return localStorage.getItem(ACCESS_LS)||'';}catch(e){return'';}}
+
+async function checkCode(code){
+  // Sin Worker no se puede validar → la app queda abierta (modo difusión).
+  if(!YAHOO_PROXY)return true;
+  try{
+    const r=await fetch(`${YAHOO_PROXY}/?check=1&k=${encodeURIComponent(code)}`);
+    if(!r.ok)return false;
+    const j=await r.json();
+    return !!j.ok;
+  }catch(e){
+    // Si el Worker no responde, no bloqueamos al alumno legítimo.
+    return true;
+  }
+}
+
+function showGate(){document.getElementById('gate').classList.add('show');setTimeout(()=>{const i=document.getElementById('gateInput');if(i)i.focus();},80);}
+function hideGate(){document.getElementById('gate').classList.remove('show');}
+
+async function submitGate(){
+  const inp=document.getElementById('gateInput');
+  const btn=document.getElementById('gateBtn');
+  const err=document.getElementById('gateErr');
+  const code=inp.value.trim();
+  if(!code){err.textContent='Ingresá tu código de acceso.';return;}
+  btn.disabled=true;err.textContent='Verificando...';
+  const ok=await checkCode(code);
+  btn.disabled=false;
+  if(ok){
+    CLIENT_CODE=code;
+    try{localStorage.setItem(ACCESS_LS,code);}catch(e){}
+    err.textContent='';
+    hideGate();
+  }else{
+    err.textContent='Código incorrecto. Revisá tu área de miembros.';
+    inp.select();
+  }
+}
+
+async function initGate(){
+  const saved=storedCode();
+  if(saved && await checkCode(saved)){CLIENT_CODE=saved;hideGate();return;}
+  // checkCode('') devuelve true si el Worker NO tiene ACCESS_CODE (modo abierto)
+  if(await checkCode('')){hideGate();return;}
+  showGate();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const gi=document.getElementById('gateInput');
+  if(gi)gi.addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
+  initGate();
+});
+
+/* ============================================================
+   UI helpers
+   ============================================================ */
 function go(t){document.getElementById('tickerInput').value=t;analyze();}
 document.getElementById('tickerInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyze();});
 
-const msgs=['Conectando con Finnhub...','Extrayendo indicadores fundamentales...','Procesando datos...','Generando diagnóstico...'];
+const msgs=['Conectando con Yahoo Finance...','Extrayendo indicadores fundamentales...','Procesando datos...','Generando diagnóstico...'];
 let mi;
 function startLoad(){let i=0;document.getElementById('loadTxt').textContent=msgs[0];mi=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('loadTxt').textContent=msgs[i];},2200);}
 function stopLoad(){clearInterval(mi);}
 function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';}
 
-function cacheKey(t){return`snse_v15_${t}`;}
+function cacheKey(t){return`snse_v16_${t}`;}
 function getCache(t){try{const r=localStorage.getItem(cacheKey(t));if(!r)return null;const o=JSON.parse(r);if(Date.now()-o.ts>CACHE_TTL){localStorage.removeItem(cacheKey(t));return null;}return o;}catch(e){return null;}}
 function setCache(t,d){try{localStorage.setItem(cacheKey(t),JSON.stringify({ts:Date.now(),data:d}));}catch(e){}}
 
+/* ============================================================
+   Formato y utilidades numéricas
+   ============================================================ */
 function toFloat(v){if(v==null||v==='')return null;const n=parseFloat(v);return isNaN(n)||!isFinite(n)?null:n;}
 function fmtPct(v){return v!=null?v.toFixed(2)+'%':null;}
 function fmtX(v){return v!=null?v.toFixed(2)+'x':null;}
@@ -249,65 +358,96 @@ function sanitizePE(v){
   if(v>500||v<0)return{val:null,distorted:true};
   return{val:v,distorted:false};
 }
+const mul=(v,k)=>v==null?null:v*k;
 
-// Calcula FCF total desde campos per-share que Finnhub SÍ provee en free tier:
-// FCF = cashFlowPerShareTTM × sharesOutstanding
-// sharesOutstanding = marketCapitalization (en millones USD) × 1e6 / precio
-// Pero más directo: FCF total = marketCap / (currentEv/freeCashFlowTTM)
-// ya que EV ≈ marketCap para empresas sin deuda neta significativa,
-// y el ratio EV/FCF = precio/FCF_por_acción cuando no hay deuda neta.
-// El método más preciso disponible: usar pfcfShareTTM (Price/FCF per share)
-// FCF por acción = precio / pfcfShareTTM
-// FCF total = (precio / pfcfShareTTM) × sharesOutstanding
-//           = marketCap / pfcfShareTTM
-function calcFCFFromMetrics(m){
-  // marketCapitalization viene en millones USD en Finnhub
-  const mktCap = toFloat(m['marketCapitalization']);
-  
-  // Método 1: usar pfcfShareTTM (Price to Free Cash Flow per share TTM)
-  // FCF_total = mktCap_USD / pfcfShareTTM
-  const pfcf = toFloat(m['pfcfShareTTM']);
-  if(mktCap!=null && pfcf!=null && pfcf!==0){
-    return { fcf: (mktCap * 1e6) / pfcf, method:'Calculado: Mkt Cap / P/FCF (TTM)' };
-  }
+/* ============================================================
+   YAHOO — parseo de quoteSummary
+   Yahoo envuelve los números como {raw:123, fmt:"123"} → num() extrae raw
+   ============================================================ */
+function num(o){
+  if(o==null)return null;
+  if(typeof o==='number')return isFinite(o)?o:null;
+  if(typeof o==='object'&&'raw'in o)return toFloat(o.raw);
+  return null;
+}
+function parseYahoo(json){
+  try{
+    const r=json&&json.quoteSummary&&json.quoteSummary.result&&json.quoteSummary.result[0];
+    if(!r)return null;
+    const sd=r.summaryDetail||{},fd=r.financialData||{},ks=r.defaultKeyStatistics||{},pr=r.price||{},ap=r.assetProfile||{};
+    return {
+      // Valores exactamente como los muestra Yahoo (para que coincida la verificación)
+      pe:      num(sd.trailingPE) ?? num(ks.trailingPE),
+      roe:     mul(num(fd.returnOnEquity),100),     // 1.4775 → 147.75 %
+      margin:  mul(num(fd.profitMargins),100),      // 0.243  → 24.30 %
+      debtEq:  num(fd.debtToEquity),                // Yahoo ya lo da en % (154.49)
+      fcf:     num(fd.freeCashflow),                // ¡FCF real reportado, en USD!
+      divYield:mul(num(sd.dividendYield),100),      // 0.0044 → 0.44 %
+      // Perfil (por si Finnhub fallara)
+      name:    pr.longName||pr.shortName||null,
+      exchange:pr.exchangeName||null,
+      industry:ap.industry||null,
+      country: ap.country||null,
+    };
+  }catch(e){return null;}
+}
 
-  // Método 2: usar currentEv/freeCashFlowTTM
-  // FCF_total ≈ mktCap_USD / (EV/FCF_TTM)  [aproximación, EV≈mktCap]
-  const evFcf = toFloat(m['currentEv/freeCashFlowTTM']);
-  if(mktCap!=null && evFcf!=null && evFcf!==0){
-    return { fcf: (mktCap * 1e6) / evFcf, method:'Calculado: Mkt Cap / EV/FCF (TTM)' };
-  }
+/* ============================================================
+   Construcción de los 5 indicadores
+   Regla: Yahoo primero (coincide con la verificación), Finnhub de respaldo.
+   Cada indicador registra su fuente real en `src`.
+   ============================================================ */
+function pick(yVal, fnVal){
+  if(yVal!=null) return {val:yVal, src:'Y'};   // Yahoo Finance
+  if(fnVal!=null) return {val:fnVal, src:'F'}; // Finnhub
+  return {val:null, src:null};
+}
 
+// Fallback FCF desde métricas per-share de Finnhub (free tier no expone el FCF real)
+function calcFCFFinnhub(m){
+  const mktCap=toFloat(m['marketCapitalization']);
+  const pfcf=toFloat(m['pfcfShareTTM']);
+  if(mktCap!=null&&pfcf!=null&&pfcf!==0)
+    return {fcf:(mktCap*1e6)/pfcf, method:'Calculado (Finnhub): Mkt Cap / P/FCF (TTM)'};
+  const evFcf=toFloat(m['currentEv/freeCashFlowTTM']);
+  if(mktCap!=null&&evFcf!=null&&evFcf!==0)
+    return {fcf:(mktCap*1e6)/evFcf, method:'Calculado (Finnhub): Mkt Cap / EV/FCF (TTM)'};
   return null;
 }
 
 function buildIndicators(data,ticker){
-  const m=data.metrics;
+  const m=data.metrics||{};
+  const y=data.yahoo||null;
 
-  // 1. Precio / Ganancias
-  const rawPE=toFloat(m['peBasicExclExtraTTM'])??toFloat(m['peTTM'])??toFloat(m['peNormalizedAnnual']);
-  const{val:pe,distorted:peDistorted}=sanitizePE(rawPE);
-
-  // 2. Rentabilidad sobre Patrimonio (ROE)
-  const roe=toFloat(m['roeTTM']);
-
-  // 3. Margen Neto
-  const margin=toFloat(m['netProfitMarginTTM']);
-
-  // 4. Deuda / Patrimonio — Finnhub entrega ratio puro; convertir a %
+  // --- Finnhub (respaldo) ---
+  const fnPEraw=toFloat(m['peBasicExclExtraTTM'])??toFloat(m['peTTM'])??toFloat(m['peNormalizedAnnual']);
+  const fnRoe=toFloat(m['roeTTM']);
+  const fnMargin=toFloat(m['netProfitMarginTTM']);
   const deRaw=toFloat(m['totalDebt/totalEquityQuarterly'])??toFloat(m['totalDebt/totalEquityAnnual']);
-  const debtEq=deRaw!=null?deRaw*100:null;
+  const fnDebtEq=deRaw!=null?deRaw*100:null;
+  const fnFcfRes=calcFCFFinnhub(m);
+  const fnFcf=fnFcfRes?fnFcfRes.fcf:null;
+  const fnDiv=toFloat(m['dividendYieldIndicatedAnnual']);
 
-  // 5. Flujo de Caja Libre — calculado desde métricas per-share que Finnhub sí provee
-  // Todos los campos están en /stock/metric (misma llamada que ya hacemos, sin llamadas extra)
-  // Método principal: mktCap / pfcfShareTTM (Price to Free Cash Flow per share TTM)
-  // Fallback: mktCap / (currentEv/freeCashFlowTTM)
-  let fcf=null,fcfPeriod='TTM',fcfMethod='';
+  // --- Elección Yahoo-first ---
+  const pePick=pick(y?y.pe:null, fnPEraw);
+  const{val:pe,distorted:peDistorted}=sanitizePE(pePick.val);
+  const roePick=pick(y?y.roe:null, fnRoe);
+  const marginPick=pick(y?y.margin:null, fnMargin);
+  const debtPick=pick(y?y.debtEq:null, fnDebtEq);
+  const fcfPick=pick(y?y.fcf:null, fnFcf);
 
-  const fcfResult = calcFCFFromMetrics(m);
-  if(fcfResult){ fcf=fcfResult.fcf; fcfMethod=fcfResult.method; }
+  // Método FCF a mostrar
+  let fcfMethod='';
+  if(fcfPick.src==='Y') fcfMethod='Fuente: Yahoo Finance (FCF reportado · Operativo − CapEx)';
+  else if(fcfPick.src==='F'&&fnFcfRes) fcfMethod=fnFcfRes.method;
 
-  const divYield=toFloat(m['dividendYieldIndicatedAnnual']);
+  // Dividendo
+  const divPick=pick(y?y.divYield:null, fnDiv);
+
+  const srcTag=s=>s==='Y'?'<span class="y">● Yahoo Finance</span>'
+                 :s==='F'?'<span class="f">● Finnhub (respaldo)</span>'
+                 :'<span>● sin dato</span>';
 
   const inds=[
     {
@@ -315,58 +455,64 @@ function buildIndicators(data,ticker){
       display:peDistorted
         ?{text:'N/D',nd:true,note:'Dato distorsionado — impairment o pérdida puntual'}
         :{text:fmtX(pe)??'N/D',nd:pe==null},
-      raw:pe,param:'< 25x',
+      src:pePick.src,
+      param:'< 25x',
       paramDesc:'S&P 500 histórico ~17x · Buffett compró Apple a 10-11x',
       s:peDistorted?'warn':(pe==null?'warn':(pe<=25?'ok':pe<=30?'warn':'fail')),
-      yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
-      yw:'Statistics → Valuation Measures → Trailing P/E'
+      yu:`https://finance.yahoo.com/quote/${ticker}/`,
+      yw:'Summary → PE Ratio (TTM) — coincide exacto con este valor'
     },
     {
       nameEs:'Rentabilidad sobre Patrimonio',nameEn:'ROE — Return on Equity (TTM)',
-      display:{text:fmtPct(roe)??'N/D',nd:roe==null},
-      raw:roe,param:'> 15%',
+      display:{text:fmtPct(roePick.val)??'N/D',nd:roePick.val==null},
+      src:roePick.src,
+      param:'> 15%',
       paramDesc:'Umbral Buffett (carta accionistas 1987) · Coca-Cola y J&J superan 25% histórico',
-      s:roe==null?'warn':(roe>=15?'ok':roe>=12?'warn':'fail'),
+      s:roePick.val==null?'warn':(roePick.val>=15?'ok':roePick.val>=12?'warn':'fail'),
       yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
       yw:'Statistics → Management Effectiveness → Return on Equity (ttm)'
     },
     {
       nameEs:'Margen Neto',nameEn:'Net Profit Margin (TTM)',
-      display:{text:fmtPct(margin)??'N/D',nd:margin==null},
-      raw:margin,param:'> 10%',
+      display:{text:fmtPct(marginPick.val)??'N/D',nd:marginPick.val==null},
+      src:marginPick.src,
+      param:'> 10%',
       paramDesc:'Piso institucional · Buffett ideal >20% · el margen revela la ventaja competitiva',
-      s:margin==null?'warn':(margin>=10?'ok':margin>=7?'warn':'fail'),
+      s:marginPick.val==null?'warn':(marginPick.val>=10?'ok':marginPick.val>=7?'warn':'fail'),
       yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
       yw:'Statistics → Profitability → Profit Margin'
     },
     {
       nameEs:'Deuda / Patrimonio',nameEn:'Total Debt / Equity (mrq)',
-      display:{text:debtEq!=null?debtEq.toFixed(1)+'%':'N/D',nd:debtEq==null},
-      raw:debtEq,param:'< 100%',
+      display:{text:debtPick.val!=null?debtPick.val.toFixed(1)+'%':'N/D',nd:debtPick.val==null},
+      src:debtPick.src,
+      param:'< 100%',
       paramDesc:'Buffett ideal <50% · consensus institucional tope en 100%',
-      s:debtEq==null?'warn':(debtEq<=100?'ok':debtEq<=120?'warn':'fail'),
+      s:debtPick.val==null?'warn':(debtPick.val<=100?'ok':debtPick.val<=120?'warn':'fail'),
       yu:`https://finance.yahoo.com/quote/${ticker}/key-statistics/`,
       yw:'Statistics → Balance Sheet → Total Debt/Equity (mrq)'
     },
     {
       nameEs:'Flujo de Caja Libre',nameEn:'Free Cash Flow (TTM)',
       display:{
-        text:fcf!=null
-          ?fmtM(fcf)+(fcfPeriod?` · ${fcfPeriod}`:'')
-          :'N/D · No disponible en Finnhub para este ticker',
-        nd:fcf==null
+        text:fcfPick.val!=null?fmtM(fcfPick.val)+' · TTM':'N/D · No disponible',
+        nd:fcfPick.val==null
       },
-      raw:fcf,param:'Positivo',
+      src:fcfPick.src,
+      param:'Positivo',
       paramDesc:'FCF = Flujo Operativo − CapEx · Buffett: "las ganancias se manipulan, el cash no"',
       fcfMethod,
-      s:fcf==null?'warn':(fcf>0?'ok':'fail'),
+      s:fcfPick.val==null?'warn':(fcfPick.val>0?'ok':'fail'),
       yu:`https://finance.yahoo.com/quote/${ticker}/financials/`,
       yw:'Financials → Cash Flow Statement → Free Cash Flow'
     }
   ];
-  return{inds,divYield};
+  return{inds,divPick,srcTag};
 }
 
+/* ============================================================
+   Fetchers
+   ============================================================ */
 async function fhGet(ep){
   const sep=ep.includes('?')?'&':'?';
   const r=await fetch(`${FH_BASE}${ep}${sep}token=${FH}`);
@@ -374,6 +520,20 @@ async function fhGet(ep){
   return r.json();
 }
 
+async function yfGet(ticker){
+  if(!YAHOO_PROXY)return null; // sin Worker configurado → fallback Finnhub
+  try{
+    const k=CLIENT_CODE?`&k=${encodeURIComponent(CLIENT_CODE)}`:'';
+    const r=await fetch(`${YAHOO_PROXY}/?symbol=${encodeURIComponent(ticker)}${k}`);
+    if(!r.ok)return null;
+    const j=await r.json();
+    return parseYahoo(j);
+  }catch(e){return null;}
+}
+
+/* ============================================================
+   Flujo principal
+   ============================================================ */
 async function analyze(){
   const raw=document.getElementById('tickerInput').value.trim().toUpperCase();
   if(!raw)return;
@@ -395,15 +555,18 @@ async function analyze(){
   document.getElementById('loading').style.display='block';
   startLoad();
   try{
-    // Dos llamadas en paralelo — todo desde Finnhub /stock/metric:
-    // El FCF se calcula desde campos per-share que Finnhub sí incluye en el free tier
-    // (pfcfShareTTM, currentEv/freeCashFlowTTM, marketCapitalization)
-    const[profile,metrics]=await Promise.all([
+    // Perfil + métricas Finnhub (CORS abierto) y Yahoo vía proxy, en paralelo.
+    // Yahoo provee los 5 indicadores reales (incluido FCF). Finnhub = perfil + respaldo.
+    const[profile,metrics,yahoo]=await Promise.all([
       fhGet(`/stock/profile2?symbol=${ticker}`),
-      fhGet(`/stock/metric?symbol=${ticker}&metric=all`)
+      fhGet(`/stock/metric?symbol=${ticker}&metric=all`),
+      yfGet(ticker)
     ]);
-    if(!profile||!profile.name)throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
-    const d={profile,metrics:metrics.metric||{}};
+    const hasFinnhub=profile&&profile.name;
+    const hasYahoo=yahoo&&yahoo.name;
+    if(!hasFinnhub&&!hasYahoo)
+      throw new Error(`No se encontró "${ticker}". Verificá que sea un ticker válido de NYSE o NASDAQ.`);
+    const d={profile:profile||{},metrics:metrics&&metrics.metric?metrics.metric:{},yahoo:yahoo||null};
     setCache(ticker,d);
     stopLoad();
     document.getElementById('loading').style.display='none';
@@ -417,12 +580,22 @@ async function analyze(){
   }
 }
 
+/* ============================================================
+   Render
+   ============================================================ */
 function render(data,ticker,fromCache){
-  const{inds,divYield}=buildIndicators(data,ticker);
+  const{inds,divPick,srcTag}=buildIndicators(data,ticker);
   const pass=inds.filter(i=>i.s==='ok').length;
-  const p=data.profile;
-  const name=p.name||ticker;
+  const p=data.profile||{};
+  const y=data.yahoo||{};
+  const name=p.name||y.name||ticker;
+  const exchange=p.exchange||y.exchange||'';
+  const industry=p.finnhubIndustry||y.industry||'';
+  const country=p.country||y.country||'';
   const fcfInd=inds.find(i=>i.nameEs==='Flujo de Caja Libre');
+
+  const usedYahoo=inds.some(i=>i.src==='Y');
+  const allYahoo=inds.every(i=>i.src==='Y');
 
   let vClass,vTitle;
   if(pass>=4){vClass='ok';vTitle=pass===5?'APTO — A+':'APTO — A';}
@@ -444,6 +617,7 @@ function render(data,ticker,fromCache){
         <div class="ind-en">${i.nameEn}</div>
         <div class="ind-val${i.display.nd?' nd':''}">${i.display.text}</div>
         ${i.display.note?`<div class="ind-val-note">${i.display.note}</div>`:''}
+        <div class="ind-src"><b>Fuente:</b> ${srcTag(i.src)}</div>
         <div class="ind-source">${i.paramDesc}</div>
       </div>
       <div class="ind-right">
@@ -452,9 +626,10 @@ function render(data,ticker,fromCache){
       </div>
     </div>`).join('');
 
-  const fcfNote=fcfInd?.fcfMethod?`<div class="fcf-note">⚙ Método: ${fcfInd.fcfMethod}</div>`:'';
+  const fcfNote=fcfInd&&fcfInd.fcfMethod?`<div class="fcf-note">⚙ ${fcfInd.fcfMethod}</div>`:'';
 
-  const dvNote=divYield==null?'Sin datos en Finnhub. Verificar en Yahoo Finance → Summary.'
+  const divYield=divPick.val;
+  const dvNote=divYield==null?'Sin datos disponibles. Verificar en Yahoo Finance → Summary.'
     :divYield<1?'Bajo o nulo — habitual en acciones de alto crecimiento (NVDA, AMZN, GOOGL).'
     :divYield<=4?'Rango saludable (1–4%). Típico en blue chips de calidad sostenida.'
     :divYield<=6?'Rendimiento elevado. Verificar que el payout ratio sea sostenible (< 70%).'
@@ -479,11 +654,35 @@ function render(data,ticker,fromCache){
 
   const dateStr=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
 
+  // Source bar dinámica según fuente realmente usada
+  const primaryLabel=usedYahoo?'Yahoo Finance':'Finnhub API';
+  const sourceBar=`
+    <div class="source-bar">
+      📡 Datos: <strong>${primaryLabel}</strong> · Perfil: <strong>Finnhub</strong> · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong>${usedYahoo&&!allYahoo?' · <strong>algunos indicadores usan respaldo Finnhub</strong>':''}
+    </div>`;
+
+  // Nota sobre fuentes — adaptada: si es Yahoo, debe coincidir; si es respaldo, explica por qué difiere
+  const diffNote=allYahoo?`
+    <div class="disclaimer" style="margin-bottom:22px">
+      <div class="disclaimer-title amber">✓ Sobre la verificación de datos</div>
+      <p>Los cinco indicadores de este reporte se toman <strong>directamente de Yahoo Finance</strong>, por lo que deberían coincidir con los valores que ves al verificar en los enlaces de abajo.<br><br>
+      Pueden existir diferencias mínimas (1–3%) si Yahoo actualizó el precio o publicó nuevos resultados trimestrales entre tu consulta y la verificación, ya que el ratio P/E y otros se recalculan en tiempo real.<br><br>
+      Lo que importa para el análisis es la <strong>señal</strong>, no el decimal exacto: un ROE de 150% y uno de 160% llevan a la misma conclusión.</p>
+    </div>`:`
+    <div class="disclaimer" style="margin-bottom:22px">
+      <div class="disclaimer-title amber">⚠ Sobre las diferencias entre fuentes</div>
+      <p>Algunos indicadores de este reporte usan <strong>Finnhub como respaldo</strong> (marcado en cada card) porque Yahoo no estuvo disponible en el momento de la consulta. Esos valores pueden diferir levemente de los que aparecen en Yahoo Finance.<br><br>
+      <strong>P/E Trailing:</strong> cambia con cada movimiento del precio. Finnhub y Yahoo pueden usar el precio de momentos distintos del día (cierre anterior vs. tiempo real).<br><br>
+      <strong>ROE y rentabilidad:</strong> algunos proveedores promedian el patrimonio inicio/fin del período; otros usan el cierre del último trimestre.<br><br>
+      <strong>Free Cash Flow:</strong> el valor de respaldo se estima desde métricas per-share (Mkt Cap / P-FCF); el de Yahoo es el FCF reportado (Operativo − CapEx).<br><br>
+      Lo que importa para el análisis es la <strong>señal</strong>, no el número exacto.</p>
+    </div>`;
+
   document.getElementById('report').innerHTML=`
     <div class="co-card">
       <div class="co-eyebrow">Reporte de calidad · ${dateStr}${fromCache?' · datos en caché':''}</div>
       <div class="co-name">${name} <span class="co-ticker">(${ticker})</span></div>
-      <div class="co-meta">${p.exchange||''}${p.finnhubIndustry?' · '+p.finnhubIndustry:''}${p.country?' · '+p.country:''}</div>
+      <div class="co-meta">${exchange}${industry?' · '+industry:''}${country?' · '+country:''}</div>
     </div>
 
     <div class="verdict-card ${vClass}">
@@ -500,9 +699,7 @@ function render(data,ticker,fromCache){
       </div>
     </div>
 
-    <div class="source-bar">
-      📡 Datos: <strong>Finnhub API</strong> · Benchmarks: <strong>Buffett / AAII / GuruFocus</strong> · Verificación: <strong>Yahoo Finance</strong>
-    </div>
+    ${sourceBar}
 
     <div class="sec-label">5 Filtros de Calidad Institucional</div>
     <div class="ind-cards">${cards}</div>
@@ -513,21 +710,14 @@ function render(data,ticker,fromCache){
     <div class="sec-label">Guía de Verificación en Yahoo Finance</div>
     <div class="vgrid">${vcards}</div>
 
-    <div class="disclaimer" style="margin-bottom:22px">
-      <div class="disclaimer-title" style="color:var(--amber);border-color:var(--amber)">⚠ Sobre las diferencias entre fuentes</div>
-      <p>Es normal que los valores mostrados aquí difieran levemente de los que aparecen en Yahoo Finance u otras plataformas. Estas diferencias no son errores — reflejan criterios distintos en el cálculo de cada proveedor de datos.<br><br>
-      <strong>P/E Trailing:</strong> el ratio Precio/Ganancias cambia con cada movimiento del precio de la acción. Finnhub y Yahoo pueden usar el precio de momentos distintos del día (cierre anterior vs. tiempo real), lo que genera diferencias de 1–3% en el valor final.<br><br>
-      <strong>ROE y otros ratios de rentabilidad:</strong> algunos proveedores calculan el patrimonio neto promediando inicio y fin del período; otros usan solo el valor al cierre del último trimestre. Además, si una empresa acaba de publicar resultados trimestrales, es posible que una fuente ya los incorpore y la otra todavía no.<br><br>
-      <strong>Free Cash Flow:</strong> no existe una definición universal de FCF. Distintas fuentes incluyen o excluyen conceptos como stock-based compensation, lease payments o working capital changes. El valor aquí calculado sigue la fórmula estándar: Flujo Operativo − CapEx.<br><br>
-      Lo que importa para el análisis es la <strong>señal</strong>, no el número exacto. Un ROE de 150% y uno de 160% llevan a la misma conclusión. La habilidad del inversor está en interpretar la tendencia y el orden de magnitud, no en buscar coincidencia decimal entre plataformas.</p>
-    </div>
+    ${diffNote}
 
     <div class="sec-label">Aviso Legal</div>
     <div class="disclaimer">
       <div class="disclaimer-title">Disclaimer — Aviso importante</div>
-      <p>La información presentada en esta aplicación proviene de <strong>Finnhub API</strong>, fuente de datos financieros pública, y se utiliza exclusivamente con fines <strong>educativos e informativos</strong>. Los datos pueden contener demoras, errores u omisiones inherentes a la fuente original.<br><br>
+      <p>La información presentada en esta aplicación proviene de <strong>Yahoo Finance</strong> y <strong>Finnhub API</strong>, fuentes de datos financieros públicas, y se utiliza exclusivamente con fines <strong>educativos e informativos</strong>. Los datos pueden contener demoras, errores u omisiones inherentes a la fuente original.<br><br>
       Este análisis <strong>no constituye una recomendación de compra, venta o tenencia</strong> de ningún instrumento financiero. No es asesoramiento de inversión personalizado ni debe ser interpretado como tal. Los indicadores aquí presentados son herramientas de análisis fundamental y no garantizan rendimientos futuros. El desempeño pasado no es garantía de resultados futuros.<br><br>
-      Toda decisión de inversión debe ser tomada con la orientación de un asesor financiero habilitado, considerando el perfil de riesgo, el horizonte temporal y los objetivos personales de cada inversor.<br><br>
+      Toda decisión de inversión requiere que el inversor se <strong>capacite y forme su propio criterio</strong>, comprendiendo a fondo cada indicador, el perfil de riesgo, el horizonte temporal y los objetivos personales que persigue. La formación continua es la mejor herramienta para tomar decisiones informadas.<br><br>
       <strong>Carlos Traseira</strong> no es responsable de ninguna decisión de inversión tomada con base en la información aquí presentada.</p>
     </div>
   `;
