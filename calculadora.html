@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Decisiones · Semáforo del Inversor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c0c10'/><rect x='11' y='2' width='10' height='28' rx='5' fill='%231a1a24'/><circle cx='16' cy='8' r='4' fill='%2300ff88'/><circle cx='16' cy='16' r='4' fill='%23ffb840'/><circle cx='16' cy='24' r='4' fill='%23ff4070'/></svg>">
+<style>
+:root{
+  --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--border:#252538;
+  --text:#f0f0f8;--text2:#9090b0;--text3:#454565;
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.10);--green-glow:rgba(0,255,136,0.25);--green-border:rgba(0,255,136,0.30);
+  --amber:#ffb840;--amber-dim:rgba(255,184,64,0.10);--amber-border:rgba(255,184,64,0.30);
+  --red:#ff4070;--red-dim:rgba(255,64,112,0.10);--red-border:rgba(255,64,112,0.30);
+  --display:'Syne',sans-serif;--mono:'Fira Code',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 45% at 15% 5%,rgba(99,102,241,0.07) 0%,transparent 60%),radial-gradient(ellipse 55% 40% at 85% 85%,rgba(0,255,136,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;flex:1;max-width:680px;margin:0 auto;padding:36px 20px 0;width:100%}
+
+/* Header */
+.header{text-align:center;margin-bottom:26px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px}
+.logo-lights{display:flex;gap:6px;align-items:center}
+.ll{width:13px;height:13px;border-radius:50%}
+.ll.g{background:var(--green);box-shadow:0 0 10px var(--green-glow)}
+.ll.a{background:var(--amber)}
+.ll.r{background:var(--red)}
+.logo-name{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.logo-name span{color:var(--green)}
+.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+.intro{font-size:16px;color:var(--text2);line-height:1.75;max-width:560px;margin:22px auto 0;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px;text-align:left}
+.intro strong{color:var(--text)}
+.intro .lead{display:block;font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
+
+/* Inputs */
+.inputs{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:22px 22px 20px;margin-bottom:16px}
+.in-row{margin-bottom:16px}
+.in-row:last-child{margin-bottom:0}
+.in-label{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:block}
+.in-label small{color:var(--text3);text-transform:none;letter-spacing:0;font-size:11px}
+.in-wrap{position:relative}
+.in-wrap .pre{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-family:var(--mono);color:var(--text3);font-size:16px;pointer-events:none}
+.in-field{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px 14px 34px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+.in-field:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+
+/* Verdict */
+.verdict{border-radius:16px;padding:22px 24px;margin-bottom:14px;border:1px solid var(--border);background:var(--s1);text-align:center;transition:all .3s}
+.verdict.ok{background:var(--green-dim);border-color:var(--green-border)}
+.verdict.warn{background:var(--amber-dim);border-color:var(--amber-border)}
+.verdict.fail{background:var(--red-dim);border-color:var(--red-border)}
+.verdict-eyebrow{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.16em;margin-bottom:8px}
+.verdict-title{font-size:clamp(22px,5.5vw,30px);font-weight:800;line-height:1.1;margin-bottom:8px}
+.verdict.ok .verdict-title{color:var(--green)}
+.verdict.warn .verdict-title{color:var(--amber)}
+.verdict.fail .verdict-title{color:var(--red)}
+.verdict-desc{font-size:14px;color:var(--text2);line-height:1.6;font-family:var(--mono)}
+
+/* Metrics grid */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:480px){.metrics{grid-template-columns:1fr}}
+.metric{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.metric-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.metric-val{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--text);line-height:1}
+.metric-val.green{color:var(--green)}
+.metric-val.amber{color:var(--amber)}
+.metric-val.red{color:var(--red)}
+.metric-note{font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.5;margin-top:6px}
+
+/* Explainer */
+.explain{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px}
+.explain.amber{border-left:3px solid var(--amber)}
+.explain.green{border-left:3px solid var(--green)}
+.explain-title{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.explain p{font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:1.85;margin-bottom:10px}
+.explain p:last-child{margin-bottom:0}
+.explain strong{color:var(--text)}
+.explain .ex-green{color:var(--green)}
+
+footer{position:relative;z-index:1;text-align:center;padding:24px 20px 32px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:28px}
+footer span{color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
+      <div class="logo-name">Calculadora de <span>Decisiones</span></div>
+    </div>
+    <div class="logo-tag">Decidí con números, no con intuición</div>
+    <p class="intro">
+      <span class="lead">No necesitás acertar siempre. Necesitás que tus aciertos valgan más que tus errores.</span>
+      Antes de entrar, esta calculadora te dice si la relación entre lo que podés ganar y lo que podés perder juega a tu favor. Si la matemática no cierra, no es una operación: es una apuesta.
+    </p>
+  </div>
+
+  <div class="inputs">
+    <div class="in-row">
+      <label class="in-label" for="capital">Capital de la cuenta <small>· para medir el tamaño del riesgo</small></label>
+      <div class="in-wrap"><span class="pre">$</span><input class="in-field" id="capital" type="number" inputmode="decimal" placeholder="10000" oninput="calc()"></div>
+    </div>
+    <div class="in-row">
+      <label class="in-label" for="ganancia">Ganancia potencial (prima) <small>· lo que podés ganar</small></label>
+      <div class="in-wrap"><span class="pre">$</span><input class="in-field" id="ganancia" type="number" inputmode="decimal" placeholder="100" oninput="calc()"></div>
+    </div>
+    <div class="in-row">
+      <label class="in-label" for="riesgo">Pérdida máxima (riesgo) <small>· lo máximo que perdés si sale mal</small></label>
+      <div class="in-wrap"><span class="pre">$</span><input class="in-field" id="riesgo" type="number" inputmode="decimal" placeholder="80" oninput="calc()"></div>
+    </div>
+  </div>
+
+  <div class="verdict" id="verdict">
+    <div class="verdict-eyebrow">Veredicto</div>
+    <div class="verdict-title" id="vTitle">Completá los datos</div>
+    <div class="verdict-desc" id="vDesc">Ingresá ganancia y pérdida para ver si la operación tiene sentido.</div>
+  </div>
+
+  <div class="metrics" id="metrics" style="display:none">
+    <div class="metric">
+      <div class="metric-label">Relación recompensa / riesgo</div>
+      <div class="metric-val" id="mRR">—</div>
+      <div class="metric-note" id="mRRnote"></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Punto de equilibrio</div>
+      <div class="metric-val" id="mBE">—</div>
+      <div class="metric-note" id="mBEnote"></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Margen de error</div>
+      <div class="metric-val" id="mMargin">—</div>
+      <div class="metric-note" id="mMarginNote"></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Riesgo sobre tu capital</div>
+      <div class="metric-val" id="mCap">—</div>
+      <div class="metric-note" id="mCapNote"></div>
+    </div>
+  </div>
+
+  <div class="explain amber">
+    <div class="explain-title">⚖️ La regla del 100/80 — una convención con vos mismo</div>
+    <p>No existe un número mágico universal. El <strong>100/80</strong> (apuntar a ganar 100 arriesgando como máximo 80) es un <strong>compromiso que asumís con vos mismo</strong>: entrás solo cuando lo que podés ganar pesa más que lo que podés perder. Es la barrera que te separa de las operaciones "emocionantes" pero matemáticamente perdedoras.</p>
+    <p><strong>📌 El ejemplo que lo deja claro:</strong> apuntás a ganar <strong class="ex-green">$100</strong> y definís que, si sale mal, perdés como máximo <strong>$80</strong>. Tu relación es 100 : 80 = <strong>1,25</strong>.</p>
+    <p>¿Qué significa? Que tu <strong>punto de equilibrio es ganar apenas el 44% de las veces</strong>. En otras palabras: <strong class="ex-green">podés equivocarte en más de la mitad de tus operaciones y aun así no perder dinero.</strong></p>
+    <p>Esa es la matemática que trabaja a tu favor: no se trata de acertarle siempre a la dirección del precio, sino de que cada acierto valga más que cada error. La disciplina le gana a la adivinación.</p>
+  </div>
+
+</div>
+
+<footer>
+  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Uso educativo — no es recomendación de inversión
+</footer>
+
+<script>
+function val(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;}
+
+function calc(){
+  const capital=val('capital');
+  const g=val('ganancia');
+  const r=val('riesgo');
+
+  const v=document.getElementById('verdict');
+  const t=document.getElementById('vTitle');
+  const d=document.getElementById('vDesc');
+  const metrics=document.getElementById('metrics');
+  v.classList.remove('ok','warn','fail');
+
+  if(g==null||r==null||g<=0||r<=0){
+    t.textContent='Completá los datos';
+    d.textContent='Ingresá ganancia y pérdida (mayores a 0) para ver si la operación tiene sentido.';
+    metrics.style.display='none';
+    return;
+  }
+
+  metrics.style.display='grid';
+
+  const rr=g/r;
+  const be=r/(g+r)*100;          // punto de equilibrio (% de aciertos necesarios)
+  const margin=100-be;           // margen de error (% que podés fallar)
+
+  // Relación R:R
+  document.getElementById('mRR').textContent=rr.toFixed(2)+' : 1';
+  const rrEl=document.getElementById('mRR');
+  rrEl.className='metric-val '+(rr>=1.25?'green':rr>=1?'amber':'red');
+  document.getElementById('mRRnote').textContent=`Ganás $${rr.toFixed(2)} por cada $1 que arriesgás.`;
+
+  // Punto de equilibrio
+  document.getElementById('mBE').textContent=be.toFixed(0)+'%';
+  document.getElementById('mBEnote').textContent=`Ganando el ${be.toFixed(0)}% de las veces ya quedás en cero.`;
+
+  // Margen de error
+  const mEl=document.getElementById('mMargin');
+  mEl.textContent=margin.toFixed(0)+'%';
+  mEl.className='metric-val '+(margin>=50?'green':margin>=40?'amber':'red');
+  document.getElementById('mMarginNote').textContent=`Podés equivocarte hasta el ${margin.toFixed(0)}% de las veces y no perder.`;
+
+  // Riesgo sobre capital
+  const capEl=document.getElementById('mCap');
+  const capNote=document.getElementById('mCapNote');
+  let capPct=null;
+  if(capital!=null&&capital>0){
+    capPct=r/capital*100;
+    capEl.textContent=capPct.toFixed(1)+'%';
+    capEl.className='metric-val '+(capPct<=5?'green':capPct<=10?'amber':'red');
+    capNote.textContent=capPct<=5?'Tamaño de posición prudente (≤ 5%).'
+      :capPct<=10?'⚠ Advertencia: superás el 5% de tu capital. Conviene achicar.'
+      :'🔴 Más del 10% de tu capital en una sola operación. Demasiado.';
+  }else{
+    capEl.textContent='—';capEl.className='metric-val';
+    capNote.textContent='Ingresá tu capital para medir el tamaño del riesgo.';
+  }
+
+  // ---- Veredicto: combina la relación 100/80 con el riesgo sobre capital ----
+  // Nivel base por R:R
+  let base = rr>=1.25?'ok' : rr>=1?'warn' : 'fail';
+  // Override por riesgo sobre capital: >10% bloquea, >5% degrada a advertencia
+  let capLevel = null;
+  if(capPct!=null){ capLevel = capPct>10?'fail' : capPct>5?'warn' : null; }
+  // Nivel final = el peor de los dos
+  const rank={ok:0,warn:1,fail:2};
+  let level = base;
+  if(capLevel && rank[capLevel]>rank[level]) level=capLevel;
+
+  if(level==='fail'){
+    v.classList.add('fail');
+    if(capPct!=null && capPct>10){
+      t.textContent='🔴 NO AVANZAR';
+      d.textContent=`Estás arriesgando el ${capPct.toFixed(1)}% de tu capital en una sola operación. Aunque la relación fuera buena (${rr.toFixed(2)}:1), una pérdida así compromete tu cuenta. Reducí el tamaño de la posición antes de entrar.`;
+    }else{
+      t.textContent='🔴 ESPERÁS';
+      d.textContent=`Arriesgás más de lo que podés ganar (${rr.toFixed(2)}:1). Necesitarías acertar el ${be.toFixed(0)}% de las veces solo para no perder. La matemática juega en tu contra.`;
+    }
+  }else if(level==='warn'){
+    v.classList.add('warn');
+    if(capPct!=null && capPct>5 && rr>=1.25){
+      t.textContent='🟡 ACHICÁ LA POSICIÓN';
+      d.textContent=`La relación juega a tu favor (${rr.toFixed(2)}:1), pero estás arriesgando el ${capPct.toFixed(1)}% de tu capital. Es mucho para una sola operación: reducí el tamaño y volvé a evaluar.`;
+    }else{
+      t.textContent='🟡 EVALUÁ';
+      d.textContent=`Ganás más de lo que arriesgás (${rr.toFixed(2)}:1), pero estás por debajo de tu estándar 100/80 (1,25). ¿Vale la pena o conviene esperar una mejor entrada?`;
+    }
+  }else{
+    v.classList.add('ok');
+    t.textContent='🟢 OPERÁS';
+    d.textContent=`La relación juega a tu favor (${rr.toFixed(2)}:1) y el riesgo sobre tu capital es prudente. La matemática te respalda.`;
+  }
+}
+</script>
+</body>
+</html>
