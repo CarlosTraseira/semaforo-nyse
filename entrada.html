@@ -95,6 +95,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .meter-mark{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:var(--text);border:2px solid var(--bg);transform:translate(-50%,-50%);box-shadow:0 0 0 1px var(--border)}
 .meter-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px}
 
+/* Link a TradingView */
+.tv-link{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text2);text-decoration:none;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:14px;transition:border-color .15s,color .15s}
+.tv-link:hover{border-color:var(--green-border);color:var(--green)}
+
 /* Explainer */
 .explain{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;border-left:3px solid var(--amber)}
 .explain-title{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
@@ -193,23 +197,25 @@ footer span{color:var(--text2)}
         <div class="tf-rating" id="rW">—</div>
         <div class="tf-score" id="sW"></div>
         <div class="meter"><div class="meter-mark" id="mW"></div></div>
-        <div class="meter-scale"><span>Venta</span><span>Neutral</span><span>Compra</span></div>
+        <div class="meter-scale"><span>Sell</span><span>Neutral</span><span>Buy</span></div>
       </div>
       <div class="tf-card" id="cM">
         <div class="tf-label">1 Mes · Mediano plazo</div>
         <div class="tf-rating" id="rM">—</div>
         <div class="tf-score" id="sM"></div>
         <div class="meter"><div class="meter-mark" id="mM"></div></div>
-        <div class="meter-scale"><span>Venta</span><span>Neutral</span><span>Compra</span></div>
+        <div class="meter-scale"><span>Sell</span><span>Neutral</span><span>Buy</span></div>
       </div>
     </div>
+
+    <a class="tv-link" id="tvLink" href="#" target="_blank" rel="noopener">📊 Ver el análisis técnico completo en TradingView →</a>
 
     <a class="crosslink" id="toNyse" href="#">🏢 Ver Semáforo de Calidad (NYSE) de este ticker →
       <small>¿Es una buena empresa? Confirmá la calidad antes de decidir.</small></a>
 
     <div class="explain">
       <div class="explain-title">📈 Cómo leer este semáforo</div>
-      <p>El rating es un <strong>consenso de ~26 indicadores técnicos</strong> (medias móviles + osciladores) que TradingView resume en una escala de <strong>Venta fuerte</strong> a <strong>Compra fuerte</strong>. No es una orden de compra: es una foto de hacia dónde empuja el mercado hoy.</p>
+      <p>El rating es un <strong>consenso de ~26 indicadores técnicos</strong> (medias móviles + osciladores) que TradingView resume en una escala de <strong>Strong Sell</strong> a <strong>Strong Buy</strong> (las mismas etiquetas que ves abajo). No es una orden de compra: es una foto de hacia dónde empuja el mercado hoy.</p>
       <p><strong>🟢 Buen momento:</strong> las dos temporalidades acompañan. <strong>🟡 Zona neutral:</strong> señales mixtas o sin dirección clara, conviene esperar. <strong>🔴 No es el momento:</strong> al menos una temporalidad está en zona de venta.</p>
       <p>Combinalo siempre con el <strong>Semáforo de Calidad</strong> (¿buena empresa?) y la <strong>Calculadora de Decisiones</strong> (¿la relación riesgo/recompensa cierra?).</p>
     </div>
@@ -272,12 +278,12 @@ async function initGate(){
    Mapeo del rating (-1..+1) → etiqueta / nivel / color
    ============================================================ */
 function rate(v){
-  if(v==null||isNaN(v))return{label:'Sin datos',level:'',cls:''};
-  if(v>=0.5)  return{label:'Compra fuerte',level:'ok'};
-  if(v>=0.1)  return{label:'Compra',       level:'ok'};
-  if(v>-0.1)  return{label:'Neutral',      level:'warn'};
-  if(v>-0.5)  return{label:'Venta',        level:'fail'};
-  return            {label:'Venta fuerte', level:'fail'};
+  if(v==null||isNaN(v))return{label:'No data',level:''};
+  if(v>=0.5)  return{label:'Strong Buy', level:'ok'};
+  if(v>=0.1)  return{label:'Buy',        level:'ok'};
+  if(v>-0.1)  return{label:'Neutral',    level:'warn'};
+  if(v>-0.5)  return{label:'Sell',       level:'fail'};
+  return            {label:'Strong Sell',level:'fail'};
 }
 
 function fillCard(prefix, v){
@@ -357,6 +363,9 @@ function render(t,j){
   if(cv.level)v.classList.add(cv.level);
   document.getElementById('vTitle').textContent=cv.title;
   document.getElementById('vDesc').textContent=cv.desc;
+
+  const ex=j.exchange||'NYSE';
+  document.getElementById('tvLink').href=`https://www.tradingview.com/symbols/${encodeURIComponent(ex)}-${encodeURIComponent(t)}/technicals/`;
 
   document.getElementById('toNyse').href='index.html?symbol='+encodeURIComponent(t);
 
