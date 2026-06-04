@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semáforo de Entrada · Semáforo del Inversor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c0c10'/><rect x='11' y='2' width='10' height='28' rx='5' fill='%231a1a24'/><circle cx='16' cy='8' r='4' fill='%2300ff88'/><circle cx='16' cy='16' r='4' fill='%23ffb840'/><circle cx='16' cy='24' r='4' fill='%23ff4070'/></svg>">
+<style>
+:root{
+  --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--border:#252538;
+  --text:#f0f0f8;--text2:#9090b0;--text3:#454565;
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.10);--green-glow:rgba(0,255,136,0.25);--green-border:rgba(0,255,136,0.30);
+  --amber:#ffb840;--amber-dim:rgba(255,184,64,0.10);--amber-border:rgba(255,184,64,0.30);
+  --red:#ff4070;--red-dim:rgba(255,64,112,0.10);--red-border:rgba(255,64,112,0.30);
+  --display:'Syne',sans-serif;--mono:'Fira Code',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 45% at 15% 5%,rgba(99,102,241,0.07) 0%,transparent 60%),radial-gradient(ellipse 55% 40% at 85% 85%,rgba(0,255,136,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;flex:1;max-width:680px;margin:0 auto;padding:36px 20px 0;width:100%}
+
+/* Header */
+.header{text-align:center;margin-bottom:26px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px}
+.logo-lights{display:flex;gap:6px;align-items:center}
+.ll{width:13px;height:13px;border-radius:50%}
+.ll.g{background:var(--green);box-shadow:0 0 10px var(--green-glow)}
+.ll.a{background:var(--amber)}
+.ll.r{background:var(--red)}
+.logo-name{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.logo-name span{color:var(--green)}
+.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+.intro{font-size:16px;color:var(--text2);line-height:1.75;max-width:560px;margin:22px auto 0;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px;text-align:left}
+.intro strong{color:var(--text)}
+.intro .lead{display:block;font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
+
+/* Search */
+.search-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:16px}
+.search-label{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;display:block}
+.search-row{display:flex;gap:10px}
+.search-input{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;text-transform:uppercase;transition:border-color .2s,box-shadow .2s}
+.search-input::placeholder{text-transform:none;color:var(--text3)}
+.search-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+.search-btn{background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:0 24px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
+.search-btn:hover{opacity:.88}.search-btn:active{transform:scale(.98)}
+.search-btn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 11px;cursor:pointer;transition:border-color .15s,color .15s}
+.chip:hover{border-color:var(--green-border);color:var(--green)}
+
+/* Loading / error */
+.loading{display:none;text-align:center;padding:40px 0}
+.loading.show{display:block}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-family:var(--mono);font-size:12px;color:var(--text2)}
+.error-msg{display:none;background:var(--red-dim);border:1px solid var(--red-border);border-radius:12px;padding:16px 18px;font-family:var(--mono);font-size:13px;color:var(--red);line-height:1.6;margin-bottom:16px}
+.error-msg.show{display:block}
+
+/* Results */
+.results{display:none}
+.results.show{display:block}
+.res-ticker{text-align:center;font-family:var(--mono);font-size:13px;color:var(--text2);margin-bottom:14px;letter-spacing:.04em}
+.res-ticker b{color:var(--text);font-size:15px}
+
+/* Summary verdict */
+.verdict{border-radius:16px;padding:24px;margin-bottom:14px;border:1px solid var(--border);background:var(--s1);text-align:center;transition:all .3s}
+.verdict.ok{background:var(--green-dim);border-color:var(--green-border)}
+.verdict.warn{background:var(--amber-dim);border-color:var(--amber-border)}
+.verdict.fail{background:var(--red-dim);border-color:var(--red-border)}
+.verdict-eyebrow{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
+.verdict-title{font-size:clamp(24px,6vw,34px);font-weight:800;line-height:1.1;margin-bottom:10px}
+.verdict.ok .verdict-title{color:var(--green)}
+.verdict.warn .verdict-title{color:var(--amber)}
+.verdict.fail .verdict-title{color:var(--red)}
+.verdict-desc{font-size:14px;color:var(--text2);line-height:1.65;font-family:var(--mono);max-width:520px;margin:0 auto}
+
+/* Timeframe cards */
+.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:480px){.tf-grid{grid-template-columns:1fr}}
+.tf-card{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:14px;padding:18px 20px}
+.tf-card.ok{border-left-color:var(--green)}
+.tf-card.warn{border-left-color:var(--amber)}
+.tf-card.fail{border-left-color:var(--red)}
+.tf-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
+.tf-rating{font-size:22px;font-weight:800;line-height:1.1;margin-bottom:4px}
+.tf-card.ok .tf-rating{color:var(--green)}
+.tf-card.warn .tf-rating{color:var(--amber)}
+.tf-card.fail .tf-rating{color:var(--red)}
+.tf-score{font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:12px}
+.meter{position:relative;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--red) 0%,var(--amber) 50%,var(--green) 100%);opacity:.85}
+.meter-mark{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:var(--text);border:2px solid var(--bg);transform:translate(-50%,-50%);box-shadow:0 0 0 1px var(--border)}
+.meter-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px}
+
+/* Explainer */
+.explain{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;border-left:3px solid var(--amber)}
+.explain-title{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.explain p{font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:1.85;margin-bottom:10px}
+.explain p:last-child{margin-bottom:0}
+.explain strong{color:var(--text)}
+
+/* Cross-link to NYSE */
+.crosslink{display:block;text-align:center;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-bottom:14px;font-family:var(--display);font-size:14px;font-weight:700;color:var(--green);text-decoration:none;transition:border-color .15s,background .15s}
+.crosslink:hover{border-color:var(--green-border);background:var(--green-dim)}
+.crosslink small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text2);margin-top:4px}
+
+/* Gate — pantalla de bloqueo */
+.gate{position:fixed;inset:0;z-index:50;background:rgba(8,8,12,0.94);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.gate.show{display:flex}
+.gate-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:34px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.gate-lock{font-size:34px;margin-bottom:14px}
+.gate-title{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.gate-title span{color:var(--green)}
+.gate-sub{font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:22px}
+.gate-input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:16px;font-weight:500;color:var(--text);outline:none;letter-spacing:.08em;text-align:center;text-transform:uppercase;transition:border-color .2s,box-shadow .2s;margin-bottom:12px}
+.gate-input::placeholder{color:var(--text3);text-transform:none;letter-spacing:.02em}
+.gate-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+.gate-btn{width:100%;background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:14px 24px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
+.gate-btn:hover{opacity:.88}.gate-btn:active{transform:scale(.98)}
+.gate-btn:disabled{opacity:.4;cursor:not-allowed}
+.gate-err{font-family:var(--mono);font-size:12px;color:var(--red);margin-top:14px;min-height:16px;line-height:1.5}
+.gate-foot{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:20px;line-height:1.6}
+
+footer{position:relative;z-index:1;text-align:center;padding:24px 20px 32px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:28px}
+footer span{color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-lock">🔒</div>
+    <div class="gate-title">Semáforo de <span>Entrada</span></div>
+    <div class="gate-sub">Herramienta exclusiva para alumnos.<br>Ingresá el código de acceso que figura en tu área de miembros.</div>
+    <input class="gate-input" id="gateInput" type="text" placeholder="Código de acceso" autocomplete="off" autocapitalize="characters"/>
+    <button class="gate-btn" id="gateBtn" onclick="submitGate()">Desbloquear</button>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-foot">© 2026 Carlos Traseira</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
+      <div class="logo-name">Semáforo de <span>Entrada</span></div>
+    </div>
+    <div class="logo-tag">¿Es buen momento para entrar?</div>
+    <p class="intro">
+      <span class="lead">Una buena empresa no siempre está en un buen momento para entrar.</span>
+      Este semáforo lee el <strong>consenso técnico de TradingView</strong> —el promedio de unos 26 indicadores— en dos horizontes: <strong>1 semana</strong> (corto plazo) y <strong>1 mes</strong> (mediano plazo). Te dice si el mercado, hoy, acompaña o no.
+    </p>
+  </div>
+
+  <div class="search-card">
+    <div class="search-label">Símbolo de la acción (Ticker)</div>
+    <div class="search-row">
+      <input class="search-input" id="tickerInput" type="text" placeholder="ej: AAPL, MSFT, KO..." autocomplete="off" autocapitalize="characters"/>
+      <button class="search-btn" id="btn" onclick="analyze()">Ver</button>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="go('AAPL')">AAPL</span>
+      <span class="chip" onclick="go('MSFT')">MSFT</span>
+      <span class="chip" onclick="go('NVDA')">NVDA</span>
+      <span class="chip" onclick="go('KO')">KO</span>
+      <span class="chip" onclick="go('JNJ')">JNJ</span>
+      <span class="chip" onclick="go('XOM')">XOM</span>
+    </div>
+  </div>
+
+  <div class="error-msg" id="err"></div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p id="loadTxt">Consultando TradingView...</p>
+  </div>
+
+  <div class="results" id="results">
+    <div class="res-ticker" id="resTicker"></div>
+
+    <div class="verdict" id="verdict">
+      <div class="verdict-eyebrow">Veredicto de Entrada</div>
+      <div class="verdict-title" id="vTitle">—</div>
+      <div class="verdict-desc" id="vDesc"></div>
+    </div>
+
+    <div class="tf-grid">
+      <div class="tf-card" id="cW">
+        <div class="tf-label">1 Semana · Corto plazo</div>
+        <div class="tf-rating" id="rW">—</div>
+        <div class="tf-score" id="sW"></div>
+        <div class="meter"><div class="meter-mark" id="mW"></div></div>
+        <div class="meter-scale"><span>Venta</span><span>Neutral</span><span>Compra</span></div>
+      </div>
+      <div class="tf-card" id="cM">
+        <div class="tf-label">1 Mes · Mediano plazo</div>
+        <div class="tf-rating" id="rM">—</div>
+        <div class="tf-score" id="sM"></div>
+        <div class="meter"><div class="meter-mark" id="mM"></div></div>
+        <div class="meter-scale"><span>Venta</span><span>Neutral</span><span>Compra</span></div>
+      </div>
+    </div>
+
+    <a class="crosslink" id="toNyse" href="#">🏢 Ver Semáforo de Calidad (NYSE) de este ticker →
+      <small>¿Es una buena empresa? Confirmá la calidad antes de decidir.</small></a>
+
+    <div class="explain">
+      <div class="explain-title">📈 Cómo leer este semáforo</div>
+      <p>El rating es un <strong>consenso de ~26 indicadores técnicos</strong> (medias móviles + osciladores) que TradingView resume en una escala de <strong>Venta fuerte</strong> a <strong>Compra fuerte</strong>. No es una orden de compra: es una foto de hacia dónde empuja el mercado hoy.</p>
+      <p><strong>🟢 Buen momento:</strong> las dos temporalidades acompañan. <strong>🟡 Zona neutral:</strong> señales mixtas o sin dirección clara, conviene esperar. <strong>🔴 No es el momento:</strong> al menos una temporalidad está en zona de venta.</p>
+      <p>Combinalo siempre con el <strong>Semáforo de Calidad</strong> (¿buena empresa?) y la <strong>Calculadora de Decisiones</strong> (¿la relación riesgo/recompensa cierra?).</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Datos: TradingView · Uso educativo — no es recomendación de inversión
+</footer>
+
+<script>
+/* ============================================================
+   Worker proxy (mismo que el Semáforo NYSE)
+   ============================================================ */
+const PROXY='https://yahoo-proxy.webmaster-c89.workers.dev';
+const ACCESS_LS='snse_access_code';        // candado COMPARTIDO con el NYSE
+let CLIENT_CODE='';
+
+/* ---- Puerta de acceso (código de alumno) ---- */
+function storedCode(){try{return localStorage.getItem(ACCESS_LS)||'';}catch(e){return'';}}
+async function checkCode(code){
+  if(!PROXY)return true;
+  try{
+    const r=await fetch(`${PROXY}/?check=1&k=${encodeURIComponent(code)}`);
+    if(!r.ok)return false;
+    const j=await r.json();
+    return !!j.ok;
+  }catch(e){return true;} // si el Worker no responde, no bloqueamos al alumno legítimo
+}
+function showGate(){document.getElementById('gate').classList.add('show');setTimeout(()=>{const i=document.getElementById('gateInput');if(i)i.focus();},80);}
+function hideGate(){document.getElementById('gate').classList.remove('show');}
+async function submitGate(){
+  const inp=document.getElementById('gateInput');
+  const btn=document.getElementById('gateBtn');
+  const err=document.getElementById('gateErr');
+  const code=inp.value.trim().toUpperCase();
+  if(!code){err.textContent='Ingresá tu código de acceso.';return;}
+  btn.disabled=true;err.textContent='Verificando...';
+  const ok=await checkCode(code);
+  btn.disabled=false;
+  if(ok){
+    CLIENT_CODE=code;
+    try{localStorage.setItem(ACCESS_LS,code);}catch(e){}
+    err.textContent='';hideGate();
+    if(pendingSymbol){go(pendingSymbol);pendingSymbol='';}
+  }else{
+    err.textContent='Código incorrecto. Revisá tu área de miembros.';
+    inp.select();
+  }
+}
+async function initGate(){
+  const saved=storedCode();
+  if(saved && await checkCode(saved)){CLIENT_CODE=saved;hideGate();return true;}
+  if(await checkCode('')){hideGate();return true;} // Worker en modo abierto
+  showGate();return false;
+}
+
+/* ============================================================
+   Mapeo del rating (-1..+1) → etiqueta / nivel / color
+   ============================================================ */
+function rate(v){
+  if(v==null||isNaN(v))return{label:'Sin datos',level:'',cls:''};
+  if(v>=0.5)  return{label:'Compra fuerte',level:'ok'};
+  if(v>=0.1)  return{label:'Compra',       level:'ok'};
+  if(v>-0.1)  return{label:'Neutral',      level:'warn'};
+  if(v>-0.5)  return{label:'Venta',        level:'fail'};
+  return            {label:'Venta fuerte', level:'fail'};
+}
+
+function fillCard(prefix, v){
+  const r=rate(v);
+  const card=document.getElementById('c'+prefix);
+  card.classList.remove('ok','warn','fail');
+  if(r.level)card.classList.add(r.level);
+  document.getElementById('r'+prefix).textContent=r.label;
+  document.getElementById('s'+prefix).textContent=(v==null||isNaN(v))?'—':('score '+v.toFixed(2)+' · escala −1 a +1');
+  const pct=(v==null||isNaN(v))?50:Math.max(0,Math.min(100,(v+1)/2*100));
+  document.getElementById('m'+prefix).style.left=pct+'%';
+}
+
+/* Veredicto combinado de Entrada a partir de 1W y 1M */
+function combinedVerdict(w,m){
+  const vals=[w,m].filter(x=>x!=null&&!isNaN(x));
+  if(!vals.length)return{level:'',title:'Sin datos',desc:'TradingView no devolvió un rating para este ticker.'};
+  const bearish = vals.some(x=>x<=-0.1);
+  const bullishBoth = vals.length===2 && w>=0.1 && m>=0.1;
+  if(bearish){
+    return{level:'fail',title:'🔴 No es el momento',
+      desc:'Al menos una temporalidad está en zona de venta. El mercado no acompaña: conviene esperar a que el técnico mejore antes de entrar.'};
+  }
+  if(bullishBoth){
+    return{level:'ok',title:'🟢 Buen momento de entrada',
+      desc:'Corto y mediano plazo acompañan: el consenso técnico está del lado comprador en ambas temporalidades.'};
+  }
+  return{level:'warn',title:'🟡 Zona neutral — esperá',
+    desc:'Señales mixtas o sin dirección clara entre el corto y el mediano plazo. No hay una ventaja técnica evidente; mejor esperar una señal más nítida.'};
+}
+
+/* ============================================================
+   Flujo principal
+   ============================================================ */
+let pendingSymbol='';
+function go(t){document.getElementById('tickerInput').value=t;analyze();}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('show');}
+function hideErr(){document.getElementById('err').classList.remove('show');}
+
+async function analyze(){
+  const t=document.getElementById('tickerInput').value.trim().toUpperCase();
+  if(!t){showErr('Escribí un símbolo (ej: AAPL).');return;}
+  if(!/^[A-Z0-9.\-]{1,12}$/.test(t)){showErr('Símbolo inválido.');return;}
+  hideErr();
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('btn').disabled=true;
+  try{
+    const k=CLIENT_CODE?`&k=${encodeURIComponent(CLIENT_CODE)}`:'';
+    const r=await fetch(`${PROXY}/?tv=${encodeURIComponent(t)}${k}`);
+    const j=await r.json();
+    if(!r.ok||j.error){
+      throw new Error(j&&j.error?j.error:('HTTP '+r.status));
+    }
+    render(t,j);
+  }catch(e){
+    showErr('No se pudo obtener el consenso de TradingView para '+t+'. '+(e.message||e)+' (verificá el ticker; el endpoint cubre NYSE/NASDAQ/AMEX).');
+  }finally{
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('btn').disabled=false;
+  }
+}
+
+function render(t,j){
+  const w=j.ratings?j.ratings['1W']:null;
+  const m=j.ratings?j.ratings['1M']:null;
+
+  document.getElementById('resTicker').innerHTML=
+    `<b>${t}</b>${j.exchange?(' · '+j.exchange):''} · consenso técnico TradingView`;
+
+  fillCard('W',w);
+  fillCard('M',m);
+
+  const cv=combinedVerdict(w,m);
+  const v=document.getElementById('verdict');
+  v.classList.remove('ok','warn','fail');
+  if(cv.level)v.classList.add(cv.level);
+  document.getElementById('vTitle').textContent=cv.title;
+  document.getElementById('vDesc').textContent=cv.desc;
+
+  document.getElementById('toNyse').href='index.html?symbol='+encodeURIComponent(t);
+
+  document.getElementById('results').classList.add('show');
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ============================================================
+   Init: candado + lectura de ?symbol= (conexión con el NYSE)
+   ============================================================ */
+document.getElementById('tickerInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyze();});
+document.getElementById('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  const sym=(new URLSearchParams(location.search).get('symbol')||'').trim().toUpperCase();
+  const open=await initGate();
+  if(sym && /^[A-Z0-9.\-]{1,12}$/.test(sym)){
+    if(open){go(sym);}else{pendingSymbol=sym;} // si está bloqueado, carga al desbloquear
+  }
+});
+</script>
+</body>
+</html>
