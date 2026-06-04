@@ -294,7 +294,7 @@ async function submitGate(){
   const inp=document.getElementById('gateInput');
   const btn=document.getElementById('gateBtn');
   const err=document.getElementById('gateErr');
-  const code=inp.value.trim();
+  const code=inp.value.trim().toUpperCase();
   if(!code){err.textContent='Ingresá tu código de acceso.';return;}
   btn.disabled=true;err.textContent='Verificando...';
   const ok=await checkCode(code);
