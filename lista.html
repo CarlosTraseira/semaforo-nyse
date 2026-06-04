@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista Curada · Semáforo del Inversor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c0c10'/><rect x='11' y='2' width='10' height='28' rx='5' fill='%231a1a24'/><circle cx='16' cy='8' r='4' fill='%2300ff88'/><circle cx='16' cy='16' r='4' fill='%23ffb840'/><circle cx='16' cy='24' r='4' fill='%23ff4070'/></svg>">
+<style>
+:root{
+  --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--border:#252538;
+  --text:#f0f0f8;--text2:#9090b0;--text3:#454565;
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.10);--green-glow:rgba(0,255,136,0.25);--green-border:rgba(0,255,136,0.30);
+  --amber:#ffb840;--amber-dim:rgba(255,184,64,0.10);--amber-border:rgba(255,184,64,0.30);
+  --red:#ff4070;
+  --display:'Syne',sans-serif;--mono:'Fira Code',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 45% at 15% 5%,rgba(99,102,241,0.07) 0%,transparent 60%),radial-gradient(ellipse 55% 40% at 85% 85%,rgba(0,255,136,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;flex:1;max-width:780px;margin:0 auto;padding:36px 20px 0;width:100%}
+
+.header{text-align:center;margin-bottom:24px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px}
+.logo-lights{display:flex;gap:6px;align-items:center}
+.ll{width:13px;height:13px;border-radius:50%}
+.ll.g{background:var(--green);box-shadow:0 0 10px var(--green-glow)}
+.ll.a{background:var(--amber)}
+.ll.r{background:var(--red)}
+.logo-name{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.logo-name span{color:var(--green)}
+.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+.intro{font-size:16px;color:var(--text2);line-height:1.75;max-width:600px;margin:22px auto 0;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px;text-align:left}
+.intro strong{color:var(--text)}
+.intro .lead{display:block;font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
+
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:18px 0 6px}
+@media(max-width:560px){.steps{grid-template-columns:1fr}}
+.step{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.step.active{border-left:3px solid var(--green)}
+.step-n{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.step-t{font-size:14px;font-weight:700;margin-bottom:3px}
+.step.active .step-t{color:var(--green)}
+.step-d{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.5}
+
+.sec-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.18em;margin:26px 0 14px;display:flex;align-items:center;gap:10px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:580px){.grid{grid-template-columns:1fr}}
+.co{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.co-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px}
+.co-id{min-width:0}
+.tk{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--green);display:block;line-height:1.1}
+.nm{font-size:12px;color:var(--text2);display:block;line-height:1.3;margin-top:2px}
+.badge{font-family:var(--mono);font-size:10px;font-weight:600;padding:4px 8px;border-radius:7px;white-space:nowrap;border:1px solid;flex-shrink:0}
+.badge.b-ok{background:var(--green-dim);color:var(--green);border-color:var(--green-border)}
+.badge.b-warn{background:var(--amber-dim);color:var(--amber);border-color:var(--amber-border)}
+.co-sector{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.co-light{display:flex;gap:6px;margin-bottom:14px}
+.dot{width:14px;height:14px;border-radius:50%}
+.d-ok{background:var(--green);box-shadow:0 0 6px var(--green-glow)}
+.d-warn{background:var(--amber)}
+.d-fail{background:var(--red)}
+.co-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;border-top:1px solid var(--border);padding-top:12px}
+.st{display:flex;flex-direction:column;gap:3px;min-width:0}
+.st-l{font-family:var(--mono);font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em}
+.st-v{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)}
+.st-v.v-ok{color:var(--green)}
+.st-v.v-warn{color:var(--amber)}
+.st-v.v-fail{color:var(--red)}
+
+.legend{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.9;margin:18px 0 6px;display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .dot{width:11px;height:11px}
+
+.disclaimer{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:22px 0 28px}
+.disclaimer.amber{border-left:3px solid var(--amber)}
+.disclaimer-title{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.16em;margin-bottom:12px}
+.disclaimer p{font-family:var(--mono);font-size:12px;color:var(--text3);line-height:1.85}
+.disclaimer strong{color:var(--text2)}
+.cta{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--green);text-decoration:none}
+.cta:hover{text-decoration:underline}
+
+footer{position:relative;z-index:1;text-align:center;padding:24px 20px 32px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:28px}
+footer span{color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
+      <div class="logo-name">Lista <span>Curada</span></div>
+    </div>
+    <div class="logo-tag">20 empresas que superan el Semáforo de Calidad · junio 2026</div>
+    <p class="intro">
+      <span class="lead">Empezás desde el día 1, sin búsqueda y sin dudas.</span>
+      Estas 20 empresas del NYSE/NASDAQ <strong>ya superaron el primer filtro del sistema — el de calidad fundamental</strong>: precio razonable, alta rentabilidad, deuda controlada y flujo de caja positivo. El trabajo de rastrear y descartar ya está hecho. Vos arrancás con una base sólida y aplicás los otros dos semáforos antes de operar.
+    </p>
+  </div>
+
+  <div class="steps">
+    <div class="step active">
+      <div class="step-n">Semáforo 1</div>
+      <div class="step-t">Calidad ✓</div>
+      <div class="step-d">Resuelto en esta lista.</div>
+    </div>
+    <div class="step">
+      <div class="step-n">Semáforo 2</div>
+      <div class="step-t">Entrada</div>
+      <div class="step-d">¿Buen momento? Lo aplicás vos.</div>
+    </div>
+    <div class="step">
+      <div class="step-n">Semáforo 3</div>
+      <div class="step-t">Riesgo</div>
+      <div class="step-d">La calculadora, por operación.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">20 empresas · 13 en verde pleno (5/5)</div>
+  <div class="grid">
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">MKC</span><span class="nm">McCormick & Company, Incorporated</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Consumo Defensivo</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">7.6</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">25%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">23%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">65%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">373M</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">TRV</span><span class="nm">The Travelers Companies, Inc.</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Servicios Financieros</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">8.7</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">25%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">16%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">29%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">13.3B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">PGR</span><span class="nm">The Progressive Corporation</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Servicios Financieros</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">9.9</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">38%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">13%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">26%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">15.5B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">CB</span><span class="nm">Chubb Limited</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Servicios Financieros</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">11.1</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">15%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">19%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">31%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">12.6B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">AFL</span><span class="nm">Aflac Incorporated</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Servicios Financieros</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">13.1</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">16%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">26%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">48%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">4.9B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">ACN</span><span class="nm">Accenture plc</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Tecnología</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">14.6</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">25%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">11%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">25%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">12.2B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">ADBE</span><span class="nm">Adobe Inc.</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Tecnología</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">15.1</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">59%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">29%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">58%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">9.3B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">GILD</span><span class="nm">Gilead Sciences, Inc.</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Salud</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">17.5</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">43%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">31%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">95%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">7.9B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">INTU</span><span class="nm">Intuit Inc.</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Tecnología</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">18.5</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">22%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">22%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">33%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">5.2B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">PG</span><span class="nm">The Procter & Gamble Company</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Consumo Defensivo</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">20.5</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">31%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">19%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">68%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">12.7B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">ADP</span><span class="nm">Automatic Data Processing, Inc.</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Tecnología</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">21.5</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">71%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">20%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">69%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">4.7B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">CME</span><span class="nm">CME Group Inc.</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Servicios Financieros</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">21.7</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">16%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">63%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">14%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">3.0B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">META</span><span class="nm">Meta Platforms, Inc.</span></div>
+        <span class="badge b-ok">5/5 PLENO</span>
+      </div>
+      <div class="co-sector">Comunicaciones</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">22.9</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">33%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">33%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">36%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">25.6B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">ICE</span><span class="nm">Intercontinental Exchange, Inc.</span></div>
+        <span class="badge b-warn">4/5 APTO</span>
+      </div>
+      <div class="co-sector">Servicios Financieros</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-warn"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">20.7</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-warn">14%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">38%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">71%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">3.7B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">GD</span><span class="nm">General Dynamics Corporation</span></div>
+        <span class="badge b-warn">4/5 APTO</span>
+      </div>
+      <div class="co-sector">Industria</div>
+      <div class="co-light"><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-warn"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-ok">21.5</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">18%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-warn">8%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">38%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">5.3B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">MSFT</span><span class="nm">Microsoft Corporation</span></div>
+        <span class="badge b-warn">4/5 APTO</span>
+      </div>
+      <div class="co-sector">Tecnología</div>
+      <div class="co-light"><span class="dot d-warn"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-warn">25.5</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">34%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">39%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">30%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">37.0B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">QCOM</span><span class="nm">QUALCOMM Incorporated</span></div>
+        <span class="badge b-warn">4/5 APTO</span>
+      </div>
+      <div class="co-sector">Tecnología</div>
+      <div class="co-light"><span class="dot d-warn"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-warn">26.2</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">36%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">22%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">56%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">9.6B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">JNJ</span><span class="nm">Johnson & Johnson</span></div>
+        <span class="badge b-warn">4/5 APTO</span>
+      </div>
+      <div class="co-sector">Salud</div>
+      <div class="co-light"><span class="dot d-warn"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-warn">26.4</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">26%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">22%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">68%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">12.5B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">V</span><span class="nm">Visa Inc.</span></div>
+        <span class="badge b-warn">4/5 APTO</span>
+      </div>
+      <div class="co-sector">Servicios Financieros</div>
+      <div class="co-light"><span class="dot d-warn"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-warn">27.9</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">60%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">52%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">67%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">20.8B</span></div></div>
+    </div>
+    <div class="co">
+      <div class="co-head">
+        <div class="co-id"><span class="tk">GOOGL</span><span class="nm">Alphabet Inc.</span></div>
+        <span class="badge b-warn">4/5 APTO</span>
+      </div>
+      <div class="co-sector">Comunicaciones</div>
+      <div class="co-light"><span class="dot d-warn"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span><span class="dot d-ok"></span></div>
+      <div class="co-stats"><div class="st"><span class="st-l">P/E</span><span class="st-v v-warn">28.5</span></div><div class="st"><span class="st-l">ROE</span><span class="st-v v-ok">39%</span></div><div class="st"><span class="st-l">Margen</span><span class="st-v v-ok">38%</span></div><div class="st"><span class="st-l">Deuda</span><span class="st-v v-ok">20%</span></div><div class="st"><span class="st-l">FCF</span><span class="st-v v-ok">27.9B</span></div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot d-ok"></span>Cumple</span>
+    <span><span class="dot d-warn"></span>En el límite</span>
+    <span><span class="dot d-fail"></span>No cumple</span>
+    <span>· orden de indicadores: P/E · ROE · Margen · Deuda · Flujo de caja</span>
+  </div>
+
+  <div class="disclaimer amber">
+    <div class="disclaimer-title">⚠ Cómo usar esta lista</div>
+    <p>Datos fundamentales verificados en <strong>04/06/2026</strong> (fuente: Yahoo Finance). Los números cambian con cada balance trimestral y con el precio: <strong>reverificá siempre con el Semáforo NYSE</strong> antes de operar.<br><br>
+    Que una empresa supere el filtro de calidad <strong>no es una señal de compra</strong>: es solo el primer paso. Una gran empresa puede ser una mala operación si el momento o el riesgo no acompañan. Aplicá los 3 semáforos.<br><br>
+    Las empresas marcadas <strong>5/5</strong> cumplen los cinco indicadores; las <strong>4/5</strong> quedan en "límite" amarillo en uno (precio o rentabilidad al borde), sin ningún indicador en rojo.<br>
+    <a class="cta" href="../semaforo-nyse/" target="_blank" rel="noopener">→ Verificar cualquiera en el Semáforo NYSE</a></p>
+  </div>
+
+  <div class="disclaimer">
+    <div class="disclaimer-title" style="color:var(--text3)">Disclaimer</div>
+    <p>Uso exclusivamente educativo e informativo. <strong>No constituye recomendación de compra, venta o tenencia</strong> de ningún instrumento financiero. El desempeño pasado no garantiza resultados futuros. <strong>Carlos Traseira</strong> no se responsabiliza por decisiones tomadas con base en esta información.</p>
+  </div>
+
+</div>
+
+<footer>
+  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Lista actualizada junio 2026
+</footer>
+</body>
+</html>
