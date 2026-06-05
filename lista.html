@@ -40,6 +40,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 @media(max-width:560px){.steps{grid-template-columns:1fr}}
 .step{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
 .step.active{border-left:3px solid var(--green)}
+a.step{text-decoration:none;color:inherit;display:block;transition:border-color .15s,transform .1s}
+a.step:hover{border-color:var(--green-border)}
+a.step:active{transform:scale(.99)}
+.step-cue{color:var(--green)}
 .step-n{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
 .step-t{font-size:14px;font-weight:700;margin-bottom:3px}
 .step.active .step-t{color:var(--green)}
@@ -113,16 +117,16 @@ footer span{color:var(--text2)}
       <div class="step-t">Calidad ✓</div>
       <div class="step-d">Resuelto en esta lista.</div>
     </div>
-    <div class="step">
+    <a class="step" href="entrada.html">
       <div class="step-n">Semáforo 2</div>
       <div class="step-t">Entrada</div>
-      <div class="step-d">¿Buen momento? Lo aplicás vos.</div>
-    </div>
-    <div class="step">
+      <div class="step-d">¿Buen momento? <span class="step-cue">Abrí la app →</span></div>
+    </a>
+    <a class="step" href="calculadora.html">
       <div class="step-n">Semáforo 3</div>
       <div class="step-t">Riesgo</div>
-      <div class="step-d">La calculadora, por operación.</div>
-    </div>
+      <div class="step-d">Riesgo por operación. <span class="step-cue">Abrí la app →</span></div>
+    </a>
   </div>
 
   <div class="sec-label" id="secLabel">Cargando lista…</div>
@@ -207,9 +211,9 @@ async function load(){
     grid.innerHTML=list.map(card).join('');
     document.getElementById('secLabel').textContent=
       `${d.count} empresas · ${d.count_5} en verde pleno (5/5)`;
-    if(d.updated_month)
+    if(d.updated_label)
       document.getElementById('logoTag').textContent=
-        `${d.count} empresas que superan el Semáforo de Calidad · ${d.updated_month}`;
+        `${d.count} empresas que superan el Semáforo de Calidad · Actualizada el ${d.updated_label}`;
     if(d.updated_label)
       document.getElementById('discDate').textContent='el '+d.updated_label;
     if(d.updated_month)
