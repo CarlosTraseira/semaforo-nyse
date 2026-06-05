@@ -1,0 +1,390 @@
+{
+  "updated_iso": "2026-06-05T11:42:30Z",
+  "updated_label": "5 de junio de 2026",
+  "updated_month": "junio 2026",
+  "count": 20,
+  "count_5": 5,
+  "universe": 50,
+  "companies": [
+    {
+      "ticker": "ACN",
+      "name": "Accenture plc",
+      "sector": "Technology",
+      "pe": 14.660656,
+      "roe": 24.762999999999998,
+      "margin": 10.606,
+      "debt": 25.469,
+      "fcf": 12164313088.0,
+      "div": 3.65,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 5
+    },
+    {
+      "ticker": "ADBE",
+      "name": "Adobe Inc.",
+      "sector": "Technology",
+      "pe": 15.059442,
+      "roe": 58.774,
+      "margin": 29.476999999999997,
+      "debt": 58.34,
+      "fcf": 9321374720.0,
+      "div": null,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 5
+    },
+    {
+      "ticker": "INTU",
+      "name": "Intuit Inc.",
+      "sector": "Technology",
+      "pe": 18.413416,
+      "roe": 22.496,
+      "margin": 21.907,
+      "debt": 33.448,
+      "fcf": 5232000000.0,
+      "div": 1.59,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 5
+    },
+    {
+      "ticker": "PG",
+      "name": "The Procter & Gamble Company",
+      "sector": "Consumer Defensive",
+      "pe": 20.581871,
+      "roe": 31.112000000000002,
+      "margin": 19.162000000000003,
+      "debt": 67.651,
+      "fcf": 12733750272.0,
+      "div": 3.0299999,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 5
+    },
+    {
+      "ticker": "META",
+      "name": "Meta Platforms, Inc.",
+      "sector": "Communication Services",
+      "pe": 22.82903,
+      "roe": 32.930002,
+      "margin": 32.836999999999996,
+      "debt": 35.608,
+      "fcf": 25558249472.0,
+      "div": 0.33000002,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 5
+    },
+    {
+      "ticker": "CMCSA",
+      "name": "Comcast Corporation",
+      "sector": "Communication Services",
+      "pe": 4.57451,
+      "roe": 20.918,
+      "margin": 15.004000000000001,
+      "debt": 106.858,
+      "fcf": 4013125120.0,
+      "div": 5.6599997,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "warn",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "DIS",
+      "name": "The Walt Disney Company",
+      "sector": "Communication Services",
+      "pe": 15.8944,
+      "roe": 11.01,
+      "margin": 11.540000000000001,
+      "debt": 41.069,
+      "fcf": 3751375104.0,
+      "div": 1.50999995,
+      "states": [
+        "ok",
+        "fail",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "AMGN",
+      "name": "Amgen Inc.",
+      "sector": "Healthcare",
+      "pe": 24.03338,
+      "roe": 101.318,
+      "margin": 20.955999,
+      "debt": 623.754,
+      "fcf": 7436624896.0,
+      "div": 2.92,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "fail",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "KO",
+      "name": "The Coca-Cola Company",
+      "sector": "Consumer Defensive",
+      "pe": 24.157232,
+      "roe": 43.372001999999995,
+      "margin": 27.800000000000004,
+      "debt": 124.943,
+      "fcf": 3124250112.0,
+      "div": 2.76,
+      "states": [
+        "ok",
+        "ok",
+        "ok",
+        "fail",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft Corporation",
+      "sector": "Technology",
+      "pe": 25.509533,
+      "roe": 34.013999,
+      "margin": 39.341998000000004,
+      "debt": 30.271,
+      "fcf": 37011251200.0,
+      "div": 0.8500000000000001,
+      "states": [
+        "warn",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "sector": "Technology",
+      "pe": 26.110872,
+      "roe": 36.083,
+      "margin": 22.308001,
+      "debt": 55.979,
+      "fcf": 9589624832.0,
+      "div": 1.52,
+      "states": [
+        "warn",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "JNJ",
+      "name": "Johnson & Johnson",
+      "sector": "Healthcare",
+      "pe": 26.469837,
+      "roe": 26.416,
+      "margin": 21.834,
+      "debt": 67.73,
+      "fcf": 12511375360.0,
+      "div": 2.35,
+      "states": [
+        "warn",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "V",
+      "name": "Visa Inc.",
+      "sector": "Financial Services",
+      "pe": 27.938917,
+      "roe": 60.349,
+      "margin": 51.679003,
+      "debt": 67.233,
+      "fcf": 20839749632.0,
+      "div": 0.84,
+      "states": [
+        "warn",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet Inc.",
+      "sector": "Communication Services",
+      "pe": 28.41145,
+      "roe": 38.884997,
+      "margin": 37.919000000000004,
+      "debt": 20.026,
+      "fcf": 27921750016.0,
+      "div": 0.23999999000000002,
+      "states": [
+        "warn",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA Corporation",
+      "sector": "Technology",
+      "pe": 33.43425,
+      "roe": 114.28799999999998,
+      "margin": 62.966,
+      "debt": 6.555,
+      "fcf": 46335873024.0,
+      "div": 0.45999999999999996,
+      "states": [
+        "fail",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "AAPL",
+      "name": "Apple Inc.",
+      "sector": "Technology",
+      "pe": 37.72485,
+      "roe": 141.47099,
+      "margin": 27.152001999999996,
+      "debt": 79.548,
+      "fcf": 101090746368.0,
+      "div": 0.34999999,
+      "states": [
+        "fail",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "CSCO",
+      "name": "Cisco Systems, Inc.",
+      "sector": "Technology",
+      "pe": 43.333332,
+      "roe": 25.229000000000003,
+      "margin": 19.685,
+      "debt": 67.541,
+      "fcf": 9288375296.0,
+      "div": 1.2899999500000001,
+      "states": [
+        "fail",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "TXN",
+      "name": "Texas Instruments Incorporated",
+      "sector": "Technology",
+      "pe": 52.11092,
+      "roe": 32.347,
+      "margin": 29.108,
+      "debt": 83.741,
+      "fcf": 1068249984.0,
+      "div": 1.8599999999999999,
+      "states": [
+        "fail",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "AVGO",
+      "name": "Broadcom Inc.",
+      "sector": "Technology",
+      "pe": 69.9349,
+      "roe": 37.280998,
+      "margin": 38.848,
+      "debt": 74.018,
+      "fcf": 27212249088.0,
+      "div": 0.62,
+      "states": [
+        "fail",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    },
+    {
+      "ticker": "NOW",
+      "name": "ServiceNow, Inc.",
+      "sector": "Technology",
+      "pe": 71.04762,
+      "roe": 16.07,
+      "margin": 12.586,
+      "debt": 20.728,
+      "fcf": 5108125184.0,
+      "div": null,
+      "states": [
+        "fail",
+        "ok",
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "score": 4
+    }
+  ]
+}
