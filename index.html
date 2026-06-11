@@ -155,6 +155,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .disclaimer p{font-family:var(--mono);font-size:12px;color:var(--text3);line-height:1.85}
 .disclaimer strong{color:var(--text2)}
 
+/* Cross-link a otras herramientas */
+.crosslink{display:block;text-align:center;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-bottom:14px;font-family:var(--display);font-size:14px;font-weight:700;color:var(--green);text-decoration:none;transition:border-color .15s,background .15s}
+.crosslink:hover{border-color:var(--green-border);background:var(--green-dim)}
+.crosslink small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text2);margin-top:4px}
+
 /* Gate — pantalla de bloqueo */
 .gate{position:fixed;inset:0;z-index:50;background:rgba(8,8,12,0.94);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
 .gate.show{display:flex}
@@ -304,6 +309,7 @@ async function submitGate(){
     try{localStorage.setItem(ACCESS_LS,code);}catch(e){}
     err.textContent='';
     hideGate();
+    if(pendingSymbol){go(pendingSymbol);pendingSymbol='';}
   }else{
     err.textContent='Código incorrecto. Revisá tu área de miembros.';
     inp.select();
@@ -312,15 +318,20 @@ async function submitGate(){
 
 async function initGate(){
   const saved=storedCode();
-  if(saved && await checkCode(saved)){CLIENT_CODE=saved;hideGate();return;}
+  if(saved && await checkCode(saved)){CLIENT_CODE=saved;hideGate();return true;}
   // checkCode('') devuelve true si el Worker NO tiene ACCESS_CODE (modo abierto)
-  if(await checkCode('')){hideGate();return;}
-  showGate();
+  if(await checkCode('')){hideGate();return true;}
+  showGate();return false;
 }
-document.addEventListener('DOMContentLoaded',()=>{
+let pendingSymbol='';
+document.addEventListener('DOMContentLoaded',async()=>{
   const gi=document.getElementById('gateInput');
   if(gi)gi.addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
-  initGate();
+  const sym=(new URLSearchParams(location.search).get('symbol')||'').trim().toUpperCase();
+  const open=await initGate();
+  if(sym && /^[A-Z0-9.\-]{1,12}$/.test(sym)){
+    if(open){go(sym);}else{pendingSymbol=sym;} // si está bloqueado, carga al desbloquear
+  }
 });
 
 /* ============================================================
@@ -698,6 +709,9 @@ function render(data,ticker,fromCache){
         </div>
       </div>
     </div>
+
+    <a class="crosslink" href="entrada.html?symbol=${encodeURIComponent(ticker)}">📈 Ver Semáforo de Entrada de ${ticker} →
+      <small>¿Es buen momento? Qué dice TradingView — y cuánto acierta de verdad.</small></a>
 
     ${sourceBar}
 
