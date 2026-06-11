@@ -232,6 +232,7 @@ footer span{color:var(--text2)}
     <div class="explain" style="border-left-color:var(--green)">
       <div class="explain-title">🔬 De dónde sale el "historial real"</div>
       <p>Reconstruimos el medidor de TradingView —los mismos ~26 indicadores oficiales— barra por barra sobre <strong>26 acciones y ETFs</strong> (la Lista Curada completa + SPY, QQQ, DIA y otros), desde 2016 hasta hoy: <strong>más de 13.000 señales semanales y 3.000 mensuales</strong>. Para cada señal medimos qué hizo el precio en la barra siguiente.</p>
+      <p>Si el ticker que consultás está en la muestra, te mostramos <strong>su historial propio</strong> — siempre que esa señal tenga casos suficientes (30 o más); con menos, un porcentaje individual sería ruido estadístico y te mostramos el promedio de la muestra, aclarándolo. Si el ticker no está en la muestra, también te lo decimos: los porcentajes describen el comportamiento de la señal, no de tu ticker en particular.</p>
       <p>Resultado: después de un <strong>SELL semanal</strong> el precio subió igual el <strong>54% de las veces</strong> (retorno promedio positivo). Después de un <strong>BUY</strong>: 56% — casi lo mismo que sin ninguna señal (55%). <strong>El medidor describe el pasado; no predice el futuro.</strong></p>
       <p>Nadie te muestra este dato. Nosotros sí, porque la ventaja del inversor no está en obedecer indicadores: está en comprar calidad con un riesgo controlado.</p>
     </div>
@@ -324,29 +325,54 @@ const AUDIT={
     'Strong Sell':{n:32,  sube:46.9,ret:1.55}
   }}
 };
+/* Historial POR TICKER (mismos backtest y criterio; s: [n, %sube, ret_medio%]).
+   Si el ticker consultado está acá y la celda tiene n>=MIN_N, se muestra SU
+   historial; si no, el promedio de la muestra (aclarándolo). */
+const MIN_N=30;
+const AUDIT_T={"ACN":{"1W":{"base":54.9,"s":{"Strong Buy":[112,58.9,0.1],"Buy":[220,54.1,0.24],"Neutral":[44,61.4,0.07],"Sell":[130,50.0,-0.06],"Strong Sell":[15,60.0,0.98]}},"1M":{"base":56.3,"s":{"Strong Buy":[33,48.5,-0.38],"Buy":[57,64.9,1.42],"Neutral":[13,46.2,-0.04],"Sell":[16,50.0,0.72]}}},"ADBE":{"1W":{"base":53.7,"s":{"Strong Buy":[99,57.6,0.35],"Buy":[209,57.4,0.46],"Neutral":[49,46.9,0.56],"Sell":[135,48.9,-0.15],"Strong Sell":[29,48.3,0.33]}},"1M":{"base":57.1,"s":{"Strong Buy":[33,60.6,1.53],"Buy":[52,65.4,2.04],"Neutral":[10,30.0,-2.33],"Sell":[24,45.8,0.55]}}},"INTU":{"1W":{"base":53.7,"s":{"Strong Buy":[114,55.3,0.63],"Buy":[249,54.2,0.26],"Neutral":[49,44.9,-0.31],"Sell":[101,55.4,0.45],"Strong Sell":[8,50.0,-1.39]}},"1M":{"base":56.3,"s":{"Strong Buy":[41,56.1,1.88],"Buy":[62,58.1,0.91],"Neutral":[9,55.6,4.0],"Sell":[7,42.9,-3.24]}}},"PG":{"1W":{"base":55.9,"s":{"Strong Buy":[91,50.5,-0.28],"Buy":[229,57.6,0.11],"Neutral":[40,55.0,0.17],"Sell":[141,58.9,0.49],"Strong Sell":[20,40.0,-0.14]}},"1M":{"base":58.0,"s":{"Strong Buy":[25,44.0,-1.01],"Buy":[65,61.5,0.64],"Neutral":[17,58.8,1.84],"Sell":[12,66.7,1.59]}}},"META":{"1W":{"base":54.9,"s":{"Strong Buy":[106,48.1,-0.07],"Buy":[250,60.0,0.88],"Neutral":[41,58.5,1.12],"Sell":[110,47.3,-0.52],"Strong Sell":[14,64.3,2.06]}},"1M":{"base":59.7,"s":{"Strong Buy":[32,59.4,2.12],"Buy":[66,62.1,1.7],"Neutral":[2,50.0,0.26],"Sell":[18,50.0,1.54],"Strong Sell":[1,100.0,26.77]}}},"QCOM":{"1W":{"base":55.1,"s":{"Strong Buy":[72,52.8,0.48],"Buy":[193,54.9,0.4],"Neutral":[61,57.4,-0.4],"Sell":[158,53.2,0.3],"Strong Sell":[37,64.9,2.03]}},"1M":{"base":48.7,"s":{"Strong Buy":[25,56.0,1.07],"Buy":[50,42.0,0.17],"Neutral":[12,50.0,-0.28],"Sell":[31,54.8,6.45],"Strong Sell":[1,0.0,-0.82]}}},"MSFT":{"1W":{"base":57.4,"s":{"Strong Buy":[114,54.4,0.07],"Buy":[276,60.9,0.54],"Neutral":[52,50.0,0.24],"Sell":[77,54.5,0.89],"Strong Sell":[2,50.0,-0.95]}},"1M":{"base":63.0,"s":{"Strong Buy":[39,64.1,1.37],"Buy":[67,64.2,2.62],"Neutral":[8,50.0,-0.36],"Sell":[5,60.0,2.93]}}},"CMCSA":{"1W":{"base":49.9,"s":{"Strong Buy":[57,42.1,-0.18],"Buy":[199,52.8,0.19],"Neutral":[47,40.4,-0.7],"Sell":[176,50.6,-0.02],"Strong Sell":[42,54.8,0.37]}},"1M":{"base":55.5,"s":{"Strong Buy":[17,35.3,-2.12],"Buy":[49,65.3,0.95],"Neutral":[15,40.0,-1.66],"Sell":[35,60.0,0.84],"Strong Sell":[3,33.3,-1.88]}}},"DIS":{"1W":{"base":47.0,"s":{"Strong Buy":[58,44.8,0.27],"Buy":[183,47.5,0.18],"Neutral":[59,35.6,-0.97],"Sell":[184,49.5,0.23],"Strong Sell":[37,54.1,0.15]}},"1M":{"base":43.7,"s":{"Strong Buy":[20,30.0,-1.15],"Buy":[42,45.2,-0.17],"Neutral":[17,41.2,3.64],"Sell":[39,48.7,-0.23],"Strong Sell":[1,100.0,24.87]}}},"AMGN":{"1W":{"base":51.8,"s":{"Strong Buy":[103,54.4,-0.24],"Buy":[225,46.2,-0.04],"Neutral":[43,58.1,0.76],"Sell":[143,55.9,0.72],"Strong Sell":[7,71.4,1.37]}},"1M":{"base":53.8,"s":{"Strong Buy":[42,47.6,-0.6],"Buy":[56,53.6,0.93],"Neutral":[12,58.3,2.85],"Sell":[9,77.8,5.18]}}},"KO":{"1W":{"base":55.3,"s":{"Strong Buy":[108,54.6,-0.17],"Buy":[215,55.8,0.12],"Neutral":[61,55.7,0.28],"Sell":[124,52.4,0.21],"Strong Sell":[13,76.9,1.65]}},"1M":{"base":59.7,"s":{"Strong Buy":[31,54.8,0.06],"Buy":[62,51.6,0.23],"Neutral":[17,88.2,2.01],"Sell":[9,77.8,2.13]}}},"JNJ":{"1W":{"base":53.9,"s":{"Strong Buy":[101,52.5,-0.08],"Buy":[222,51.8,0.06],"Neutral":[39,48.7,0.23],"Sell":[138,59.4,0.39],"Strong Sell":[21,57.1,0.84]}},"1M":{"base":54.6,"s":{"Strong Buy":[37,54.1,0.07],"Buy":[49,46.9,0.13],"Neutral":[13,76.9,2.79],"Sell":[20,60.0,1.55]}}},"GOOGL":{"1W":{"base":56.6,"s":{"Strong Buy":[127,57.5,0.38],"Buy":[256,57.4,0.64],"Neutral":[55,50.9,-0.34],"Sell":[75,58.7,0.83],"Strong Sell":[8,37.5,1.84]}},"1M":{"base":64.7,"s":{"Strong Buy":[44,65.9,1.7],"Buy":[58,67.2,2.77],"Neutral":[12,41.7,-0.74],"Sell":[5,80.0,9.75]}}},"V":{"1W":{"base":55.9,"s":{"Strong Buy":[124,53.2,0.04],"Buy":[264,59.8,0.26],"Neutral":[50,44.0,-0.41],"Sell":[80,55.0,1.39],"Strong Sell":[3,33.3,-0.57]}},"1M":{"base":60.5,"s":{"Strong Buy":[38,57.9,0.33],"Buy":[72,62.5,1.72],"Neutral":[3,0.0,-4.44],"Sell":[6,83.3,7.61]}}},"NVDA":{"1W":{"base":58.7,"s":{"Strong Buy":[121,58.7,1.41],"Buy":[281,60.5,1.18],"Neutral":[40,60.0,1.79],"Sell":[79,51.9,0.61]}},"1M":{"base":66.4,"s":{"Strong Buy":[44,63.6,4.15],"Buy":[60,65.0,5.99],"Neutral":[8,75.0,3.05],"Sell":[7,85.7,9.96]}}},"AAPL":{"1W":{"base":58.9,"s":{"Strong Buy":[129,61.2,0.74],"Buy":[254,59.4,0.32],"Neutral":[58,53.4,0.15],"Sell":[78,56.4,1.28],"Strong Sell":[2,100.0,2.02]}},"1M":{"base":60.5,"s":{"Strong Buy":[40,65.0,3.59],"Buy":[69,52.2,0.93],"Neutral":[8,100.0,8.88],"Sell":[2,100.0,8.28]}}},"CSCO":{"1W":{"base":55.1,"s":{"Strong Buy":[92,52.2,0.18],"Buy":[234,55.6,0.41],"Neutral":[63,52.4,0.02],"Sell":[106,59.4,0.52],"Strong Sell":[26,50.0,0.21]}},"1M":{"base":59.7,"s":{"Strong Buy":[29,62.1,1.86],"Buy":[63,58.7,1.15],"Neutral":[11,63.6,1.65],"Sell":[16,56.2,1.81]}}},"TXN":{"1W":{"base":54.7,"s":{"Strong Buy":[117,57.3,0.55],"Buy":[227,51.1,-0.04],"Neutral":[47,59.6,0.69],"Sell":[118,57.6,0.75],"Strong Sell":[12,50.0,1.11]}},"1M":{"base":59.7,"s":{"Strong Buy":[34,52.9,0.63],"Buy":[62,56.5,0.87],"Neutral":[11,72.7,2.9],"Sell":[12,83.3,7.48]}}},"AVGO":{"1W":{"base":55.7,"s":{"Strong Buy":[117,52.1,0.49],"Buy":[289,55.7,0.51],"Neutral":[45,60.0,1.0],"Sell":[69,59.4,2.3],"Strong Sell":[1,0.0,-17.93]}},"1M":{"base":65.5,"s":{"Strong Buy":[41,70.7,2.62],"Buy":[69,62.3,3.54],"Neutral":[5,60.0,1.01],"Sell":[4,75.0,9.1]}}},"NOW":{"1W":{"base":54.5,"s":{"Strong Buy":[123,56.1,0.4],"Buy":[237,56.1,0.61],"Neutral":[47,46.8,-0.31],"Sell":[103,51.5,0.77],"Strong Sell":[11,63.6,1.42]}},"1M":{"base":58.0,"s":{"Strong Buy":[37,70.3,2.86],"Buy":[63,57.1,2.43],"Neutral":[7,42.9,2.86],"Sell":[12,33.3,-0.22]}}},"XOM":{"1W":{"base":52.0,"s":{"Strong Buy":[71,47.9,-0.08],"Buy":[178,55.6,0.2],"Neutral":[58,48.3,0.12],"Sell":[170,51.2,0.39],"Strong Sell":[44,52.3,-0.28]}},"1M":{"base":52.1,"s":{"Strong Buy":[15,40.0,-2.8],"Buy":[45,53.3,1.44],"Neutral":[16,62.5,2.49],"Sell":[36,50.0,0.49],"Strong Sell":[7,57.1,0.33]}}},"SPY":{"1W":{"base":58.0,"s":{"Strong Buy":[106,59.4,0.29],"Buy":[310,58.7,0.2],"Neutral":[32,40.6,-0.05],"Sell":[71,59.2,0.53],"Strong Sell":[2,100.0,6.17]}},"1M":{"base":68.9,"s":{"Strong Buy":[37,67.6,0.25],"Buy":[72,68.1,1.34],"Neutral":[5,60.0,-1.83],"Sell":[5,100.0,8.87]}}},"QQQ":{"1W":{"base":58.9,"s":{"Strong Buy":[123,57.7,0.29],"Buy":[287,61.3,0.43],"Neutral":[42,54.8,0.36],"Sell":[66,53.0,0.41],"Strong Sell":[3,66.7,2.32]}},"1M":{"base":67.2,"s":{"Strong Buy":[44,68.2,1.67],"Buy":[65,67.7,1.82],"Neutral":[6,50.0,0.39],"Sell":[4,75.0,4.53]}}},"DIA":{"1W":{"base":55.3,"s":{"Strong Buy":[125,56.8,0.17],"Buy":[283,54.1,0.08],"Neutral":[35,54.3,0.48],"Sell":[74,58.1,0.86],"Strong Sell":[4,50.0,-1.38]}},"1M":{"base":66.4,"s":{"Strong Buy":[31,67.7,0.73],"Buy":[76,65.8,0.8],"Neutral":[9,55.6,0.14],"Sell":[3,100.0,10.56]}}},"BP":{"1W":{"base":51.1,"s":{"Strong Buy":[47,57.4,0.16],"Buy":[208,47.1,-0.1],"Neutral":[72,47.2,0.19],"Sell":[161,55.3,0.63],"Strong Sell":[33,54.5,-0.66]}},"1M":{"base":52.1,"s":{"Strong Buy":[3,100.0,8.17],"Buy":[44,43.2,-0.87],"Neutral":[16,43.8,-0.59],"Sell":[47,63.8,1.9],"Strong Sell":[9,33.3,-1.89]}}},"SLV":{"1W":{"base":53.4,"s":{"Strong Buy":[84,54.8,0.39],"Buy":[197,48.7,0.12],"Neutral":[52,67.3,0.95],"Sell":[148,51.4,0.18],"Strong Sell":[40,62.5,1.16]}},"1M":{"base":52.1,"s":{"Strong Buy":[26,53.8,2.64],"Buy":[42,47.6,1.16],"Neutral":[13,53.8,0.92],"Sell":[28,57.1,0.96],"Strong Sell":[10,50.0,1.92]}}}};
 const nf=x=>x.toFixed(1).replace('.',',');
 const nfn=n=>n.toLocaleString('es-AR');
 
-function auditLine(tf,label){
-  const a=AUDIT[tf]; if(!a)return'';
-  const d=a.s[label]; if(!d)return'';
+/* Frase núcleo de una señal. quien = 'de AAPL' (historial propio) o '' (muestra). */
+function fraseSignal(label,base,adj,unidad,d,quien){
+  const px=quien?`el precio ${quien}`:'el precio';
   const ret=(d.ret>0?'+':'')+d.ret.toFixed(2).replace('.',',')+'%';
-  const chico=d.n<100?` <i>(muestra chica: solo ${nfn(d.n)} casos en 10 años)</i>`:'';
   if(label==='Buy'||label==='Strong Buy'){
-    const diff=d.sube-a.base;
+    const diff=d.sube-base;
     const dtxt=(diff>0?'+':'')+nf(diff)+' puntos';
-    return `📊 <b>Historial real:</b> después de un <b>${label}</b> ${a.adj}, el precio subió el <b>${nf(d.sube)}%</b> de las veces (${nfn(d.n)} casos). Sin ninguna señal sube el ${nf(a.base)}%. Ventaja real: <span class="meh">${dtxt}</span> — prácticamente nada.`;
+    const cal=Math.abs(diff)<3?' — prácticamente nada':'';
+    return `después de un <b>${label}</b> ${adj}, ${px} subió el <b>${nf(d.sube)}%</b> de las veces (${nfn(d.n)} casos). Sin ninguna señal sube el ${nf(base)}%. Ventaja real: <span class="meh">${dtxt}</span>${cal}.`;
   }
   if(label==='Sell'||label==='Strong Sell'){
     if(d.sube>=50){
-      return `⚠️ <b>Historial real:</b> después de un <b>${label}</b> ${a.adj}, el precio <span class="hot">igual SUBIÓ el ${nf(d.sube)}%</span> de las veces (${nfn(d.n)} casos · retorno medio ${ret}). Esta señal acertó <b>menos que una moneda</b>.${chico}`;
+      return `después de un <b>${label}</b> ${adj}, ${px} <span class="hot">igual SUBIÓ el ${nf(d.sube)}%</span> de las veces (${nfn(d.n)} casos · retorno medio ${ret}). Esta señal acertó <b>menos que una moneda</b>.`;
     }
-    return `⚠️ <b>Historial real:</b> después de un <b>${label}</b> ${a.adj}, el precio subió el ${nf(d.sube)}% de las veces (${nfn(d.n)} casos) — apenas mejor que una moneda, y el retorno medio igual fue <span class="hot">${ret}</span>.${chico}`;
+    return `después de un <b>${label}</b> ${adj}, ${px} subió el ${nf(d.sube)}% de las veces (${nfn(d.n)} casos) — apenas mejor que una moneda, con retorno medio <span class="hot">${ret}</span>.`;
   }
-  return `📊 <b>Historial real:</b> en <b>Neutral</b> el precio subió el ${nf(d.sube)}% de las ${a.unidad} (${nfn(d.n)} casos), contra ${nf(a.base)}% de base. El medidor hoy no está diciendo nada.`;
+  return `con señal <b>Neutral</b>, ${px} subió el ${nf(d.sube)}% de las ${unidad} (${nfn(d.n)} casos), contra ${nf(base)}% de base. El medidor no está diciendo nada.`;
 }
 
-function fillCard(prefix, v){
+function auditLine(tf,label,ticker){
+  const a=AUDIT[tf]; if(!a)return'';
+  const pd=a.s[label]; if(!pd)return'';
+  const icon=(label==='Sell'||label==='Strong Sell')?'⚠️':'📊';
+  const t=AUDIT_T[ticker];
+  if(t&&t[tf]){
+    const cell=t[tf].s[label];
+    if(cell&&cell[0]>=MIN_N){
+      // Historial PROPIO del ticker (muestra suficiente)
+      const d={n:cell[0],sube:cell[1],ret:cell[2]};
+      return `${icon} <b>Historial real:</b> ${fraseSignal(label,t[tf].base,a.adj,a.unidad,d,'de '+ticker)}`;
+    }
+    // Ticker testeado pero con muy pocas señales de este tipo → promedio de la muestra
+    const nC=cell?cell[0]:0;
+    return `${icon} <b>Historial real:</b> ${ticker} tuvo solo ${nfn(nC)} ${nC===1?'señal':'señales'} <b>${label}</b> en 10 años: muestra demasiado chica para sacar conclusiones. <b>Para los 26 tickers testeados:</b> ${fraseSignal(label,a.base,a.adj,a.unidad,pd,'')}`;
+  }
+  // Ticker FUERA de la muestra del backtest
+  return `${icon} <b>${ticker} no está en la muestra del backtest.</b><br><b>Para los tickers testeados</b> (26 acciones y ETFs · 10 años): ${fraseSignal(label,a.base,a.adj,a.unidad,pd,'')}`;
+}
+
+function fillCard(prefix, v, ticker){
   const r=rate(v);
   const card=document.getElementById('c'+prefix);
   card.classList.remove('ok','warn','fail');
@@ -356,7 +382,7 @@ function fillCard(prefix, v){
   const pct=(v==null||isNaN(v))?50:Math.max(0,Math.min(100,(v+1)/2*100));
   document.getElementById('m'+prefix).style.left=pct+'%';
   const tf=prefix==='W'?'1W':'1M';
-  document.getElementById('a'+prefix).innerHTML=auditLine(tf,r.label);
+  document.getElementById('a'+prefix).innerHTML=auditLine(tf,r.label,ticker);
 }
 
 /* Veredicto combinado de Entrada a partir de 1W y 1M */
@@ -416,8 +442,8 @@ function render(t,j){
   document.getElementById('resTicker').innerHTML=
     `<b>${t}</b>${j.exchange?(' · '+j.exchange):''} · consenso técnico TradingView`;
 
-  fillCard('W',w);
-  fillCard('M',m);
+  fillCard('W',w,t);
+  fillCard('M',m,t);
 
   const cv=combinedVerdict(w,m);
   const v=document.getElementById('verdict');
