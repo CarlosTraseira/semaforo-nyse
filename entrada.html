@@ -94,6 +94,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .meter{position:relative;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--red) 0%,var(--amber) 50%,var(--green) 100%);opacity:.85}
 .meter-mark{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:var(--text);border:2px solid var(--bg);transform:translate(-50%,-50%);box-shadow:0 0 0 1px var(--border)}
 .meter-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px}
+.audit{margin-top:13px;padding-top:11px;border-top:1px dashed var(--border);font-family:var(--mono);font-size:11.5px;color:var(--text2);line-height:1.75}
+.audit b{color:var(--text)}
+.audit .hot{color:var(--red);font-weight:600}
+.audit .meh{color:var(--amber);font-weight:600}
 
 /* Link a TradingView */
 .tv-link{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text2);text-decoration:none;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:14px;transition:border-color .15s,color .15s}
@@ -153,10 +157,10 @@ footer span{color:var(--text2)}
       <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
       <div class="logo-name">Semáforo de <span>Entrada</span></div>
     </div>
-    <div class="logo-tag">¿Es buen momento para entrar?</div>
+    <div class="logo-tag">Qué dice TradingView · y cuánto acierta de verdad</div>
     <p class="intro">
-      <span class="lead">Una buena empresa no siempre está en un buen momento para entrar.</span>
-      Este semáforo lee el <strong>consenso técnico de TradingView</strong> —el promedio de unos 26 indicadores— en dos horizontes: <strong>1 semana</strong> (corto plazo) y <strong>1 mes</strong> (mediano plazo). Te dice si el mercado, hoy, acompaña o no.
+      <span class="lead">El único semáforo que te muestra el % de acierto real de la señal.</span>
+      Lee el <strong>consenso técnico de TradingView</strong> —el promedio de unos 26 indicadores— a <strong>1 semana</strong> y <strong>1 mes</strong>, y lo contrasta con su <strong>historial real</strong>: qué hizo el precio después de cada señal, medido sobre 26 acciones y ETFs durante los últimos 10 años. El dato que TradingView no te muestra.
     </p>
   </div>
 
@@ -186,7 +190,7 @@ footer span{color:var(--text2)}
     <div class="res-ticker" id="resTicker"></div>
 
     <div class="verdict" id="verdict">
-      <div class="verdict-eyebrow">Veredicto de Entrada</div>
+      <div class="verdict-eyebrow">Qué dice el medidor · y qué dice la historia</div>
       <div class="verdict-title" id="vTitle">—</div>
       <div class="verdict-desc" id="vDesc"></div>
     </div>
@@ -198,6 +202,7 @@ footer span{color:var(--text2)}
         <div class="tf-score" id="sW"></div>
         <div class="meter"><div class="meter-mark" id="mW"></div></div>
         <div class="meter-scale"><span>Sell</span><span>Neutral</span><span>Buy</span></div>
+        <div class="audit" id="aW"></div>
       </div>
       <div class="tf-card" id="cM">
         <div class="tf-label">1 Mes · Mediano plazo</div>
@@ -205,6 +210,7 @@ footer span{color:var(--text2)}
         <div class="tf-score" id="sM"></div>
         <div class="meter"><div class="meter-mark" id="mM"></div></div>
         <div class="meter-scale"><span>Sell</span><span>Neutral</span><span>Buy</span></div>
+        <div class="audit" id="aM"></div>
       </div>
     </div>
 
@@ -213,11 +219,21 @@ footer span{color:var(--text2)}
     <a class="crosslink" id="toNyse" href="#">🏢 Ver Semáforo de Calidad (NYSE) de este ticker →
       <small>¿Es una buena empresa? Confirmá la calidad antes de decidir.</small></a>
 
+    <a class="crosslink" href="calculadora.html">⚖️ Pasá al Semáforo de Riesgo →
+      <small>Stop definido, ratio que cierra, tamaño correcto: ahí está tu verdadera ventaja.</small></a>
+
     <div class="explain">
       <div class="explain-title">📈 Cómo leer este semáforo</div>
-      <p>El rating es un <strong>consenso de ~26 indicadores técnicos</strong> (medias móviles + osciladores) que TradingView resume en una escala de <strong>Strong Sell</strong> a <strong>Strong Buy</strong> (las mismas etiquetas que ves abajo). No es una orden de compra: es una foto de hacia dónde empuja el mercado hoy.</p>
-      <p><strong>🟢 Buen momento:</strong> las dos temporalidades acompañan. <strong>🟡 Zona neutral:</strong> señales mixtas o sin dirección clara, conviene esperar. <strong>🔴 No es el momento:</strong> al menos una temporalidad está en zona de venta.</p>
-      <p>Combinalo siempre con el <strong>Semáforo de Calidad</strong> (¿buena empresa?) y el <strong>Semáforo de Riesgo</strong> (¿la relación riesgo/recompensa cierra?).</p>
+      <p>El rating es un <strong>consenso de ~26 indicadores técnicos</strong> (medias móviles + osciladores) que TradingView resume en una escala de <strong>Strong Sell</strong> a <strong>Strong Buy</strong>. No es una orden de compra ni de venta: es una foto de lo que el precio <strong>ya hizo</strong>.</p>
+      <p>Por eso, debajo de cada luz te mostramos el <strong>historial real de esa señal</strong>: qué hizo el precio la barra siguiente, en 10 años de historia. Spoiler: casi nunca acierta más que una moneda cargada al alza — y los <strong>Sell</strong> son los que peor pronostican.</p>
+      <p>La decisión de entrada no la da un indicador. La da tu plan: <strong>Semáforo de Calidad</strong> (¿buena empresa?) → <strong>Semáforo de Riesgo</strong> (¿stop definido y ratio que cierra?). Este semáforo está para que el medidor no te apure ni te asuste.</p>
+    </div>
+
+    <div class="explain" style="border-left-color:var(--green)">
+      <div class="explain-title">🔬 De dónde sale el "historial real"</div>
+      <p>Reconstruimos el medidor de TradingView —los mismos ~26 indicadores oficiales— barra por barra sobre <strong>26 acciones y ETFs</strong> (la Lista Curada completa + SPY, QQQ, DIA y otros), desde 2016 hasta hoy: <strong>más de 13.000 señales semanales y 3.000 mensuales</strong>. Para cada señal medimos qué hizo el precio en la barra siguiente.</p>
+      <p>Resultado: después de un <strong>SELL semanal</strong> el precio subió igual el <strong>54% de las veces</strong> (retorno promedio positivo). Después de un <strong>BUY</strong>: 56% — casi lo mismo que sin ninguna señal (55%). <strong>El medidor describe el pasado; no predice el futuro.</strong></p>
+      <p>Nadie te muestra este dato. Nosotros sí, porque la ventaja del inversor no está en obedecer indicadores: está en comprar calidad con un riesgo controlado.</p>
     </div>
   </div>
 
@@ -286,6 +302,50 @@ function rate(v){
   return            {label:'Strong Sell',level:'fail'};
 }
 
+/* ============================================================
+   Auditoría histórica del medidor (backtest propio)
+   Reconstrucción de los 26 indicadores oficiales sobre 26 acciones
+   y ETFs, 2016-06-10 → 2026-06-11. Por cada señal: % de barras
+   siguientes que cerraron ARRIBA y retorno medio de esa barra.
+   ============================================================ */
+const AUDIT={
+  '1W':{base:54.7,adj:'semanal',unidad:'semanas',s:{
+    'Strong Buy' :{n:2641,sube:54.8,ret:0.27},
+    'Buy'        :{n:6175,sube:55.6,ret:0.33},
+    'Neutral'    :{n:1281,sube:51.8,ret:0.18},
+    'Sell'       :{n:3015,sube:53.9,ret:0.46},
+    'Strong Sell':{n:434, sube:56.0,ret:0.56}
+  }},
+  '1M':{base:58.5,adj:'mensual',unidad:'meses',s:{
+    'Strong Buy' :{n:838, sube:58.7,ret:1.21},
+    'Buy'        :{n:1537,sube:58.8,ret:1.48},
+    'Neutral'    :{n:275, sube:56.4,ret:1.32},
+    'Sell'       :{n:412, sube:59.0,ret:2.29},
+    'Strong Sell':{n:32,  sube:46.9,ret:1.55}
+  }}
+};
+const nf=x=>x.toFixed(1).replace('.',',');
+const nfn=n=>n.toLocaleString('es-AR');
+
+function auditLine(tf,label){
+  const a=AUDIT[tf]; if(!a)return'';
+  const d=a.s[label]; if(!d)return'';
+  const ret=(d.ret>0?'+':'')+d.ret.toFixed(2).replace('.',',')+'%';
+  const chico=d.n<100?` <i>(muestra chica: solo ${nfn(d.n)} casos en 10 años)</i>`:'';
+  if(label==='Buy'||label==='Strong Buy'){
+    const diff=d.sube-a.base;
+    const dtxt=(diff>0?'+':'')+nf(diff)+' puntos';
+    return `📊 <b>Historial real:</b> después de un <b>${label}</b> ${a.adj}, el precio subió el <b>${nf(d.sube)}%</b> de las veces (${nfn(d.n)} casos). Sin ninguna señal sube el ${nf(a.base)}%. Ventaja real: <span class="meh">${dtxt}</span> — prácticamente nada.`;
+  }
+  if(label==='Sell'||label==='Strong Sell'){
+    if(d.sube>=50){
+      return `⚠️ <b>Historial real:</b> después de un <b>${label}</b> ${a.adj}, el precio <span class="hot">igual SUBIÓ el ${nf(d.sube)}%</span> de las veces (${nfn(d.n)} casos · retorno medio ${ret}). Esta señal acertó <b>menos que una moneda</b>.${chico}`;
+    }
+    return `⚠️ <b>Historial real:</b> después de un <b>${label}</b> ${a.adj}, el precio subió el ${nf(d.sube)}% de las veces (${nfn(d.n)} casos) — apenas mejor que una moneda, y el retorno medio igual fue <span class="hot">${ret}</span>.${chico}`;
+  }
+  return `📊 <b>Historial real:</b> en <b>Neutral</b> el precio subió el ${nf(d.sube)}% de las ${a.unidad} (${nfn(d.n)} casos), contra ${nf(a.base)}% de base. El medidor hoy no está diciendo nada.`;
+}
+
 function fillCard(prefix, v){
   const r=rate(v);
   const card=document.getElementById('c'+prefix);
@@ -295,6 +355,8 @@ function fillCard(prefix, v){
   document.getElementById('s'+prefix).textContent=(v==null||isNaN(v))?'—':('score '+v.toFixed(2)+' · escala −1 a +1');
   const pct=(v==null||isNaN(v))?50:Math.max(0,Math.min(100,(v+1)/2*100));
   document.getElementById('m'+prefix).style.left=pct+'%';
+  const tf=prefix==='W'?'1W':'1M';
+  document.getElementById('a'+prefix).innerHTML=auditLine(tf,r.label);
 }
 
 /* Veredicto combinado de Entrada a partir de 1W y 1M */
@@ -304,15 +366,15 @@ function combinedVerdict(w,m){
   const bearish = vals.some(x=>x<=-0.1);
   const bullishBoth = vals.length===2 && w>=0.1 && m>=0.1;
   if(bearish){
-    return{level:'fail',title:'🔴 No es el momento',
-      desc:'Al menos una temporalidad está en zona de venta. El mercado no acompaña: conviene esperar a que el técnico mejore antes de entrar.'};
+    return{level:'fail',title:'🔴 El medidor dice "no"',
+      desc:'Al menos una temporalidad está en zona de venta. Dato real: en 10 años de historia, después de estas señales el precio subió igual la mayoría de las veces. No es una profecía — si la empresa pasó el filtro de Calidad, lo que decide es tu stop y tu ratio, no este medidor.'};
   }
   if(bullishBoth){
-    return{level:'ok',title:'🟢 Buen momento de entrada',
-      desc:'Corto y mediano plazo acompañan: el consenso técnico está del lado comprador en ambas temporalidades.'};
+    return{level:'ok',title:'🟢 El medidor acompaña',
+      desc:'Corto y mediano plazo en zona compradora. Ojo: históricamente esta señal acierta casi lo mismo que el mercado solo — las acciones suben la mayoría de las semanas, con o sin señal. No es garantía: definí stop y ratio antes de entrar.'};
   }
-  return{level:'warn',title:'🟡 Zona neutral — esperá',
-    desc:'Señales mixtas o sin dirección clara entre el corto y el mediano plazo. No hay una ventaja técnica evidente; mejor esperar una señal más nítida.'};
+  return{level:'warn',title:'🟡 El medidor no se moja',
+    desc:'Señales mixtas o sin dirección clara entre el corto y el mediano plazo. En zona neutral el mercado se comportó igual que siempre: el medidor hoy no aporta información. Tu decisión pasa por Calidad y Riesgo.'};
 }
 
 /* ============================================================
