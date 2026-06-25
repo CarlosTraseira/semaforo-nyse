@@ -341,7 +341,9 @@ function fraseSignal(label,base,adj,unidad,d,quien){
     const diff=d.sube-base;
     const dtxt=(diff>0?'+':'')+nf(diff)+' puntos';
     const cal=Math.abs(diff)<3?' — prácticamente nada':'';
-    return `después de un <b>${label}</b> ${adj}, ${px} subió el <b>${nf(d.sube)}%</b> de las veces (${nfn(d.n)} casos). Sin ninguna señal sube el ${nf(base)}%. Ventaja real: <span class="meh">${dtxt}</span>${cal}.`;
+    const sig=unidad==='semanas'?'la semana siguiente':'el mes siguiente';
+    const todas=unidad==='semanas'?'todas las semanas':'todos los meses';
+    return `${px} subió ${sig} el <b>${nf(d.sube)}%</b> de las <b>${nfn(d.n)}</b> veces que el medidor marcó <b>${label}</b> ${adj}. Pero sube el ${nf(base)}% de ${todas} igual, haya señal o no: la señal aporta <span class="meh">${dtxt}</span>${cal}.`;
   }
   if(label==='Sell'||label==='Strong Sell'){
     if(d.sube>=50){
@@ -352,19 +354,57 @@ function fraseSignal(label,base,adj,unidad,d,quien){
   return `con señal <b>Neutral</b>, ${px} subió el ${nf(d.sube)}% de las ${unidad} (${nfn(d.n)} casos), contra ${nf(base)}% de base. El medidor no está diciendo nada.`;
 }
 
+/* Combina Buy + Strong Buy en un solo balde alcista. getCell(label) -> {n,sube} | null */
+function combBull(getCell){
+  let n=0,num=0;
+  for(const lab of ['Buy','Strong Buy']){
+    const c=getCell(lab);
+    if(c){n+=c.n; num+=c.n*c.sube;}
+  }
+  return n?{n:n,sube:num/n}:null;
+}
+
+/* Frase alcista combinada (Buy o Strong Buy). subj = 'AAPL' (propio) o 'El precio' (muestra). */
+function fraseBull(subj,base,unidad,d){
+  const art=unidad==='semanas'?'las':'los';
+  const subjLow=subj==='El precio'?'el precio':subj;
+  const add=d.sube-base;
+  const addTxt=(add>0?'+':'')+nf(add)+' puntos porcentuales';
+  const cal=add<=-0.05?' En contra.':(add<3?' Casi nada.':'');
+  const fail=100-d.sube;
+  return `${subj} subió el <b>${nf(base)}%</b> de ${art} ${unidad}.<br>`+
+    `Cuando TradingView indicó <b>Buy o Strong Buy</b>, ${subjLow} subió el <b>${nf(d.sube)}%</b> de esas veces (${nfn(d.n)} casos).<br>`+
+    `Valor agregado de TradingView: <span class="meh">${addTxt}</span>.${cal}<br>`+
+    `Es decir, la indicación falló el <b>${nf(fail)}%</b> de las veces.`;
+}
+
 function auditLine(tf,label,ticker){
   const a=AUDIT[tf]; if(!a)return'';
-  const pd=a.s[label]; if(!pd)return'';
   const icon=(label==='Sell'||label==='Strong Sell')?'⚠️':'📊';
   const t=AUDIT_T[ticker];
+
+  // --- Caso alcista: Buy + Strong Buy combinados en un solo balde ---
+  if(label==='Buy'||label==='Strong Buy'){
+    const dSample=combBull(lab=>{const c=a.s[lab];return c?{n:c.n,sube:c.sube}:null;});
+    if(t&&t[tf]){
+      const d=combBull(lab=>{const c=t[tf].s[lab];return c?{n:c[0],sube:c[1]}:null;});
+      if(d&&d.n>=MIN_N){
+        return `${icon} <b>Historial real:</b> ${fraseBull(ticker,t[tf].base,a.unidad,d)}`;
+      }
+      const nC=d?d.n:0;
+      return `${icon} <b>Historial real:</b> ${ticker} tuvo solo ${nfn(nC)} ${nC===1?'señal':'señales'} de compra en 10 años: muestra demasiado chica. <b>Para los 26 tickers testeados:</b> ${fraseBull('El precio',a.base,a.unidad,dSample)}`;
+    }
+    return `${icon} <b>${ticker} no está en la muestra del backtest.</b><br><b>Para los tickers testeados</b> (26 acciones y ETFs · 10 años): ${fraseBull('El precio',a.base,a.unidad,dSample)}`;
+  }
+
+  // --- Sell / Strong Sell / Neutral: lógica original por señal ---
+  const pd=a.s[label]; if(!pd)return'';
   if(t&&t[tf]){
     const cell=t[tf].s[label];
     if(cell&&cell[0]>=MIN_N){
-      // Historial PROPIO del ticker (muestra suficiente)
       const d={n:cell[0],sube:cell[1],ret:cell[2]};
       return `${icon} <b>Historial real:</b> ${fraseSignal(label,t[tf].base,a.adj,a.unidad,d,'de '+ticker)}`;
     }
-    // Ticker testeado pero con muy pocas señales de este tipo → promedio de la muestra
     const nC=cell?cell[0]:0;
     return `${icon} <b>Historial real:</b> ${ticker} tuvo solo ${nfn(nC)} ${nC===1?'señal':'señales'} <b>${label}</b> en 10 años: muestra demasiado chica para sacar conclusiones. <b>Para los 26 tickers testeados:</b> ${fraseSignal(label,a.base,a.adj,a.unidad,pd,'')}`;
   }
