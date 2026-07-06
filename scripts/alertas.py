@@ -42,7 +42,7 @@ def get_tv(ticker):
 
 
 def label(v):
-    """Valor -1..+1 → etiqueta TradingView (igual que entrada.html)."""
+    """Valor -1..+1 → etiqueta TradingView (igual que prueba.html)."""
     if v is None: return "No data"
     if v >= 0.5:  return "Strong Buy"
     if v >= 0.1:  return "Buy"
@@ -52,7 +52,7 @@ def label(v):
 
 
 def entrada_verdict(w, m):
-    """Veredicto combinado de Entrada (igual que entrada.html): ok/warn/fail/nodata."""
+    """Veredicto combinado del medidor TV (igual que prueba.html): ok/warn/fail/nodata."""
     vals = [x for x in (w, m) if x is not None]
     if not vals: return "nodata"
     if any(x <= -0.1 for x in vals): return "fail"        # alguna en venta
@@ -87,7 +87,7 @@ def build_email(alerts, now):
             <div style="margin:8px 0 14px;font-size:13px;color:#333;">
               <strong>1 Semana:</strong> {a['w_label']} &nbsp;·&nbsp; <strong>1 Mes:</strong> {a['m_label']}
             </div>
-            <a href="{a['entrada_url']}" style="display:inline-block;background:#00b386;color:#fff;text-decoration:none;font-size:13px;font-weight:bold;padding:9px 16px;border-radius:7px;font-family:Arial,sans-serif;">Ver Semáforo de Entrada →</a>
+            <a href="{a['entrada_url']}" style="display:inline-block;background:#00b386;color:#fff;text-decoration:none;font-size:13px;font-weight:bold;padding:9px 16px;border-radius:7px;font-family:Arial,sans-serif;">Ver el historial real de esta señal →</a>
             &nbsp;
             <a href="{a['tradingview_url']}" style="display:inline-block;color:#00875a;text-decoration:none;font-size:13px;padding:9px 8px;font-family:Arial,sans-serif;">Análisis en TradingView</a>
           </td></tr>
@@ -165,7 +165,7 @@ def main():
                     "exchange": j.get("exchange", ""),
                     "w": w, "m": m,
                     "w_label": label(w), "m_label": label(m),
-                    "entrada_url": f"{SITE}/entrada.html?symbol={urllib.parse.quote(t)}",
+                    "entrada_url": f"{SITE}/prueba.html?symbol={urllib.parse.quote(t)}",
                     "tradingview_url": f"https://www.tradingview.com/symbols/{j.get('exchange','NYSE')}-{t}/technicals/",
                 })
         except Exception as e:

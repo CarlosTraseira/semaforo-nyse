@@ -1,0 +1,45 @@
+name: Alertas del Semáforo (diaria)
+
+# Días hábiles, 22:00 UTC (después del cierre de EE.UU. en cualquier huso).
+# También disparable a mano desde la pestaña Actions.
+on:
+  schedule:
+    - cron: "0 22 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: alertas-diaria
+  cancel-in-progress: false
+
+jobs:
+  alertas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Revisar Entrada y enviar alertas
+        env:
+          SEMAFORO_CODE: ${{ secrets.SEMAFORO_CODE }}
+          ALERT_WEBHOOK: ${{ secrets.ALERT_WEBHOOK }}
+        run: python scripts/alertas.py
+
+      - name: Guardar estado (commit si cambió)
+        run: |
+          git config user.name "alertas-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add alertas_estado.json
+          if git diff --staged --quiet; then
+            echo "Sin cambios de estado."
+          else
+            git commit -m "chore: estado de alertas $(date -u +%Y-%m-%d)"
+            git push
+          fi

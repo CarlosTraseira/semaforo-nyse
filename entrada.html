@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Semáforo de Entrada · Semáforo del Inversor</title>
+<title>Semáforo de Entrada · ¿Qué terreno pisás?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c0c10'/><rect x='11' y='2' width='10' height='28' rx='5' fill='%231a1a24'/><circle cx='16' cy='8' r='4' fill='%2300ff88'/><circle cx='16' cy='16' r='4' fill='%23ffb840'/><circle cx='16' cy='24' r='4' fill='%23ff4070'/></svg>">
@@ -78,42 +78,40 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .verdict.fail .verdict-title{color:var(--red)}
 .verdict-desc{font-size:14px;color:var(--text2);line-height:1.65;font-family:var(--mono);max-width:520px;margin:0 auto}
 
-/* Timeframe cards */
+/* Aviso instrumento fuera del universo */
+.exotic{display:none;background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:12px;padding:14px 18px;font-family:var(--mono);font-size:12.5px;color:var(--amber);line-height:1.7;margin-bottom:14px}
+.exotic.show{display:block}
+
+/* Tarjetas de nivel (clima / ticker) */
 .tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 @media(max-width:480px){.tf-grid{grid-template-columns:1fr}}
 .tf-card{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:14px;padding:18px 20px}
 .tf-card.ok{border-left-color:var(--green)}
 .tf-card.warn{border-left-color:var(--amber)}
 .tf-card.fail{border-left-color:var(--red)}
-.tf-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
-.tf-rating{font-size:22px;font-weight:800;line-height:1.1;margin-bottom:4px}
-.tf-card.ok .tf-rating{color:var(--green)}
-.tf-card.warn .tf-rating{color:var(--amber)}
-.tf-card.fail .tf-rating{color:var(--red)}
-.tf-score{font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:12px}
-.meter{position:relative;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--red) 0%,var(--amber) 50%,var(--green) 100%);opacity:.85}
-.meter-mark{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:var(--text);border:2px solid var(--bg);transform:translate(-50%,-50%);box-shadow:0 0 0 1px var(--border)}
-.meter-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px}
-.audit{margin-top:13px;padding-top:11px;border-top:1px dashed var(--border);font-family:var(--mono);font-size:11.5px;color:var(--text2);line-height:1.75}
+.tf-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+.tf-name{font-size:19px;font-weight:800;margin-bottom:12px}
+.lrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 0;border-top:1px dashed var(--border);font-family:var(--mono);font-size:12px;color:var(--text2)}
+.lval{font-weight:600;white-space:nowrap}
+.lval.ok{color:var(--green)}
+.lval.warn{color:var(--amber)}
+.lval.fail{color:var(--red)}
+.audit{margin-top:12px;padding-top:11px;border-top:1px dashed var(--border);font-family:var(--mono);font-size:11.5px;color:var(--text2);line-height:1.75}
 .audit b{color:var(--text)}
-.audit .hot{color:var(--red);font-weight:600}
-.audit .meh{color:var(--amber);font-weight:600}
 
-/* Link a TradingView */
-.tv-link{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text2);text-decoration:none;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:14px;transition:border-color .15s,color .15s}
-.tv-link:hover{border-color:var(--green-border);color:var(--green)}
+/* Crosslinks */
+.crosslink{display:block;text-align:center;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-bottom:14px;font-family:var(--display);font-size:14px;font-weight:700;color:var(--green);text-decoration:none;transition:border-color .15s,background .15s}
+.crosslink:hover{border-color:var(--green-border);background:var(--green-dim)}
+.crosslink small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text2);margin-top:4px}
 
 /* Explainer */
-.explain{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;border-left:3px solid var(--amber)}
+.explain{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;border-left:3px solid var(--green)}
+.explain.no{border-left-color:var(--red)}
 .explain-title{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .explain p{font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:1.85;margin-bottom:10px}
 .explain p:last-child{margin-bottom:0}
 .explain strong{color:var(--text)}
-
-/* Cross-link to NYSE */
-.crosslink{display:block;text-align:center;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-bottom:14px;font-family:var(--display);font-size:14px;font-weight:700;color:var(--green);text-decoration:none;transition:border-color .15s,background .15s}
-.crosslink:hover{border-color:var(--green-border);background:var(--green-dim)}
-.crosslink small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text2);margin-top:4px}
+.explain .nx{color:var(--red);font-weight:600}
 
 /* Gate — pantalla de bloqueo */
 .gate{position:fixed;inset:0;z-index:50;background:rgba(8,8,12,0.94);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
@@ -157,10 +155,10 @@ footer span{color:var(--text2)}
       <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
       <div class="logo-name">Semáforo de <span>Entrada</span></div>
     </div>
-    <div class="logo-tag">Qué dice TradingView · y cuánto acierta de verdad</div>
+    <div class="logo-tag">¿Qué terreno pisás? · Riesgo medido, no profecías</div>
     <p class="intro">
-      <span class="lead">El único semáforo que te muestra el % de acierto real de la señal.</span>
-      Lee el <strong>consenso técnico de TradingView</strong> —el promedio de unos 26 indicadores— a <strong>1 semana</strong> y <strong>1 mes</strong>, y lo contrasta con su <strong>historial real</strong>: qué hizo el precio después de cada señal, medido sobre 26 acciones y ETFs durante los últimos 10 años. El dato que TradingView no te muestra.
+      <span class="lead">Este semáforo no adivina si va a subir. Mide el terreno.</span>
+      Nadie puede decirte qué hará el precio esta semana — lo medimos: los indicadores más famosos aciertan casi lo mismo que el mercado solo. Lo que <strong>sí</strong> es robusto, en hasta <strong>98 años de datos</strong>, es dónde se concentra la turbulencia. Cuatro luces: el <strong>clima del mercado</strong> y el <strong>estado de tu acción</strong>, medidos con las dos únicas referencias que pasaron la prueba — la <strong>media de 200</strong> y la <strong>zona de máximos de 52 semanas</strong>.
     </p>
   </div>
 
@@ -183,65 +181,64 @@ footer span{color:var(--text2)}
   <div class="error-msg" id="err"></div>
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p id="loadTxt">Consultando TradingView...</p>
+    <p id="loadTxt">Midiendo el terreno...</p>
   </div>
 
   <div class="results" id="results">
     <div class="res-ticker" id="resTicker"></div>
 
     <div class="verdict" id="verdict">
-      <div class="verdict-eyebrow">Qué dice el medidor · y qué dice la historia</div>
+      <div class="verdict-eyebrow">Cuatro luces · clima del mercado + estado del ticker</div>
       <div class="verdict-title" id="vTitle">—</div>
       <div class="verdict-desc" id="vDesc"></div>
     </div>
 
+    <div class="exotic" id="exotic"></div>
+
     <div class="tf-grid">
-      <div class="tf-card" id="cW">
-        <div class="tf-label">1 Semana · Corto plazo</div>
-        <div class="tf-rating" id="rW">—</div>
-        <div class="tf-score" id="sW"></div>
-        <div class="meter"><div class="meter-mark" id="mW"></div></div>
-        <div class="meter-scale"><span>Sell</span><span>Neutral</span><span>Buy</span></div>
-        <div class="audit" id="aW"></div>
+      <div class="tf-card" id="cIdx">
+        <div class="tf-label">🌍 Clima de mercado</div>
+        <div class="tf-name" id="idxName">—</div>
+        <div class="lrow"><span>Tendencia (media de 200)</span><span class="lval" id="li1">—</span></div>
+        <div class="lrow"><span>Zona (máximo de 52 sem.)</span><span class="lval" id="li2">—</span></div>
+        <div class="audit" id="evIdx"></div>
       </div>
-      <div class="tf-card" id="cM">
-        <div class="tf-label">1 Mes · Mediano plazo</div>
-        <div class="tf-rating" id="rM">—</div>
-        <div class="tf-score" id="sM"></div>
-        <div class="meter"><div class="meter-mark" id="mM"></div></div>
-        <div class="meter-scale"><span>Sell</span><span>Neutral</span><span>Buy</span></div>
-        <div class="audit" id="aM"></div>
+      <div class="tf-card" id="cTk">
+        <div class="tf-label">🎯 Estado del ticker</div>
+        <div class="tf-name" id="tkName">—</div>
+        <div class="lrow"><span>Su tendencia (media de 200)</span><span class="lval" id="lt1">—</span></div>
+        <div class="lrow"><span>Su zona (máx. de 52 sem.)</span><span class="lval" id="lt2">—</span></div>
+        <div class="audit" id="evTk"></div>
       </div>
     </div>
 
-    <a class="tv-link" id="tvLink" href="#" target="_blank" rel="noopener">📊 Ver el análisis técnico completo en TradingView →</a>
-
     <a class="crosslink" id="toNyse" href="#">🏢 Ver Semáforo de Calidad (NYSE) de este ticker →
-      <small>¿Es una buena empresa? Confirmá la calidad antes de decidir.</small></a>
+      <small>¿Es una buena empresa? El cuándo importa menos que el qué.</small></a>
 
     <a class="crosslink" href="calculadora.html">⚖️ Pasá al Semáforo de Riesgo →
       <small>Stop definido, ratio que cierra, tamaño correcto: ahí está tu verdadera ventaja.</small></a>
 
     <div class="explain">
-      <div class="explain-title">📈 Cómo leer este semáforo</div>
-      <p>El rating es un <strong>consenso de ~26 indicadores técnicos</strong> (medias móviles + osciladores) que TradingView resume en una escala de <strong>Strong Sell</strong> a <strong>Strong Buy</strong>. No es una orden de compra ni de venta: es una foto de lo que el precio <strong>ya hizo</strong>.</p>
-      <p>Por eso, debajo de cada luz te mostramos el <strong>historial real de esa señal</strong>: qué hizo el precio la barra siguiente, en 10 años de historia. Spoiler: casi nunca acierta más que una moneda cargada al alza — y los <strong>Sell</strong> son los que peor pronostican.</p>
-      <p>La decisión de entrada no la da un indicador. La da tu plan: <strong>Semáforo de Calidad</strong> (¿buena empresa?) → <strong>Semáforo de Riesgo</strong> (¿stop definido y ratio que cierra?). Este semáforo está para que el medidor no te apure ni te asuste.</p>
+      <div class="explain-title">🧭 Cómo leer este semáforo</div>
+      <p>Las cuatro luces miden <strong>riesgo</strong>, no dirección. Verde no significa "va a subir": significa que estás en el terreno donde, históricamente, la turbulencia fue <strong>la mitad</strong> y los desplomes fueron raros. Rojo no significa "va a bajar": significa que estás donde la volatilidad <strong>se duplica</strong> y se concentran los golpes grandes.</p>
+      <p><strong>Terreno favorable</strong> → si la empresa pasó el filtro de Calidad, es el mejor momento para entrar <strong>con plan</strong>: stop y ratio definidos antes. <strong>Zona de tormenta</strong> → no es prohibido, pero el precio del error es más alto: posición chica o esperar. La luz no reemplaza tu plan — te dice cuánto viento hay.</p>
+      <p>La evidencia: media de 200 y zona de máximos medidas sobre el <strong>S&P 500 desde 1928</strong>, el <strong>Nasdaq desde 1971</strong>, el <strong>Dow desde 1992</strong> y 26 acciones grandes durante 10 años. Cada luz se calcula en vivo para cualquier ticker.</p>
     </div>
 
-    <div class="explain" style="border-left-color:var(--green)">
-      <div class="explain-title">🔬 De dónde sale el "historial real"</div>
-      <p>Reconstruimos el medidor de TradingView —los mismos ~26 indicadores oficiales— barra por barra sobre <strong>26 acciones y ETFs</strong> (la Lista Curada completa + SPY, QQQ, DIA y otros), desde 2016 hasta hoy: <strong>más de 13.000 señales semanales y 3.000 mensuales</strong>. Para cada señal medimos qué hizo el precio en la barra siguiente.</p>
-      <p>Si el ticker que consultás está en la muestra, te mostramos <strong>su historial propio</strong> — siempre que esa señal tenga casos suficientes (30 o más); con menos, un porcentaje individual sería ruido estadístico y te mostramos el promedio de la muestra, aclarándolo. Si el ticker no está en la muestra, también te lo decimos: los porcentajes describen el comportamiento de la señal, no de tu ticker en particular.</p>
-      <p>Resultado: después de un <strong>SELL semanal</strong> el precio subió igual el <strong>54% de las veces</strong> (retorno promedio positivo). Después de un <strong>BUY</strong>: 56% — casi lo mismo que sin ninguna señal (55%). <strong>El medidor describe el pasado; no predice el futuro.</strong></p>
-      <p>Nadie te muestra este dato. Nosotros sí, porque la ventaja del inversor no está en obedecer indicadores: está en comprar calidad con un riesgo controlado.</p>
+    <div class="explain no">
+      <div class="explain-title">🚫 Lo que este semáforo NO mira — porque lo medimos y falló</div>
+      <p><span class="nx">✗ Osciladores (RSI, MACD y 24 más):</span> el consenso técnico más usado del mundo acierta casi lo mismo que el mercado solo. En AAPL, seguir sus señales de compra agregó <strong>+1,1 puntos</strong> — y sus señales de venta erraron más que una moneda.</p>
+      <p><span class="nx">✗ Fuerza relativa:</span> "comprá lo que le viene ganando al mercado" funcionó en 2016-2026… y se <strong>invirtió</strong> en 2006-2016. Una señal que cambia de bando según la década no es una señal.</p>
+      <p><span class="nx">✗ Volumen confirmando rupturas:</span> las rupturas <strong>sin</strong> volumen rindieron más que las rupturas con volumen (5.743 casos medidos). El manual dice lo contrario. El manual no lo midió.</p>
+      <a class="crosslink" id="toPrueba" href="prueba.html" style="margin:14px 0 0">🔬 Ver la prueba completa del medidor de TradingView →
+        <small>Señal por señal, con su historial real de aciertos en 10 años.</small></a>
     </div>
   </div>
 
 </div>
 
 <footer>
-  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Datos: TradingView · Uso educativo — no es recomendación de inversión
+  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Datos: Yahoo Finance · Uso educativo — no es recomendación de inversión
 </footer>
 
 <script>
@@ -292,155 +289,91 @@ async function initGate(){
 }
 
 /* ============================================================
-   Mapeo del rating (-1..+1) → etiqueta / nivel / color
+   Evidencia medida (backtests propios, sin survivorship en índices)
+   - Índices: ^GSPC 1928-2026 · ^IXIC 1971-2026 · ^DJI 1992-2026
+   - Acciones: 26 large caps 2016-2026 (survivorship declarado)
    ============================================================ */
-function rate(v){
-  if(v==null||isNaN(v))return{label:'No data',level:''};
-  if(v>=0.5)  return{label:'Strong Buy', level:'ok'};
-  if(v>=0.1)  return{label:'Buy',        level:'ok'};
-  if(v>-0.1)  return{label:'Neutral',    level:'warn'};
-  if(v>-0.5)  return{label:'Sell',       level:'fail'};
-  return            {label:'Strong Sell',level:'fail'};
+const CLIMA={
+  QQQ:{name:'Nasdaq',ev:'<b>Nasdaq, 55 años medidos:</b> arriba de la media de 200 la volatilidad fue 15,5% anual; abajo, 28,5% — y el <b>73%</b> de los desplomes diarios de −3% ocurrió abajo. En zona de máximos la vol fue 11%; hundido, 38%.'},
+  SPY:{name:'S&P 500',ev:'<b>S&P 500, 98 años medidos:</b> arriba de la media de 200 la volatilidad fue 14,8% anual; abajo, 25,4% — y el <b>73%</b> de los desplomes diarios de −3% ocurrió abajo. En zona de máximos la vol fue 10%; hundido, 43%.'},
+  DIA:{name:'Dow Jones',ev:'<b>Dow Jones, 34 años medidos:</b> arriba de la media de 200 la volatilidad fue 12,5% anual; abajo, 27,5% — y el <b>86%</b> de los desplomes diarios de −3% ocurrió abajo. En zona de máximos la vol fue 10%; hundido, 47%.'}
+};
+const EV_TICKER='<b>Acciones grandes (26 medidas, 10 años):</b> abajo de su media de 200 la volatilidad salta de 26,6% a 37,7% anual, y ahí se concentra la mitad de los desplomes. En zona hundida (−25% o más del máximo) la vol llega a <b>51%</b> y los trimestres positivos caen de 66% a 56%.';
+const PLAIN_ETF=new Set(['SPY','QQQ','DIA','VOO','IVV','VTI','IWM','VIG','SCHD','VYM','VEA','VWO','RSP','MDY']);
+
+/* ============================================================
+   Luces
+   ============================================================ */
+const nf=x=>x.toFixed(1).replace('.',',');
+
+function lightTrend(price,sma){
+  if(price==null||sma==null||!isFinite(price/sma))return{level:'warn',txt:'sin datos'};
+  const d=(price/sma-1)*100;
+  return d>=0?{level:'ok',txt:`arriba (+${nf(d)}%)`}:{level:'fail',txt:`abajo (−${nf(-d)}%)`};
+}
+function lightZone(price,hi){
+  if(price==null||hi==null||!isFinite(price/hi))return{level:'warn',txt:'sin datos'};
+  const d=(price/hi-1)*100;
+  const t=`(−${nf(Math.abs(d))}%)`;
+  if(d>=-2)  return{level:'ok',txt:`en máximos ${t}`};
+  if(d>=-10) return{level:'ok',txt:`cerca ${t}`};
+  if(d>=-25) return{level:'warn',txt:`lejos ${t}`};
+  return{level:'fail',txt:`hundida ${t}`};
+}
+
+/* Veredicto = combinación simple de las 4 luces */
+function combinedVerdict(lights){
+  const fails=lights.filter(l=>l.level==='fail').length;
+  const warns=lights.filter(l=>l.level==='warn').length;
+  if(fails>0)return{level:'fail',title:'🔴 Zona de tormenta',
+    desc:'Al menos una luz está en la zona donde, históricamente, la volatilidad se duplica y se concentran los desplomes. No significa que vaya a bajar — significa que si entrás, lo hacés donde los golpes son más grandes y más frecuentes. Posición chica o esperar; el stop no es negociable.'};
+  if(warns>0)return{level:'warn',title:'🟡 Terreno mixto',
+    desc:'Ninguna luz en zona de tormenta, pero tampoco todas en verde. El riesgo histórico acá es intermedio: se puede entrar, con el plan completo — Calidad confirmada, stop definido y ratio que cierre.'};
+  return{level:'ok',title:'🟢 Terreno favorable',
+    desc:'Clima calmo y acción en zona sana: históricamente, acá la turbulencia fue la mitad y los desplomes fueron raros. Ojo — esto no predice la suba: es el terreno, no el pronóstico. Si la empresa pasó el filtro de Calidad, entrá con stop y ratio definidos antes.'};
+}
+
+/* Aviso instrumento fuera del universo medido */
+function exoticNote(t,type,cap){
+  if(type==='EQUITY'&&cap!=null&&cap<2e9)
+    return `⚠️ ${t} es una empresa chica (menos de $2 mil millones). La evidencia de este semáforo está medida sobre acciones grandes e índices: el estado es real, las probabilidades son orientativas.`;
+  if(type==='ETF'&&!PLAIN_ETF.has(t))
+    return `⚠️ ${t} es un ETF especializado. Si sigue un activo volátil (cripto, apalancados, un solo commodity), la estadística de acciones grandes e índices no le calza: estado real, probabilidades orientativas.`;
+  if(type!=='EQUITY'&&type!=='ETF')
+    return `⚠️ ${t} no es una acción común ni un ETF de índice. La evidencia de este semáforo está medida sobre acciones grandes de EE. UU. e índices: tomá las luces como referencia, no como historial propio.`;
+  return'';
 }
 
 /* ============================================================
-   Auditoría histórica del medidor (backtest propio)
-   Reconstrucción de los 26 indicadores oficiales sobre 26 acciones
-   y ETFs, 2016-06-10 → 2026-06-11. Por cada señal: % de barras
-   siguientes que cerraron ARRIBA y retorno medio de esa barra.
+   Datos (Worker → Yahoo quoteSummary)
    ============================================================ */
-const AUDIT={
-  '1W':{base:54.7,adj:'semanal',unidad:'semanas',s:{
-    'Strong Buy' :{n:2641,sube:54.8,ret:0.27},
-    'Buy'        :{n:6175,sube:55.6,ret:0.33},
-    'Neutral'    :{n:1281,sube:51.8,ret:0.18},
-    'Sell'       :{n:3015,sube:53.9,ret:0.46},
-    'Strong Sell':{n:434, sube:56.0,ret:0.56}
-  }},
-  '1M':{base:58.5,adj:'mensual',unidad:'meses',s:{
-    'Strong Buy' :{n:838, sube:58.7,ret:1.21},
-    'Buy'        :{n:1537,sube:58.8,ret:1.48},
-    'Neutral'    :{n:275, sube:56.4,ret:1.32},
-    'Sell'       :{n:412, sube:59.0,ret:2.29},
-    'Strong Sell':{n:32,  sube:46.9,ret:1.55}
-  }}
-};
-/* Historial POR TICKER (mismos backtest y criterio; s: [n, %sube, ret_medio%]).
-   Si el ticker consultado está acá y la celda tiene n>=MIN_N, se muestra SU
-   historial; si no, el promedio de la muestra (aclarándolo). */
-const MIN_N=30;
-const AUDIT_T={"ACN":{"1W":{"base":54.9,"s":{"Strong Buy":[112,58.9,0.1],"Buy":[220,54.1,0.24],"Neutral":[44,61.4,0.07],"Sell":[130,50.0,-0.06],"Strong Sell":[15,60.0,0.98]}},"1M":{"base":56.3,"s":{"Strong Buy":[33,48.5,-0.38],"Buy":[57,64.9,1.42],"Neutral":[13,46.2,-0.04],"Sell":[16,50.0,0.72]}}},"ADBE":{"1W":{"base":53.7,"s":{"Strong Buy":[99,57.6,0.35],"Buy":[209,57.4,0.46],"Neutral":[49,46.9,0.56],"Sell":[135,48.9,-0.15],"Strong Sell":[29,48.3,0.33]}},"1M":{"base":57.1,"s":{"Strong Buy":[33,60.6,1.53],"Buy":[52,65.4,2.04],"Neutral":[10,30.0,-2.33],"Sell":[24,45.8,0.55]}}},"INTU":{"1W":{"base":53.7,"s":{"Strong Buy":[114,55.3,0.63],"Buy":[249,54.2,0.26],"Neutral":[49,44.9,-0.31],"Sell":[101,55.4,0.45],"Strong Sell":[8,50.0,-1.39]}},"1M":{"base":56.3,"s":{"Strong Buy":[41,56.1,1.88],"Buy":[62,58.1,0.91],"Neutral":[9,55.6,4.0],"Sell":[7,42.9,-3.24]}}},"PG":{"1W":{"base":55.9,"s":{"Strong Buy":[91,50.5,-0.28],"Buy":[229,57.6,0.11],"Neutral":[40,55.0,0.17],"Sell":[141,58.9,0.49],"Strong Sell":[20,40.0,-0.14]}},"1M":{"base":58.0,"s":{"Strong Buy":[25,44.0,-1.01],"Buy":[65,61.5,0.64],"Neutral":[17,58.8,1.84],"Sell":[12,66.7,1.59]}}},"META":{"1W":{"base":54.9,"s":{"Strong Buy":[106,48.1,-0.07],"Buy":[250,60.0,0.88],"Neutral":[41,58.5,1.12],"Sell":[110,47.3,-0.52],"Strong Sell":[14,64.3,2.06]}},"1M":{"base":59.7,"s":{"Strong Buy":[32,59.4,2.12],"Buy":[66,62.1,1.7],"Neutral":[2,50.0,0.26],"Sell":[18,50.0,1.54],"Strong Sell":[1,100.0,26.77]}}},"QCOM":{"1W":{"base":55.1,"s":{"Strong Buy":[72,52.8,0.48],"Buy":[193,54.9,0.4],"Neutral":[61,57.4,-0.4],"Sell":[158,53.2,0.3],"Strong Sell":[37,64.9,2.03]}},"1M":{"base":48.7,"s":{"Strong Buy":[25,56.0,1.07],"Buy":[50,42.0,0.17],"Neutral":[12,50.0,-0.28],"Sell":[31,54.8,6.45],"Strong Sell":[1,0.0,-0.82]}}},"MSFT":{"1W":{"base":57.4,"s":{"Strong Buy":[114,54.4,0.07],"Buy":[276,60.9,0.54],"Neutral":[52,50.0,0.24],"Sell":[77,54.5,0.89],"Strong Sell":[2,50.0,-0.95]}},"1M":{"base":63.0,"s":{"Strong Buy":[39,64.1,1.37],"Buy":[67,64.2,2.62],"Neutral":[8,50.0,-0.36],"Sell":[5,60.0,2.93]}}},"CMCSA":{"1W":{"base":49.9,"s":{"Strong Buy":[57,42.1,-0.18],"Buy":[199,52.8,0.19],"Neutral":[47,40.4,-0.7],"Sell":[176,50.6,-0.02],"Strong Sell":[42,54.8,0.37]}},"1M":{"base":55.5,"s":{"Strong Buy":[17,35.3,-2.12],"Buy":[49,65.3,0.95],"Neutral":[15,40.0,-1.66],"Sell":[35,60.0,0.84],"Strong Sell":[3,33.3,-1.88]}}},"DIS":{"1W":{"base":47.0,"s":{"Strong Buy":[58,44.8,0.27],"Buy":[183,47.5,0.18],"Neutral":[59,35.6,-0.97],"Sell":[184,49.5,0.23],"Strong Sell":[37,54.1,0.15]}},"1M":{"base":43.7,"s":{"Strong Buy":[20,30.0,-1.15],"Buy":[42,45.2,-0.17],"Neutral":[17,41.2,3.64],"Sell":[39,48.7,-0.23],"Strong Sell":[1,100.0,24.87]}}},"AMGN":{"1W":{"base":51.8,"s":{"Strong Buy":[103,54.4,-0.24],"Buy":[225,46.2,-0.04],"Neutral":[43,58.1,0.76],"Sell":[143,55.9,0.72],"Strong Sell":[7,71.4,1.37]}},"1M":{"base":53.8,"s":{"Strong Buy":[42,47.6,-0.6],"Buy":[56,53.6,0.93],"Neutral":[12,58.3,2.85],"Sell":[9,77.8,5.18]}}},"KO":{"1W":{"base":55.3,"s":{"Strong Buy":[108,54.6,-0.17],"Buy":[215,55.8,0.12],"Neutral":[61,55.7,0.28],"Sell":[124,52.4,0.21],"Strong Sell":[13,76.9,1.65]}},"1M":{"base":59.7,"s":{"Strong Buy":[31,54.8,0.06],"Buy":[62,51.6,0.23],"Neutral":[17,88.2,2.01],"Sell":[9,77.8,2.13]}}},"JNJ":{"1W":{"base":53.9,"s":{"Strong Buy":[101,52.5,-0.08],"Buy":[222,51.8,0.06],"Neutral":[39,48.7,0.23],"Sell":[138,59.4,0.39],"Strong Sell":[21,57.1,0.84]}},"1M":{"base":54.6,"s":{"Strong Buy":[37,54.1,0.07],"Buy":[49,46.9,0.13],"Neutral":[13,76.9,2.79],"Sell":[20,60.0,1.55]}}},"GOOGL":{"1W":{"base":56.6,"s":{"Strong Buy":[127,57.5,0.38],"Buy":[256,57.4,0.64],"Neutral":[55,50.9,-0.34],"Sell":[75,58.7,0.83],"Strong Sell":[8,37.5,1.84]}},"1M":{"base":64.7,"s":{"Strong Buy":[44,65.9,1.7],"Buy":[58,67.2,2.77],"Neutral":[12,41.7,-0.74],"Sell":[5,80.0,9.75]}}},"V":{"1W":{"base":55.9,"s":{"Strong Buy":[124,53.2,0.04],"Buy":[264,59.8,0.26],"Neutral":[50,44.0,-0.41],"Sell":[80,55.0,1.39],"Strong Sell":[3,33.3,-0.57]}},"1M":{"base":60.5,"s":{"Strong Buy":[38,57.9,0.33],"Buy":[72,62.5,1.72],"Neutral":[3,0.0,-4.44],"Sell":[6,83.3,7.61]}}},"NVDA":{"1W":{"base":58.7,"s":{"Strong Buy":[121,58.7,1.41],"Buy":[281,60.5,1.18],"Neutral":[40,60.0,1.79],"Sell":[79,51.9,0.61]}},"1M":{"base":66.4,"s":{"Strong Buy":[44,63.6,4.15],"Buy":[60,65.0,5.99],"Neutral":[8,75.0,3.05],"Sell":[7,85.7,9.96]}}},"AAPL":{"1W":{"base":58.9,"s":{"Strong Buy":[129,61.2,0.74],"Buy":[254,59.4,0.32],"Neutral":[58,53.4,0.15],"Sell":[78,56.4,1.28],"Strong Sell":[2,100.0,2.02]}},"1M":{"base":60.5,"s":{"Strong Buy":[40,65.0,3.59],"Buy":[69,52.2,0.93],"Neutral":[8,100.0,8.88],"Sell":[2,100.0,8.28]}}},"CSCO":{"1W":{"base":55.1,"s":{"Strong Buy":[92,52.2,0.18],"Buy":[234,55.6,0.41],"Neutral":[63,52.4,0.02],"Sell":[106,59.4,0.52],"Strong Sell":[26,50.0,0.21]}},"1M":{"base":59.7,"s":{"Strong Buy":[29,62.1,1.86],"Buy":[63,58.7,1.15],"Neutral":[11,63.6,1.65],"Sell":[16,56.2,1.81]}}},"TXN":{"1W":{"base":54.7,"s":{"Strong Buy":[117,57.3,0.55],"Buy":[227,51.1,-0.04],"Neutral":[47,59.6,0.69],"Sell":[118,57.6,0.75],"Strong Sell":[12,50.0,1.11]}},"1M":{"base":59.7,"s":{"Strong Buy":[34,52.9,0.63],"Buy":[62,56.5,0.87],"Neutral":[11,72.7,2.9],"Sell":[12,83.3,7.48]}}},"AVGO":{"1W":{"base":55.7,"s":{"Strong Buy":[117,52.1,0.49],"Buy":[289,55.7,0.51],"Neutral":[45,60.0,1.0],"Sell":[69,59.4,2.3],"Strong Sell":[1,0.0,-17.93]}},"1M":{"base":65.5,"s":{"Strong Buy":[41,70.7,2.62],"Buy":[69,62.3,3.54],"Neutral":[5,60.0,1.01],"Sell":[4,75.0,9.1]}}},"NOW":{"1W":{"base":54.5,"s":{"Strong Buy":[123,56.1,0.4],"Buy":[237,56.1,0.61],"Neutral":[47,46.8,-0.31],"Sell":[103,51.5,0.77],"Strong Sell":[11,63.6,1.42]}},"1M":{"base":58.0,"s":{"Strong Buy":[37,70.3,2.86],"Buy":[63,57.1,2.43],"Neutral":[7,42.9,2.86],"Sell":[12,33.3,-0.22]}}},"XOM":{"1W":{"base":52.0,"s":{"Strong Buy":[71,47.9,-0.08],"Buy":[178,55.6,0.2],"Neutral":[58,48.3,0.12],"Sell":[170,51.2,0.39],"Strong Sell":[44,52.3,-0.28]}},"1M":{"base":52.1,"s":{"Strong Buy":[15,40.0,-2.8],"Buy":[45,53.3,1.44],"Neutral":[16,62.5,2.49],"Sell":[36,50.0,0.49],"Strong Sell":[7,57.1,0.33]}}},"SPY":{"1W":{"base":58.0,"s":{"Strong Buy":[106,59.4,0.29],"Buy":[310,58.7,0.2],"Neutral":[32,40.6,-0.05],"Sell":[71,59.2,0.53],"Strong Sell":[2,100.0,6.17]}},"1M":{"base":68.9,"s":{"Strong Buy":[37,67.6,0.25],"Buy":[72,68.1,1.34],"Neutral":[5,60.0,-1.83],"Sell":[5,100.0,8.87]}}},"QQQ":{"1W":{"base":58.9,"s":{"Strong Buy":[123,57.7,0.29],"Buy":[287,61.3,0.43],"Neutral":[42,54.8,0.36],"Sell":[66,53.0,0.41],"Strong Sell":[3,66.7,2.32]}},"1M":{"base":67.2,"s":{"Strong Buy":[44,68.2,1.67],"Buy":[65,67.7,1.82],"Neutral":[6,50.0,0.39],"Sell":[4,75.0,4.53]}}},"DIA":{"1W":{"base":55.3,"s":{"Strong Buy":[125,56.8,0.17],"Buy":[283,54.1,0.08],"Neutral":[35,54.3,0.48],"Sell":[74,58.1,0.86],"Strong Sell":[4,50.0,-1.38]}},"1M":{"base":66.4,"s":{"Strong Buy":[31,67.7,0.73],"Buy":[76,65.8,0.8],"Neutral":[9,55.6,0.14],"Sell":[3,100.0,10.56]}}},"BP":{"1W":{"base":51.1,"s":{"Strong Buy":[47,57.4,0.16],"Buy":[208,47.1,-0.1],"Neutral":[72,47.2,0.19],"Sell":[161,55.3,0.63],"Strong Sell":[33,54.5,-0.66]}},"1M":{"base":52.1,"s":{"Strong Buy":[3,100.0,8.17],"Buy":[44,43.2,-0.87],"Neutral":[16,43.8,-0.59],"Sell":[47,63.8,1.9],"Strong Sell":[9,33.3,-1.89]}}},"SLV":{"1W":{"base":53.4,"s":{"Strong Buy":[84,54.8,0.39],"Buy":[197,48.7,0.12],"Neutral":[52,67.3,0.95],"Sell":[148,51.4,0.18],"Strong Sell":[40,62.5,1.16]}},"1M":{"base":52.1,"s":{"Strong Buy":[26,53.8,2.64],"Buy":[42,47.6,1.16],"Neutral":[13,53.8,0.92],"Sell":[28,57.1,0.96],"Strong Sell":[10,50.0,1.92]}}}};
-const nf=x=>x.toFixed(1).replace('.',',');
-const nfn=n=>n.toLocaleString('es-AR');
-
-/* Frase núcleo de una señal. quien = 'de AAPL' (historial propio) o '' (muestra). */
-function fraseSignal(label,base,adj,unidad,d,quien){
-  const px=quien?`el precio ${quien}`:'el precio';
-  const ret=(d.ret>0?'+':'')+d.ret.toFixed(2).replace('.',',')+'%';
-  if(label==='Buy'||label==='Strong Buy'){
-    const diff=d.sube-base;
-    const dtxt=(diff>0?'+':'')+nf(diff)+' puntos';
-    const cal=Math.abs(diff)<3?' — prácticamente nada':'';
-    const sig=unidad==='semanas'?'la semana siguiente':'el mes siguiente';
-    const todas=unidad==='semanas'?'todas las semanas':'todos los meses';
-    return `${px} subió ${sig} el <b>${nf(d.sube)}%</b> de las <b>${nfn(d.n)}</b> veces que el medidor marcó <b>${label}</b> ${adj}. Pero sube el ${nf(base)}% de ${todas} igual, haya señal o no: la señal aporta <span class="meh">${dtxt}</span>${cal}.`;
-  }
-  if(label==='Sell'||label==='Strong Sell'){
-    if(d.sube>=50){
-      return `después de un <b>${label}</b> ${adj}, ${px} <span class="hot">igual SUBIÓ el ${nf(d.sube)}%</span> de las veces (${nfn(d.n)} casos · retorno medio ${ret}). Esta señal acertó <b>menos que una moneda</b>.`;
-    }
-    return `después de un <b>${label}</b> ${adj}, ${px} subió el ${nf(d.sube)}% de las veces (${nfn(d.n)} casos) — apenas mejor que una moneda, con retorno medio <span class="hot">${ret}</span>.`;
-  }
-  return `con señal <b>Neutral</b>, ${px} subió el ${nf(d.sube)}% de las ${unidad} (${nfn(d.n)} casos), contra ${nf(base)}% de base. El medidor no está diciendo nada.`;
+function fx(j){
+  const r=j&&j.quoteSummary&&j.quoteSummary.result&&j.quoteSummary.result[0];
+  if(!r)return null;
+  const raw=v=>(v&&typeof v==='object')?v.raw:v;
+  const sd=r.summaryDetail||{},pr=r.price||{};
+  return{
+    price:raw(pr.regularMarketPrice),
+    sma:raw(sd.twoHundredDayAverage),
+    hi:raw(sd.fiftyTwoWeekHigh),
+    cap:raw(pr.marketCap)??raw(sd.marketCap),
+    type:pr.quoteType||'',
+    exch:pr.exchangeName||'',
+    name:pr.shortName||pr.longName||''
+  };
 }
-
-/* Combina Buy + Strong Buy en un solo balde alcista. getCell(label) -> {n,sube} | null */
-function combBull(getCell){
-  let n=0,num=0;
-  for(const lab of ['Buy','Strong Buy']){
-    const c=getCell(lab);
-    if(c){n+=c.n; num+=c.n*c.sube;}
-  }
-  return n?{n:n,sube:num/n}:null;
+async function fetchSym(s){
+  const k=CLIENT_CODE?`&k=${encodeURIComponent(CLIENT_CODE)}`:'';
+  const r=await fetch(`${PROXY}/?symbol=${encodeURIComponent(s)}${k}`);
+  const j=await r.json();
+  if(!r.ok||j.error)throw new Error(j&&j.error?j.error:('HTTP '+r.status));
+  const d=fx(j);
+  if(!d||d.price==null)throw new Error('sin datos de precio');
+  return d;
 }
-
-/* Frase alcista combinada (Buy o Strong Buy). subj = 'AAPL' (propio) o 'El precio' (muestra). */
-function fraseBull(subj,base,unidad,d){
-  const art=unidad==='semanas'?'las':'los';
-  const subjLow=subj==='El precio'?'el precio':subj;
-  const add=d.sube-base;
-  const addTxt=(add>0?'+':'')+nf(add)+' puntos porcentuales';
-  const cal=add<=-0.05?' En contra.':(add<3?' Casi nada.':'');
-  const fail=100-d.sube;
-  return `${subj} subió el <b>${nf(base)}%</b> de ${art} ${unidad}.<br>`+
-    `Cuando TradingView indicó <b>Buy o Strong Buy</b>, ${subjLow} subió el <b>${nf(d.sube)}%</b> de esas veces (${nfn(d.n)} casos).<br>`+
-    `Valor agregado de TradingView: <span class="meh">${addTxt}</span>.${cal}<br>`+
-    `Es decir, la indicación falló el <b>${nf(fail)}%</b> de las veces.`;
-}
-
-function auditLine(tf,label,ticker){
-  const a=AUDIT[tf]; if(!a)return'';
-  const icon=(label==='Sell'||label==='Strong Sell')?'⚠️':'📊';
-  const t=AUDIT_T[ticker];
-
-  // --- Caso alcista: Buy + Strong Buy combinados en un solo balde ---
-  if(label==='Buy'||label==='Strong Buy'){
-    const dSample=combBull(lab=>{const c=a.s[lab];return c?{n:c.n,sube:c.sube}:null;});
-    if(t&&t[tf]){
-      const d=combBull(lab=>{const c=t[tf].s[lab];return c?{n:c[0],sube:c[1]}:null;});
-      if(d&&d.n>=MIN_N){
-        return `${icon} <b>Historial real:</b> ${fraseBull(ticker,t[tf].base,a.unidad,d)}`;
-      }
-      const nC=d?d.n:0;
-      return `${icon} <b>Historial real:</b> ${ticker} tuvo solo ${nfn(nC)} ${nC===1?'señal':'señales'} de compra en 10 años: muestra demasiado chica. <b>Para los 26 tickers testeados:</b> ${fraseBull('El precio',a.base,a.unidad,dSample)}`;
-    }
-    return `${icon} <b>${ticker} no está en la muestra del backtest.</b><br><b>Para los tickers testeados</b> (26 acciones y ETFs · 10 años): ${fraseBull('El precio',a.base,a.unidad,dSample)}`;
-  }
-
-  // --- Sell / Strong Sell / Neutral: lógica original por señal ---
-  const pd=a.s[label]; if(!pd)return'';
-  if(t&&t[tf]){
-    const cell=t[tf].s[label];
-    if(cell&&cell[0]>=MIN_N){
-      const d={n:cell[0],sube:cell[1],ret:cell[2]};
-      return `${icon} <b>Historial real:</b> ${fraseSignal(label,t[tf].base,a.adj,a.unidad,d,'de '+ticker)}`;
-    }
-    const nC=cell?cell[0]:0;
-    return `${icon} <b>Historial real:</b> ${ticker} tuvo solo ${nfn(nC)} ${nC===1?'señal':'señales'} <b>${label}</b> en 10 años: muestra demasiado chica para sacar conclusiones. <b>Para los 26 tickers testeados:</b> ${fraseSignal(label,a.base,a.adj,a.unidad,pd,'')}`;
-  }
-  // Ticker FUERA de la muestra del backtest
-  return `${icon} <b>${ticker} no está en la muestra del backtest.</b><br><b>Para los tickers testeados</b> (26 acciones y ETFs · 10 años): ${fraseSignal(label,a.base,a.adj,a.unidad,pd,'')}`;
-}
-
-function fillCard(prefix, v, ticker){
-  const r=rate(v);
-  const card=document.getElementById('c'+prefix);
-  card.classList.remove('ok','warn','fail');
-  if(r.level)card.classList.add(r.level);
-  document.getElementById('r'+prefix).textContent=r.label;
-  document.getElementById('s'+prefix).textContent=(v==null||isNaN(v))?'—':('score '+v.toFixed(2)+' · escala −1 a +1');
-  const pct=(v==null||isNaN(v))?50:Math.max(0,Math.min(100,(v+1)/2*100));
-  document.getElementById('m'+prefix).style.left=pct+'%';
-  const tf=prefix==='W'?'1W':'1M';
-  document.getElementById('a'+prefix).innerHTML=auditLine(tf,r.label,ticker);
-}
-
-/* Veredicto combinado de Entrada a partir de 1W y 1M */
-function combinedVerdict(w,m){
-  const vals=[w,m].filter(x=>x!=null&&!isNaN(x));
-  if(!vals.length)return{level:'',title:'Sin datos',desc:'TradingView no devolvió un rating para este ticker.'};
-  const bearish = vals.some(x=>x<=-0.1);
-  const bullishBoth = vals.length===2 && w>=0.1 && m>=0.1;
-  if(bearish){
-    return{level:'fail',title:'🔴 El medidor dice "no"',
-      desc:'Al menos una temporalidad está en zona de venta. Dato real: en 10 años de historia, después de estas señales el precio subió igual la mayoría de las veces. No es una profecía — si la empresa pasó el filtro de Calidad, lo que decide es tu stop y tu ratio, no este medidor.'};
-  }
-  if(bullishBoth){
-    return{level:'ok',title:'🟢 El medidor acompaña',
-      desc:'Corto y mediano plazo en zona compradora. Ojo: históricamente esta señal acierta casi lo mismo que el mercado solo — las acciones suben la mayoría de las semanas, con o sin señal. No es garantía: definí stop y ratio antes de entrar.'};
-  }
-  return{level:'warn',title:'🟡 El medidor no se moja',
-    desc:'Señales mixtas o sin dirección clara entre el corto y el mediano plazo. En zona neutral el mercado se comportó igual que siempre: el medidor hoy no aporta información. Tu decisión pasa por Calidad y Riesgo.'};
+function proxyFor(t,exch){
+  if(CLIMA[t])return t;                       // SPY/QQQ/DIA: su clima es él mismo
+  return /nasdaq/i.test(exch||'')?'QQQ':'SPY';
 }
 
 /* ============================================================
@@ -460,42 +393,62 @@ async function analyze(){
   document.getElementById('loading').classList.add('show');
   document.getElementById('btn').disabled=true;
   try{
-    const k=CLIENT_CODE?`&k=${encodeURIComponent(CLIENT_CODE)}`:'';
-    const r=await fetch(`${PROXY}/?tv=${encodeURIComponent(t)}${k}`);
-    const j=await r.json();
-    if(!r.ok||j.error){
-      throw new Error(j&&j.error?j.error:('HTTP '+r.status));
-    }
-    render(t,j);
+    const dT=await fetchSym(t);
+    const px=proxyFor(t,dT.exch);
+    const dI=(px===t)?dT:await fetchSym(px);
+    render(t,dT,px,dI);
   }catch(e){
-    showErr('No se pudo obtener el consenso de TradingView para '+t+'. '+(e.message||e)+' (verificá el ticker; el endpoint cubre NYSE/NASDAQ/AMEX).');
+    showErr('No se pudieron obtener datos para '+t+'. '+(e.message||e)+' (verificá el ticker; cubre NYSE/NASDAQ/AMEX).');
   }finally{
     document.getElementById('loading').classList.remove('show');
     document.getElementById('btn').disabled=false;
   }
 }
 
-function render(t,j){
-  const w=j.ratings?j.ratings['1W']:null;
-  const m=j.ratings?j.ratings['1M']:null;
+function setLight(id,l){
+  const el=document.getElementById(id);
+  el.textContent=l.txt;
+  el.className='lval '+l.level;
+}
+function cardLevel(a,b){
+  if(a.level==='fail'||b.level==='fail')return'fail';
+  if(a.level==='warn'||b.level==='warn')return'warn';
+  return'ok';
+}
+
+function render(t,dT,px,dI){
+  const li1=lightTrend(dI.price,dI.sma), li2=lightZone(dI.price,dI.hi);
+  const lt1=lightTrend(dT.price,dT.sma), lt2=lightZone(dT.price,dT.hi);
 
   document.getElementById('resTicker').innerHTML=
-    `<b>${t}</b>${j.exchange?(' · '+j.exchange):''} · consenso técnico TradingView`;
+    `<b>${t}</b>${dT.exch?(' · '+dT.exch):''}${dT.name?(' · '+dT.name):''}`;
 
-  fillCard('W',w,t);
-  fillCard('M',m,t);
-
-  const cv=combinedVerdict(w,m);
+  const cv=combinedVerdict([li1,li2,lt1,lt2]);
   const v=document.getElementById('verdict');
   v.classList.remove('ok','warn','fail');
-  if(cv.level)v.classList.add(cv.level);
+  v.classList.add(cv.level);
   document.getElementById('vTitle').textContent=cv.title;
   document.getElementById('vDesc').textContent=cv.desc;
 
-  const ex=j.exchange||'NYSE';
-  document.getElementById('tvLink').href=`https://www.tradingview.com/symbols/${encodeURIComponent(ex)}-${encodeURIComponent(t)}/technicals/`;
+  const ex=document.getElementById('exotic');
+  const note=exoticNote(t,dT.type,dT.cap);
+  ex.textContent=note;
+  ex.classList.toggle('show',!!note);
+
+  document.getElementById('idxName').textContent=CLIMA[px].name;
+  setLight('li1',li1);setLight('li2',li2);
+  document.getElementById('evIdx').innerHTML=CLIMA[px].ev;
+  const cI=document.getElementById('cIdx');
+  cI.classList.remove('ok','warn','fail');cI.classList.add(cardLevel(li1,li2));
+
+  document.getElementById('tkName').textContent=t;
+  setLight('lt1',lt1);setLight('lt2',lt2);
+  document.getElementById('evTk').innerHTML=(t===px)?CLIMA[px].ev:EV_TICKER;
+  const cT=document.getElementById('cTk');
+  cT.classList.remove('ok','warn','fail');cT.classList.add(cardLevel(lt1,lt2));
 
   document.getElementById('toNyse').href='index.html?symbol='+encodeURIComponent(t);
+  document.getElementById('toPrueba').href='prueba.html?symbol='+encodeURIComponent(t);
 
   document.getElementById('results').classList.add('show');
   document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
