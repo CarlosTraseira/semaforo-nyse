@@ -1,12 +1,12 @@
 {
-  "updated_iso": "2026-07-16T22:59:27Z",
+  "updated_iso": "2026-07-17T22:52:42Z",
   "states": {
     "ACN": "fail",
     "ADBE": "fail",
     "INTU": "fail",
     "QCOM": "fail",
-    "PG": "warn",
-    "MSFT": "warn",
+    "PG": "fail",
+    "MSFT": "fail",
     "META": "ok",
     "CMCSA": "fail",
     "DIS": "fail",
