@@ -13,8 +13,9 @@ alerta avisa "buena empresa + buen momento → calculá tu riesgo y decidí".
 Estado entre corridas en alertas_estado.json (commiteado por el workflow).
 Primera corrida = se "siembra" el estado sin enviar nada.
 
-Envío: si está ALERT_WEBHOOK (URL de Make), POSTea el lote ahí. Si no, modo
-dry-run (solo imprime) — útil para probar la detección sin mandar mails.
+Envío: POSTea el lote al ALERT_WEBHOOK (URL de Make). Si ese secret falta y hay
+alertas para mandar, el script CORTA con error (exit 1) en vez de seguir en
+silencio: un workflow verde no debe significar "alerta enviada".
 
 Pensado para GitHub Actions, una vez por día en días hábiles.
 """
@@ -122,11 +123,18 @@ def build_email(alerts, now):
 
 
 def send(payload):
-    """Envía el lote de alertas al webhook de Make (o dry-run si no hay webhook)."""
+    """Envía el lote de alertas al webhook de Make.
+
+    Si falta ALERT_WEBHOOK NO se traga el aviso: imprime el payload y corta con
+    exit(1) para que el workflow quede en rojo y GitHub mande el mail de fallo.
+    Como el estado se commitea en un paso posterior, al fallar tampoco se guarda
+    → la misma alerta se vuelve a detectar mañana en vez de perderse.
+    """
     if not WEBHOOK:
-        print("DRY-RUN (sin ALERT_WEBHOOK). Payload que se habría enviado:")
+        print("ERROR: hay alertas para enviar pero falta el secret ALERT_WEBHOOK.")
+        print("NO se envió nada. Payload que se habría enviado:")
         print(json.dumps(payload, ensure_ascii=False, indent=2))
-        return
+        sys.exit(1)
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     req = urllib.request.Request(WEBHOOK, data=data,
                                  headers={"Content-Type": "application/json"})
