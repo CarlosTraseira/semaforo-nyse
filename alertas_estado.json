@@ -1,5 +1,5 @@
 {
-  "updated_iso": "2026-07-30T23:10:37Z",
+  "updated_iso": "2026-07-31T23:03:57Z",
   "states": {
     "ACN": "fail",
     "ADBE": "fail",
@@ -16,7 +16,7 @@
     "NKE": "fail",
     "JNJ": "ok",
     "V": "ok",
-    "NVDA": "warn",
+    "NVDA": "ok",
     "CSCO": "ok",
     "AAPL": "ok",
     "TXN": "ok",
