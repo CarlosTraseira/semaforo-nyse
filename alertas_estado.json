@@ -1,5 +1,5 @@
 {
-  "updated_iso": "2026-08-05T23:02:43Z",
+  "updated_iso": "2026-08-07T01:30:31Z",
   "states": {
     "ACN": "fail",
     "ADBE": "fail",
@@ -9,7 +9,7 @@
     "META": "fail",
     "PG": "fail",
     "HON": "ok",
-    "DIS": "fail",
+    "DIS": "warn",
     "PEP": "fail",
     "NKE": "fail",
     "IBM": "fail",
