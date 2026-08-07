@@ -1,9 +1,9 @@
 {
-  "updated_iso": "2026-08-07T01:30:31Z",
+  "updated_iso": "2026-08-07T22:38:43Z",
   "states": {
     "ACN": "fail",
     "ADBE": "fail",
-    "QCOM": "fail",
+    "QCOM": "warn",
     "GOOGL": "ok",
     "INTU": "fail",
     "META": "fail",
