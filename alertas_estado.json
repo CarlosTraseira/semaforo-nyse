@@ -1,14 +1,14 @@
 {
-  "updated_iso": "2026-08-12T22:44:05Z",
+  "updated_iso": "2026-08-13T22:45:07Z",
   "states": {
     "ACN": "fail",
     "ADBE": "fail",
-    "GOOGL": "warn",
-    "QCOM": "fail",
+    "GOOGL": "ok",
+    "QCOM": "warn",
     "INTU": "fail",
     "PG": "fail",
     "META": "fail",
-    "HON": "ok",
+    "HON": "warn",
     "PEP": "fail",
     "NKE": "fail",
     "IBM": "fail",
