@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>¡Gracias por tu compra! · El Semáforo del Inversor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#f7f6f3; --cream-dark:#eeeae2; --navy:#101725; --navy-light:#182236;
+    --yellow:#f7d54a; --green:#36b879; --red:#e75a50; --gray:#677080; --white:#fff; --border:#dcd8cf;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--navy);font-family:Inter,system-ui,Arial,sans-serif;
+    line-height:1.6;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;}
+  .wrap{width:100%;max-width:720px;}
+  .dots{display:flex;gap:8px;margin-bottom:22px;justify-content:center;}
+  .dots span{width:13px;height:13px;border-radius:50%;}
+  .dots .r{background:var(--red);} .dots .y{background:var(--yellow);} .dots .g{background:var(--green);}
+  .kicker{text-align:center;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--green);font-weight:800;margin-bottom:14px;}
+  .card{background:var(--navy);color:var(--white);border-radius:6px;padding:clamp(30px,5vw,52px);
+    box-shadow:14px 14px 0 var(--yellow);border:2px solid var(--navy);}
+  h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+  h1 .chk{color:var(--green);}
+  .prod{margin-top:12px;font-size:18px;color:#c7cfda;font-weight:600;}
+  .prod b{color:var(--yellow);}
+  .lead{margin-top:24px;font-size:16px;color:#c7cfda;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;margin-top:22px;
+    background:var(--yellow);color:var(--navy);font-weight:800;text-transform:uppercase;letter-spacing:.03em;
+    font-size:15px;padding:16px 30px;border-radius:6px;border:2px solid var(--navy);
+    box-shadow:5px 5px 0 rgba(0,0,0,.35);text-decoration:none;transition:transform .15s,box-shadow .15s;}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 rgba(0,0,0,.35);}
+  .note{margin-top:22px;font-size:14px;color:#98a2b3;}
+  .note a{color:var(--yellow);}
+  .promptbox{margin-top:20px;background:#0b111c;border:1px solid #2a3446;border-radius:6px;
+    padding:20px;white-space:pre-wrap;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:13.5px;line-height:1.65;color:#e4e9f0;max-height:340px;overflow:auto;}
+  .foot{text-align:center;margin-top:26px;font-size:13px;color:var(--gray);}
+  .foot a{color:var(--navy);font-weight:700;}
+  .copied{color:var(--green)!important;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+    <div class="kicker">El Semáforo del Inversor</div>
+    <div class="card">
+      <h1><span class="chk">✓</span> ¡Gracias por tu compra!</h1>
+      <div class="prod">Acabás de acceder a <b id="prodName">tu bono</b>.</div>
+      <div id="content"></div>
+    </div>
+    <div class="foot">
+      ¿Algún problema con tu acceso? Escribinos por <a href="https://wa.me/5491161029299" target="_blank" rel="noopener">WhatsApp</a>
+      · <a href="https://www.carlostraseira.me/" target="_blank" rel="noopener">Volver al sitio</a>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var BONOS = {
+    lista: {
+      name: "la Lista Curada de 20 empresas",
+      type: "app",
+      url: "https://carlostraseira.github.io/semaforo-nyse/lista",
+      cta: "Abrir la Lista Curada"
+    },
+    riesgo: {
+      name: "la App Semáforo de Riesgo",
+      type: "app",
+      url: "https://carlostraseira.github.io/semaforo-nyse/calculadora.html",
+      cta: "Abrir el Semáforo de Riesgo"
+    },
+    operar: {
+      name: "el Checklist «¿Operar o esperar?»",
+      type: "app",
+      url: "https://carlostraseira.github.io/semaforo-nyse/operar.html",
+      cta: "Abrir el Checklist"
+    },
+    prompt: {
+      name: "el Prompt de Análisis Fundamental",
+      type: "prompt",
+      text:
+"Actuá como analista financiero. Te voy a dar el nombre o el ticker de una empresa que cotiza en la Bolsa de EE. UU. Devolveme un análisis fundamental ORDENADO, en formato simple y verificable, con estos 5 indicadores. Para cada uno: el número actual, una frase en criollo de qué significa, y un color 🟢 (juega a favor) / 🟡 (neutro, mirar con cuidado) / 🔴 (señal de alerta):\n\n1) P/E (precio / ganancias) — ¿está caro o barato frente a su historia y su sector?\n2) ROE (retorno sobre el capital) — ¿qué tan rentable es sobre lo que ponen los dueños?\n3) Margen neto — ¿cuánto le queda de cada dólar que vende?\n4) Deuda / Patrimonio — ¿está apalancada de forma sana o riesgosa?\n5) Flujo de caja libre (FCF) — ¿genera caja real o solo ganancias contables?\n\nAl final agregá un VEREDICTO de 3 líneas: fortalezas, riesgos, y si la empresa pasa o no un primer filtro de CALIDAD para seguir analizándola.\n\nRegla importante: no inventes datos. Si no tenés un dato actualizado, decímelo y pedime que lo pegue.\n\nEmpresa a analizar: [ESCRIBÍ ACÁ EL TICKER O EL NOMBRE]"
+    }
+  };
+
+  function esc(s){ return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+  var params = new URLSearchParams(location.search);
+  var key = (params.get('b')||'').toLowerCase();
+  var b = BONOS[key];
+  var cont = document.getElementById('content');
+
+  if(!b){
+    document.getElementById('prodName').textContent = "tu bono de El Semáforo del Inversor";
+    cont.innerHTML = '<div class="lead">Tu compra se procesó correctamente. Te llegó el recibo por email. '+
+      'Si no ves tu acceso, escribinos por WhatsApp y te lo damos al instante.</div>';
+    return;
+  }
+
+  document.getElementById('prodName').textContent = b.name;
+
+  if(b.type === 'app'){
+    cont.innerHTML =
+      '<div class="lead">Tu acceso está listo. Entrá cuando quieras desde este botón:</div>'+
+      '<a class="btn" href="'+b.url+'" target="_blank" rel="noopener">'+b.cta+' →</a>'+
+      '<div class="note">💡 Guardá este link en favoritos. También te llegó el recibo de tu compra por email.</div>';
+  } else {
+    cont.innerHTML =
+      '<div class="lead">Copiá el prompt y pegalo en ChatGPT o Claude. Después escribí el ticker de la empresa que quieras analizar:</div>'+
+      '<pre class="promptbox" id="pbox">'+esc(b.text)+'</pre>'+
+      '<a class="btn" href="#" id="copyBtn">Copiar prompt</a>'+
+      '<div class="note">💡 Funciona en ChatGPT y en Claude. También te llegó el recibo de tu compra por email.</div>';
+    var btn = document.getElementById('copyBtn');
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      navigator.clipboard.writeText(b.text).then(function(){
+        btn.textContent = '✓ Copiado';
+        btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent='Copiar prompt'; btn.classList.remove('copied'); }, 2200);
+      }).catch(function(){
+        var r=document.createRange(); r.selectNodeContents(document.getElementById('pbox'));
+        var s=getSelection(); s.removeAllRanges(); s.addRange(r);
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
