@@ -252,6 +252,18 @@ function calc(){
     d.textContent=`La relación juega a tu favor (${rr.toFixed(2)}:1) y el riesgo sobre tu capital es prudente. La matemática te respalda.`;
   }
 }
+
+/* Prellenado desde el Semáforo de Entrada:
+   calculadora.html?capital=10000&riesgo=500&ganancia=1000 */
+document.addEventListener('DOMContentLoaded',()=>{
+  const q=new URLSearchParams(location.search);
+  let algo=false;
+  ['capital','ganancia','riesgo'].forEach(id=>{
+    const v=parseFloat(q.get(id));
+    if(isFinite(v)&&v>0){document.getElementById(id).value=v;algo=true;}
+  });
+  if(algo)calc();
+});
 </script>
 </body>
 </html>
