@@ -115,6 +115,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .rows{display:flex;flex-direction:column}
 .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2)}
 .row:last-child{border-bottom:none}
+.row small{font-family:var(--mono);font-size:11px;color:var(--text3)}
 .row .rv{font-family:var(--mono);font-size:13px;color:var(--text);text-align:right;font-variant-numeric:tabular-nums}
 .row .rv.dim{color:var(--text2)}
 
@@ -250,7 +251,7 @@ footer{position:relative;z-index:1;font-family:var(--mono);font-size:11px;color:
     <div class="card">
       <div class="rows">
         <div class="row"><span>Precio</span><span class="rv" id="rPrice">—</span></div>
-        <div class="row"><span>Respiración diaria (ATR 14)</span><span class="rv" id="rAtr">—</span></div>
+        <div class="row"><span>Respiración diaria <small>· promedio de 14 ruedas</small></span><span class="rv" id="rAtr">—</span></div>
         <div class="row"><span>Clima · su media de 200</span><span class="rv dim" id="rMa">—</span></div>
         <div class="row"><span>Resultado histórico a este plazo</span><span class="rv" id="rEdge">—</span></div>
       </div>
@@ -462,9 +463,12 @@ function render(){
   const atrs=stop/d.atr;
   $('rskPct').textContent=`· ${nf(rsk/cap*100,1)}% de tu capital`;
 
-  $('breathe').innerHTML=`<b>${TICKER}</b> — respira <b>${nf(d.atr,2)}% por día</b>. `+
-    (d.rel<0.85?'Está más tranquila que de costumbre':d.rel>1.2?'Está más agitada que de costumbre':'Es lo normal para ella')+
-    `: su promedio de los últimos ${d.meses} meses es ${nf(d.med,2)}%.`;
+  /* Un solo número, con la ventana explícita. El promedio de 15 meses queda
+     adentro del cálculo pero NO se muestra: dos promedios de ventanas
+     distintas, sin etiqueta, no se pueden comparar de un vistazo. */
+  $('breathe').innerHTML=`<b>${TICKER}</b> — respira <b>${nf(d.atr,2)}% por día</b>, `+
+    `promedio de las últimas 14 ruedas. `+
+    (d.rel<0.85?'Está más tranquila que de costumbre.':d.rel>1.2?'Está más agitada que de costumbre.':'Es lo normal para ella.');
 
   const ex=$('exotic'),note=exoticNote(TICKER,d.tipo);
   ex.textContent=note;ex.classList.toggle('show',!!note);
@@ -511,7 +515,7 @@ function render(){
   $('mQtyX').textContent='a $'+nf(d.price,2);
 
   $('rPrice').textContent='$'+nf(d.price,2);
-  $('rAtr').textContent=nf(d.atr,2)+'% diario · su promedio: '+nf(d.med,2)+'%';
+  $('rAtr').textContent=nf(d.atr,2)+'% · '+(d.rel<0.85?'más tranquila que de costumbre':d.rel>1.2?'más agitada que de costumbre':'lo normal para ella');
   if(d.sma200){
     const dist=(d.price/d.sma200-1)*100;
     $('rMa').textContent=(dist>=0?'arriba +':'abajo ')+nf(Math.abs(dist),1)+'% · '+(dist>=0?'tiembla menos':'tiembla más');
