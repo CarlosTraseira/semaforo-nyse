@@ -389,7 +389,8 @@ function indicadores(d){
   const mediana=orden[Math.floor(orden.length/2)];
   let sma200=null;
   if(n>=200){let s=0;for(let i=n-200;i<n;i++)s+=c[i];sma200=s/200;}
-  return{price,atr,rel:mediana>0?atr/mediana:1,sma200,meses:Math.round(atrPct.length/21),n};
+  return{price,atr,med:mediana,rel:mediana>0?atr/mediana:1,
+         sma200,meses:Math.round(atrPct.length/21),n};
 }
 
 /* ---- Aviso de instrumento fuera del universo medido ---- */
@@ -461,20 +462,20 @@ function render(){
   const atrs=stop/d.atr;
   $('rskPct').textContent=`· ${nf(rsk/cap*100,1)}% de tu capital`;
 
-  $('breathe').innerHTML=`<b>${TICKER}</b> — respira <b>${nf(d.atr,2)}% por día</b>, `+
-    (d.rel<0.85?'más tranquila que de costumbre':d.rel>1.2?'más agitada que de costumbre':'lo normal para ella')+
-    ` (${nf(d.rel,2)}× su promedio de los últimos ${d.meses} meses)`;
+  $('breathe').innerHTML=`<b>${TICKER}</b> — respira <b>${nf(d.atr,2)}% por día</b>. `+
+    (d.rel<0.85?'Está más tranquila que de costumbre':d.rel>1.2?'Está más agitada que de costumbre':'Es lo normal para ella')+
+    `: su promedio de los últimos ${d.meses} meses es ${nf(d.med,2)}%.`;
 
   const ex=$('exotic'),note=exoticNote(TICKER,d.tipo);
   ex.textContent=note;ex.classList.toggle('show',!!note);
 
   $('stopPct').textContent=nf(stop,1)+'%';
-  $('stopUsd').innerHTML=`<b>$${nf(stopUsd,2)}</b> abajo de tu entrada · stop en <b>$${nf(d.price-stopUsd,2)}</b>`;
+  $('stopUsd').innerHTML=`Precio hoy <b>$${nf(d.price,2)}</b> → stop en <b>$${nf(d.price-stopUsd,2)}</b> · $${nf(stopUsd,2)} abajo`;
 
   const nT=Math.min(Math.round(atrs),18);let tk='';
   for(let i=0;i<18;i++)tk+=`<div class="tick${i<nT?' on':''}" style="height:${i<nT?22:12}px"></div>`;
   $('ticks').innerHTML=tk;
-  $('tickNote').textContent=`= ${nf(atrs,1)} respiraciones diarias de margen`;
+  $('tickNote').textContent=`= ${nf(atrs,1)} respiraciones diarias de margen · si entrás a otro precio, sostené el ${nf(stop,1)}%`;
 
   let cls='ok';
   let v=`<b>Entra cómodo.</b> Podés poner ${usd(pos)} — el ${nf(share,0)}% de tu capital, ${qty} ${qty===1?'acción':'acciones'} — y arriesgás ${usd(riesgoReal)}. Stop en $${nf(d.price-stopUsd,2)}, objetivo en $${nf(target,2)}.`;
@@ -510,7 +511,7 @@ function render(){
   $('mQtyX').textContent='a $'+nf(d.price,2);
 
   $('rPrice').textContent='$'+nf(d.price,2);
-  $('rAtr').textContent=nf(d.atr,2)+'% diario · '+nf(d.rel,2)+'× lo normal';
+  $('rAtr').textContent=nf(d.atr,2)+'% diario · su promedio: '+nf(d.med,2)+'%';
   if(d.sma200){
     const dist=(d.price/d.sma200-1)*100;
     $('rMa').textContent=(dist>=0?'arriba +':'abajo ')+nf(Math.abs(dist),1)+'% · '+(dist>=0?'tiembla menos':'tiembla más');
