@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Herramienta educativa para comparar strikes de opciones según un objetivo definido.">
+  <title>Copiloto de Opciones | El Semáforo del Inversor</title>
+  <style>
+    :root { color-scheme: light dark; background: light-dark(#eef3f6, #071521); }
+    html { background: inherit; }
+    body { margin: 0; min-width: 320px; background: inherit; }
+    #copiloto-options-objectives { min-height: 100vh; }
+  </style>
+</head>
+<body>
+<section id="copiloto-options-objectives" aria-label="Herramienta educativa Copiloto de Opciones">
+  <style>
+    #copiloto-options-objectives {
+      --cop-bg: light-dark(#eef3f6, #071521);
+      --cop-shell: light-dark(#ffffff, #0b1f2d);
+      --cop-panel: light-dark(#f7fafb, #102a3d);
+      --cop-panel-2: light-dark(#e8f0f4, #16364b);
+      --cop-text: light-dark(#102633, #f4f8fa);
+      --cop-muted: light-dark(#526a77, #a8c0cc);
+      --cop-line: light-dark(#c9d7de, #315165);
+      --cop-blue: light-dark(#0875aa, #4fc3f7);
+      --cop-green: light-dark(#08754d, #43d89a);
+      --cop-yellow: light-dark(#876000, #ffd053);
+      --cop-red: light-dark(#aa3434, #ff7a7a);
+      --cop-button: light-dark(#12364a, #dceef6);
+      --cop-button-text: light-dark(#ffffff, #071521);
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      color: var(--cop-text);
+      background: var(--cop-bg);
+      border-radius: 18px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    #copiloto-options-objectives * { box-sizing: border-box; min-width: 0; }
+    #copiloto-options-objectives .cop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 17px 20px;
+      background: var(--cop-shell);
+      border-bottom: 1px solid var(--cop-line);
+    }
+    #copiloto-options-objectives .cop-brand,
+    #copiloto-options-objectives .cop-controls,
+    #copiloto-options-objectives .cop-control-actions { display: flex; align-items: center; gap: 10px; }
+    #copiloto-options-objectives .cop-lights { display: flex; gap: 4px; }
+    #copiloto-options-objectives .cop-lights span { width: 9px; height: 9px; border-radius: 50%; }
+    #copiloto-options-objectives .cop-lights span:nth-child(1) { background: var(--cop-green); }
+    #copiloto-options-objectives .cop-lights span:nth-child(2) { background: var(--cop-yellow); }
+    #copiloto-options-objectives .cop-lights span:nth-child(3) { background: var(--cop-red); }
+    #copiloto-options-objectives .cop-brand strong,
+    #copiloto-options-objectives .cop-brand small,
+    #copiloto-options-objectives .cop-file strong,
+    #copiloto-options-objectives .cop-file span { display: block; }
+    #copiloto-options-objectives .cop-brand strong { font-weight: 500; }
+    #copiloto-options-objectives .cop-brand small,
+    #copiloto-options-objectives .cop-file span { color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-demo-label { color: var(--cop-blue); font-weight: 500; }
+    #copiloto-options-objectives .cop-import {
+      display: grid;
+      gap: 0;
+      margin: 18px 20px 0;
+      padding: 0 17px;
+      background: var(--cop-shell);
+      border: 1px solid var(--cop-line);
+      border-radius: 14px;
+    }
+    #copiloto-options-objectives .cop-step {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: 12px;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--cop-line);
+    }
+    #copiloto-options-objectives .cop-step:last-child { border-bottom: 0; }
+    #copiloto-options-objectives .cop-step-number {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      color: var(--cop-button-text);
+      background: var(--cop-button);
+      font-weight: 500;
+    }
+    #copiloto-options-objectives .cop-step-body { display: grid; gap: 10px; }
+    #copiloto-options-objectives .cop-step-body h2 { margin: 1px 0 0; font-size: 1.05rem; }
+    #copiloto-options-objectives .cop-step-body p { margin: 0; color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-ticker-row {
+      display: grid;
+      grid-template-columns: minmax(180px, 320px) minmax(0, 1fr);
+      gap: 10px;
+      align-items: end;
+    }
+    #copiloto-options-objectives .cop-ticker-field { display: grid; gap: 6px; color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-ticker-field input {
+      min-height: 44px;
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--cop-line);
+      border-radius: 10px;
+      color: var(--cop-text);
+      background: var(--cop-panel);
+      font: inherit;
+      text-transform: uppercase;
+    }
+    #copiloto-options-objectives .cop-selected-link {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      color: var(--cop-blue);
+      font-weight: 500;
+      text-underline-offset: 3px;
+      overflow-wrap: anywhere;
+    }
+    #copiloto-options-objectives .cop-selected-link[hidden] { display: none; }
+    #copiloto-options-objectives .cop-input-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    #copiloto-options-objectives .cop-file-input { display: none; }
+    #copiloto-options-objectives .cop-dropzone {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      background: var(--cop-panel);
+      border: 1px dashed var(--cop-line);
+      border-radius: 12px;
+    }
+    #copiloto-options-objectives .cop-dropzone.is-dragging {
+      border-color: var(--cop-blue);
+      background: var(--cop-panel-2);
+    }
+    #copiloto-options-objectives .cop-paste-catcher {
+      width: 100%;
+      min-height: 64px;
+      padding: 14px;
+      border: 1px solid var(--cop-line);
+      border-radius: 10px;
+      color: var(--cop-text);
+      background: var(--cop-shell);
+      font: inherit;
+      text-align: center;
+    }
+    #copiloto-options-objectives .cop-paste-catcher::placeholder { color: var(--cop-muted); opacity: 1; }
+    #copiloto-options-objectives .cop-import-hint,
+    #copiloto-options-objectives .cop-import-status { color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-import-status {
+      padding: 10px 12px;
+      border-left: 4px solid var(--cop-blue);
+      background: var(--cop-panel-2);
+    }
+    #copiloto-options-objectives .cop-import-status[data-tone="success"] { border-left-color: var(--cop-green); }
+    #copiloto-options-objectives .cop-import-status[data-tone="error"] { border-left-color: var(--cop-red); color: var(--cop-text); }
+    #copiloto-options-objectives .cop-import-status[data-tone="working"] { border-left-color: var(--cop-yellow); }
+    #copiloto-options-objectives #cop-analyze { justify-self: start; }
+    #copiloto-options-objectives button:disabled,
+    #copiloto-options-objectives input:disabled { cursor: not-allowed; opacity: .55; }
+    #copiloto-options-objectives .cop-image-preview {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+    #copiloto-options-objectives .cop-image-preview[hidden],
+    #copiloto-options-objectives .cop-validation[hidden] { display: none; }
+    #copiloto-options-objectives .cop-image-preview img {
+      width: 100%;
+      max-height: 210px;
+      object-fit: contain;
+      object-position: left center;
+      background: var(--cop-panel);
+      border-radius: 10px;
+    }
+    #copiloto-options-objectives .cop-validation {
+      display: grid;
+      gap: 9px;
+      padding-top: 2px;
+    }
+    #copiloto-options-objectives .cop-validation strong { font-weight: 500; }
+    #copiloto-options-objectives .cop-validation-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+    #copiloto-options-objectives .cop-validation-item {
+      padding: 10px;
+      background: var(--cop-panel);
+      border-radius: 9px;
+    }
+    #copiloto-options-objectives .cop-validation-item span,
+    #copiloto-options-objectives .cop-validation-item b { display: block; }
+    #copiloto-options-objectives .cop-validation-item span { color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-validation-item b { margin-top: 3px; font-weight: 500; font-variant-numeric: tabular-nums; }
+    #copiloto-options-objectives .cop-capture {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 20px 0;
+      padding: 13px 15px;
+      background: var(--cop-shell);
+      border: 1px solid var(--cop-line);
+      border-radius: 13px;
+    }
+    #copiloto-options-objectives .cop-file-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: var(--cop-panel-2);
+      color: var(--cop-blue);
+      font-weight: 500;
+    }
+    #copiloto-options-objectives .cop-source-actions { display: grid; justify-items: end; gap: 5px; text-align: right; }
+    #copiloto-options-objectives .cop-private { color: var(--cop-green); font-weight: 500; }
+    #copiloto-options-objectives .cop-source-link {
+      color: var(--cop-blue);
+      font-weight: 500;
+      text-underline-offset: 3px;
+    }
+    #copiloto-options-objectives .cop-controls { flex-wrap: wrap; align-items: end; padding: 16px 20px 0; }
+    #copiloto-options-objectives .cop-control-group { display: grid; gap: 6px; }
+    #copiloto-options-objectives .cop-control-group:first-child { flex: 0 0 auto; }
+    #copiloto-options-objectives .cop-control-group:last-child { flex: 1 1 320px; }
+    #copiloto-options-objectives .cop-control-label { color: var(--cop-muted); font-weight: 500; }
+    #copiloto-options-objectives button,
+    #copiloto-options-objectives select {
+      min-height: 44px;
+      padding: 9px 13px;
+      border: 1px solid var(--cop-line);
+      border-radius: 10px;
+      color: var(--cop-text);
+      background: var(--cop-panel);
+      font: inherit;
+    }
+    #copiloto-options-objectives button { cursor: pointer; }
+    #copiloto-options-objectives button[aria-pressed="true"] {
+      color: var(--cop-button-text);
+      background: var(--cop-button);
+      border-color: var(--cop-button);
+    }
+    #copiloto-options-objectives select { width: 100%; }
+    #copiloto-options-objectives .cop-report {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+      gap: 16px;
+      padding: 16px 20px 20px;
+    }
+    #copiloto-options-objectives .cop-main,
+    #copiloto-options-objectives .cop-aside { display: grid; gap: 14px; align-content: start; }
+    #copiloto-options-objectives .cop-hero,
+    #copiloto-options-objectives .cop-box {
+      padding: 17px;
+      background: var(--cop-shell);
+      border: 1px solid var(--cop-line);
+      border-radius: 14px;
+    }
+    #copiloto-options-objectives .cop-eyebrow {
+      color: var(--cop-blue);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      overflow-wrap: anywhere;
+    }
+    #copiloto-options-objectives h2 {
+      margin: 6px 0;
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      line-height: 1.18;
+      font-weight: 500;
+    }
+    #copiloto-options-objectives .cop-summary { margin: 0; color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-status {
+      margin-top: 13px;
+      padding: 11px 13px;
+      border-left: 4px solid var(--cop-yellow);
+      background: var(--cop-panel-2);
+    }
+    #copiloto-options-objectives .cop-status[data-tone="red"] { border-left-color: var(--cop-red); }
+    #copiloto-options-objectives .cop-status strong { display: block; font-weight: 500; }
+    #copiloto-options-objectives .cop-status span { display: block; margin-top: 3px; color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+    #copiloto-options-objectives .cop-metric { padding: 12px; background: var(--cop-panel); border-radius: 10px; }
+    #copiloto-options-objectives .cop-metric span,
+    #copiloto-options-objectives .cop-metric strong,
+    #copiloto-options-objectives .cop-metric small { display: block; }
+    #copiloto-options-objectives .cop-metric span,
+    #copiloto-options-objectives .cop-metric small { color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-metric strong {
+      margin: 4px 0 2px;
+      font-size: 1.25rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    #copiloto-options-objectives .cop-box h3 { margin: 0 0 10px; font-size: 1rem; font-weight: 500; }
+    #copiloto-options-objectives .cop-list { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+    #copiloto-options-objectives .cop-list li { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 8px; }
+    #copiloto-options-objectives .cop-dot { width: 9px; height: 9px; margin-top: 6px; border-radius: 50%; background: var(--cop-yellow); }
+    #copiloto-options-objectives .cop-dot.green { background: var(--cop-green); }
+    #copiloto-options-objectives .cop-dot.red { background: var(--cop-red); }
+    #copiloto-options-objectives .cop-list b { font-weight: 500; }
+    #copiloto-options-objectives .cop-list span { color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-candidates { display: grid; gap: 8px; }
+    #copiloto-options-objectives .cop-candidate {
+      display: grid;
+      grid-template-columns: minmax(78px, .55fr) repeat(3, minmax(0, .7fr));
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--cop-line);
+    }
+    #copiloto-options-objectives .cop-candidate:last-child { border-bottom: 0; }
+    #copiloto-options-objectives .cop-candidate strong { font-weight: 500; }
+    #copiloto-options-objectives .cop-candidate span { color: var(--cop-muted); font-variant-numeric: tabular-nums; }
+    #copiloto-options-objectives .cop-candidate .cop-choice { color: var(--cop-yellow); }
+    #copiloto-options-objectives .cop-method {
+      margin: 0 20px 20px;
+      padding: 17px;
+      background: var(--cop-shell);
+      border: 1px solid var(--cop-line);
+      border-radius: 14px;
+    }
+    #copiloto-options-objectives .cop-method h3 { margin: 0 0 8px; font-size: 1rem; font-weight: 500; }
+    #copiloto-options-objectives .cop-method p { margin: 6px 0; color: var(--cop-muted); }
+    #copiloto-options-objectives .cop-method b { color: var(--cop-text); font-weight: 500; }
+    #copiloto-options-objectives .cop-warning { color: var(--cop-yellow); }
+    #copiloto-options-objectives .cop-footer { padding: 0 20px 18px; color: var(--cop-muted); }
+
+    @media (max-width: 720px) {
+      #copiloto-options-objectives .cop-report { grid-template-columns: 1fr; }
+      #copiloto-options-objectives .cop-ticker-row { grid-template-columns: 1fr; }
+      #copiloto-options-objectives .cop-validation-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #copiloto-options-objectives .cop-capture { grid-template-columns: auto 1fr; }
+      #copiloto-options-objectives .cop-source-actions { grid-column: 1 / -1; justify-items: start; text-align: left; }
+    }
+    @media (max-width: 480px) {
+      #copiloto-options-objectives .cop-header,
+      #copiloto-options-objectives .cop-import,
+      #copiloto-options-objectives .cop-capture,
+      #copiloto-options-objectives .cop-controls,
+      #copiloto-options-objectives .cop-report,
+      #copiloto-options-objectives .cop-footer { padding-left: 13px; padding-right: 13px; }
+      #copiloto-options-objectives .cop-method { margin-left: 13px; margin-right: 13px; }
+      #copiloto-options-objectives .cop-step { grid-template-columns: 28px minmax(0, 1fr); gap: 9px; }
+      #copiloto-options-objectives .cop-demo-label { display: none; }
+      #copiloto-options-objectives .cop-control-actions { width: 100%; }
+      #copiloto-options-objectives .cop-control-actions button { flex: 1 1 0; }
+      #copiloto-options-objectives .cop-metrics { grid-template-columns: 1fr; }
+      #copiloto-options-objectives .cop-image-preview { grid-template-columns: 1fr; }
+      #copiloto-options-objectives .cop-validation-grid { grid-template-columns: 1fr; }
+      #copiloto-options-objectives .cop-candidate { grid-template-columns: 1fr; }
+      #copiloto-options-objectives h2,
+      #copiloto-options-objectives p,
+      #copiloto-options-objectives li,
+      #copiloto-options-objectives span,
+      #copiloto-options-objectives strong,
+      #copiloto-options-objectives .cop-eyebrow {
+        max-width: 100%;
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+      }
+    }
+  </style>
+
+  <header class="cop-header">
+    <div class="cop-brand">
+      <div class="cop-lights" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div><strong>Copiloto de Opciones</strong><small>De una cadena a un criterio entendible</small></div>
+    </div>
+    <div class="cop-demo-label">EDUCATIVO</div>
+  </header>
+
+  <section class="cop-import" aria-label="Ingreso de la cadena de opciones">
+    <div class="cop-step" data-step="1">
+      <span class="cop-step-number" aria-hidden="true">1</span>
+      <div class="cop-step-body">
+        <h2>Selecciona el ticker</h2>
+        <p>Escribe el símbolo de la empresa. La cadena correcta de TradingView aparecerá a continuación.</p>
+        <div class="cop-ticker-row">
+          <label class="cop-ticker-field" for="cop-ticker-input"><span>Ticker de la acción</span><input id="cop-ticker-input" list="cop-ticker-options" value="" maxlength="8" autocomplete="off" placeholder="Ej. AAPL"></label>
+          <datalist id="cop-ticker-options">
+            <option value="AAPL"></option><option value="MSFT"></option><option value="NVDA"></option><option value="AMZN"></option><option value="GOOGL"></option><option value="META"></option><option value="TSLA"></option><option value="AMD"></option><option value="KO"></option><option value="JPM"></option><option value="XOM"></option><option value="CVX"></option><option value="BP"></option><option value="B"></option>
+          </datalist>
+          <a class="cop-selected-link" id="cop-selected-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Abrir la cadena en TradingView ↗</a>
+        </div>
+      </div>
+    </div>
+    <div class="cop-step" data-step="2">
+      <span class="cop-step-number" aria-hidden="true">2</span>
+      <div class="cop-step-body">
+        <h2>Copia la cadena completa y pégala aquí</h2>
+        <p>En TradingView elige el vencimiento, selecciona ±10 strikes y copia toda la tabla. También puedes pegar una captura. Hazlo con el mercado abierto para obtener precios recientes.</p>
+        <div class="cop-input-actions">
+          <button type="button" id="cop-file-button" disabled>Elegir captura</button>
+          <input class="cop-file-input" id="cop-file-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Elegir una captura de la cadena de opciones">
+        </div>
+        <div class="cop-dropzone" id="cop-dropzone">
+          <input class="cop-paste-catcher" id="cop-paste-input" type="text" readonly disabled aria-label="Pegar la cadena de opciones" placeholder="Selecciona un ticker">
+          <div class="cop-import-hint">Puedes pegar el texto completo o una captura con Ctrl+V. La información se procesa en este navegador y no se almacena.</div>
+        </div>
+        <div class="cop-image-preview" id="cop-image-preview" hidden>
+          <img id="cop-preview-image" alt="Vista previa de la captura seleccionada">
+          <button type="button" id="cop-remove-image">Quitar captura</button>
+        </div>
+      </div>
+    </div>
+    <div class="cop-step" data-step="3">
+      <span class="cop-step-number" aria-hidden="true">3</span>
+      <div class="cop-step-body">
+        <h2>Analiza la cadena</h2>
+        <p>Cuando veas que la información fue recibida, presiona el botón para comparar los strikes según tu objetivo.</p>
+        <button type="button" id="cop-analyze" disabled>Analizar cadena</button>
+        <div class="cop-import-status" id="cop-import-status" data-tone="ready" aria-live="polite">Paso 1: selecciona un ticker para comenzar.</div>
+        <div class="cop-validation" id="cop-validation" hidden aria-live="polite">
+          <strong>Datos detectados</strong>
+          <div class="cop-validation-grid">
+            <div class="cop-validation-item"><span>Ticker</span><b id="cop-detected-ticker">—</b></div>
+            <div class="cop-validation-item"><span>Último precio</span><b id="cop-detected-last">—</b></div>
+            <div class="cop-validation-item"><span>Vencimiento</span><b id="cop-detected-expiry">—</b></div>
+            <div class="cop-validation-item"><span>Días</span><b id="cop-detected-dte">—</b></div>
+            <div class="cop-validation-item"><span>Strikes utilizables</span><b id="cop-detected-contracts">—</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cop-capture" aria-label="Captura analizada">
+    <div class="cop-file-icon" id="cop-file-icon" aria-hidden="true">B</div>
+    <div class="cop-file"><strong id="cop-source-title">Cadena completa de opciones · NYSE:B</strong><span id="cop-source-meta">18 sep 2026 · 20 días · último USD 45,65</span></div>
+    <div class="cop-source-actions">
+      <div class="cop-private" id="cop-private">Demostración · sin conexión a una cuenta</div>
+      <a class="cop-source-link" id="cop-source-link" href="https://www.tradingview.com/symbols/NYSE-B/options-chain/" target="_blank" rel="noopener noreferrer">Abrir la cadena de NYSE:B en TradingView ↗</a>
+    </div>
+  </section>
+
+  <section class="cop-controls" aria-label="Configuración del análisis">
+    <div class="cop-control-group">
+      <span class="cop-control-label">Tipo de operación</span>
+      <div class="cop-control-actions" role="group" aria-label="Tipo de opción">
+        <button type="button" data-type="put" aria-pressed="true">PUT</button>
+        <button type="button" data-type="call" aria-pressed="false">CALL</button>
+      </div>
+    </div>
+    <label class="cop-control-group" for="cop-objective">
+      <span class="cop-control-label">¿Qué quieres priorizar?</span>
+      <select id="cop-objective" aria-label="Objetivo de la operación"></select>
+    </label>
+  </section>
+
+  <section class="cop-report" aria-live="polite">
+    <main class="cop-main">
+      <article class="cop-hero">
+        <div class="cop-eyebrow">Mejor coincidencia visible con el objetivo</div>
+        <h2 id="cop-title"></h2>
+        <p class="cop-summary" id="cop-summary"></p>
+        <div class="cop-status" id="cop-status" data-tone="yellow">
+          <strong id="cop-status-title"></strong>
+          <span id="cop-status-copy"></span>
+        </div>
+        <div class="cop-metrics">
+          <div class="cop-metric"><span>Mark de referencia</span><strong id="cop-mark"></strong><small id="cop-premium"></small></div>
+          <div class="cop-metric"><span id="cop-effective-label"></span><strong id="cop-effective"></strong><small id="cop-capital"></small></div>
+          <div class="cop-metric"><span>Retorno anualizado teórico</span><strong id="cop-annual"></strong><small id="cop-period"></small></div>
+        </div>
+      </article>
+
+      <section class="cop-box">
+        <h3>Comparación de strikes visibles</h3>
+        <div class="cop-candidates" id="cop-candidates" role="list"></div>
+      </section>
+    </main>
+
+    <aside class="cop-aside">
+      <section class="cop-box">
+        <h3 id="cop-why-title"></h3>
+        <ul class="cop-list" id="cop-why"></ul>
+      </section>
+      <section class="cop-box">
+        <h3>Antes de operar</h3>
+        <ul class="cop-list" id="cop-checks"></ul>
+      </section>
+    </aside>
+  </section>
+
+  <section class="cop-method" aria-label="Criterio y límites del cálculo">
+    <h3>Criterio de selección y cálculo</h3>
+    <p id="cop-criterion"></p>
+    <p id="cop-formula"></p>
+    <p><b>Mark:</b> la aplicación usa el valor que TradingView muestra en esa columna. Suele estar cerca del punto medio entre bid y ask, pero no garantiza una ejecución. Si la captura también contiene bid y ask, se utiliza el spread para validar la calidad del precio; si no, se muestra una advertencia.</p>
+    <p class="cop-warning"><b>Importante:</b> el porcentaje anualizado es una referencia teórica. Supone repetir operaciones equivalentes sin intervalos durante el año. En la práctica puede haber meses sin una entrada válida, asignaciones, cierres anticipados y cambios de prima; además, el cálculo no incluye comisiones, impuestos ni la variación de las acciones.</p>
+  </section>
+
+  <footer class="cop-footer">Herramienta exclusivamente educativa. Explica criterios y escenarios; no genera recomendaciones personalizadas ni envía órdenes.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+  <script>
+    (() => {
+      const root = document.getElementById('copiloto-options-objectives');
+      const $ = (selector) => root.querySelector(selector);
+      const typeButtons = Array.from(root.querySelectorAll('[data-type]'));
+      const objectiveSelect = $('#cop-objective');
+      const pasteInput = $('#cop-paste-input');
+      const fileInput = $('#cop-file-input');
+      const dropzone = $('#cop-dropzone');
+      const tickerInput = $('#cop-ticker-input');
+      const selectedLink = $('#cop-selected-link');
+      const fileButton = $('#cop-file-button');
+      const analyzeButton = $('#cop-analyze');
+
+      const definitions = {
+        put: {
+          label: 'PUT',
+          objectives: [
+            { value: 'premium', label: 'Conservar la prima', min: 0.10, max: 0.20, band: '0,10–0,20', target: 'reducir la exposición a una asignación', summary: 'Busca más distancia por debajo del precio actual y acepta una prima menor.', criterion: 'Se priorizan PUT fuera del dinero con Delta absoluta entre 0,10 y 0,20. Dentro del rango, se favorecen la distancia al precio actual y una ejecución razonable.' },
+            { value: 'balance', label: 'Equilibrio', min: 0.21, max: 0.35, band: '0,21–0,35', target: 'equilibrar prima y distancia', summary: 'Acepta una posibilidad relativa de asignación mayor a cambio de una prima superior.', criterion: 'Se buscan PUT con Delta absoluta entre 0,21 y 0,35. El objetivo es equilibrar ingreso, distancia y calidad de ejecución.' },
+            { value: 'assignment', label: 'Comprar las acciones si asignan', min: 0.40, max: 0.60, band: '0,40–0,60', target: 'cobrar prima con intención real de compra', summary: 'Prioriza una prima mayor y un strike cercano al mercado, siempre que quieras comprar las acciones a ese precio.', criterion: 'Se buscan PUT cercanas al dinero con Delta absoluta entre 0,40 y 0,60. El strike solo puede seleccionarse si aceptarías comprar 100 acciones a ese precio.' }
+          ]
+        },
+        call: {
+          label: 'CALL',
+          objectives: [
+            { value: 'shares', label: 'Conservar las acciones', min: 0.10, max: 0.20, band: '0,10–0,20', target: 'reducir la exposición a una asignación', summary: 'Busca más distancia por encima del precio actual y acepta una prima menor.', criterion: 'Se priorizan CALL fuera del dinero con Delta entre 0,10 y 0,20. Dentro del rango, se favorecen la distancia al precio actual y una ejecución razonable.' },
+            { value: 'balance', label: 'Equilibrio', min: 0.21, max: 0.35, band: '0,21–0,35', target: 'equilibrar prima y recorrido de las acciones', summary: 'Acepta una posibilidad relativa de asignación mayor a cambio de una prima superior.', criterion: 'Se buscan CALL con Delta entre 0,21 y 0,35. El objetivo es equilibrar ingreso, recorrido adicional de las acciones y calidad de ejecución.' },
+            { value: 'assignment', label: 'Vender las acciones si asignan', min: 0.40, max: 0.60, band: '0,40–0,60', target: 'cobrar prima con intención real de venta', summary: 'Prioriza una prima mayor y un strike cercano al mercado, siempre que quieras vender las acciones a ese precio.', criterion: 'Se buscan CALL cercanas al dinero con Delta entre 0,40 y 0,60. El strike solo puede seleccionarse si aceptarías vender 100 acciones a ese precio.' }
+          ]
+        }
+      };
+
+      const demoMarket = {
+        ticker: 'B', exchange: 'NYSE', last: 45.65, expiry: '18 sep 2026', dte: 20, source: 'demo', isDemo: true,
+        contracts: {
+          put: [
+            { strike: 42, delta: -0.18, mark: 0.42, bid: 0.31, ask: 0.53, volume: 0 },
+            { strike: 43, delta: -0.26, mark: 0.75, bid: 0.68, ask: 0.82, volume: 0 },
+            { strike: 44, delta: -0.34, mark: 1.145, bid: 1.08, ask: 1.21, volume: 0 },
+            { strike: 46, delta: -0.51, mark: 2.07, bid: 1.88, ask: 2.26, volume: 0 }
+          ],
+          call: [
+            { strike: 46, delta: 0.49, mark: 1.675, bid: 1.59, ask: 1.76, volume: 0 },
+            { strike: 49, delta: 0.25, mark: 0.65, bid: 0.50, ask: 0.80, volume: 0 },
+            { strike: 50, delta: 0.21, mark: 0.53, bid: 0.45, ask: 0.61, volume: 0 },
+            { strike: 51, delta: 0.16, mark: 0.40, bid: 0.34, ask: 0.46, volume: 0, position: true }
+          ]
+        }
+      };
+
+      let market = JSON.parse(JSON.stringify(demoMarket));
+      let type = 'put';
+      let objective = 'premium';
+      let previewUrl = '';
+      let pendingInput = null;
+
+      function usd(value, digits = 2) {
+        return `USD ${value.toLocaleString('es-AR', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+      }
+      function pct(value) {
+        return `${value.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+      }
+      function delta(value) {
+        return value.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      function plainNumber(value) {
+        if (typeof value === 'number') return value;
+        const normalized = String(value || '').replace(/−/g, '-').replace(/%/g, '').replace(/\s/g, '').replace(',', '.');
+        const parsed = Number.parseFloat(normalized);
+        return Number.isFinite(parsed) ? parsed : NaN;
+      }
+      function pairValues(value) {
+        const parts = String(value || '').replace(/−/g, '-').split(/[×xX]/).map(plainNumber);
+        if (parts.length !== 2 || !parts.every(Number.isFinite)) return null;
+        if (parts[0] < 0 || parts[1] <= 0 || parts[1] < parts[0]) return null;
+        return { bid: parts[0], ask: parts[1], mark: (parts[0] + parts[1]) / 2 };
+      }
+      function exchangeFor(ticker) {
+        const nasdaq = new Set(['AAPL', 'MSFT', 'NVDA', 'AMZN', 'GOOGL', 'GOOG', 'META', 'TSLA', 'AMD', 'NFLX', 'INTC', 'CSCO']);
+        return nasdaq.has(ticker) ? 'NASDAQ' : 'NYSE';
+      }
+      function selectedTicker() {
+        return String(tickerInput.value || '').trim().toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 8);
+      }
+      function updateTickerSelection() {
+        const ticker = selectedTicker();
+        if (tickerInput.value !== ticker) tickerInput.value = ticker;
+        const previousTicker = selectedLink.dataset.ticker || '';
+        if (previousTicker && ticker !== previousTicker && pendingInput) clearPendingInput();
+        selectedLink.dataset.ticker = ticker;
+        const valid = /^[A-Z][A-Z0-9.]{0,7}$/.test(ticker);
+        pasteInput.disabled = !valid;
+        fileButton.disabled = !valid;
+        selectedLink.hidden = !valid;
+        if (!valid) {
+          selectedLink.removeAttribute('href');
+          pasteInput.placeholder = 'Selecciona un ticker';
+          analyzeButton.disabled = true;
+          status('Paso 1: selecciona un ticker para comenzar.', 'ready');
+          return;
+        }
+        const exchange = exchangeFor(ticker);
+        const link = `https://www.tradingview.com/symbols/${exchange}-${ticker}/options-chain/`;
+        selectedLink.href = link;
+        selectedLink.textContent = `Abrir ${ticker} en TradingView ↗`;
+        pasteInput.placeholder = 'Haz clic aquí y pega la tabla o la captura (Ctrl+V)';
+        analyzeButton.disabled = !pendingInput;
+        status(pendingInput ? 'Información recibida. Paso 3: presiona “Analizar cadena”.' : 'Paso 2: abre TradingView, copia la cadena completa y pégala en el recuadro.', 'ready');
+      }
+      function status(message, tone = 'ready') {
+        const node = $('#cop-import-status');
+        node.textContent = message;
+        node.dataset.tone = tone;
+      }
+      function metrics(contract, currentType) {
+        const premium = contract.mark * 100;
+        const base = currentType === 'put' ? contract.strike * 100 : market.last * 100;
+        const period = premium / base * 100;
+        const annual = period * (365 / market.dte);
+        const effective = currentType === 'put' ? contract.strike - contract.mark : contract.strike + contract.mark;
+        const hasSpread = Number.isFinite(contract.bid) && Number.isFinite(contract.ask) && contract.ask >= contract.bid;
+        const spread = hasSpread && contract.mark > 0 ? (contract.ask - contract.bid) / contract.mark * 100 : NaN;
+        const distance = currentType === 'put' ? (market.last - contract.strike) / market.last * 100 : (contract.strike - market.last) / market.last * 100;
+        return { premium, base, period, annual, effective, spread, distance, hasSpread };
+      }
+      function optionFor(value) {
+        return definitions[type].objectives.find((item) => item.value === value) || definitions[type].objectives[0];
+      }
+      function selectedContract(goal) {
+        const contracts = market.contracts[type].filter((item) => Number.isFinite(item.mark) && item.mark > 0 && Number.isFinite(item.delta));
+        const inside = contracts.filter((item) => Math.abs(item.delta) >= goal.min && Math.abs(item.delta) <= goal.max);
+        const pool = inside.length ? inside : contracts;
+        const target = (goal.min + goal.max) / 2;
+        return pool.slice().sort((a, b) => {
+          const aSpread = a.mark && Number.isFinite(a.ask) && Number.isFinite(a.bid) ? Math.max(0, (a.ask - a.bid) / a.mark) : 0.25;
+          const bSpread = b.mark && Number.isFinite(b.ask) && Number.isFinite(b.bid) ? Math.max(0, (b.ask - b.bid) / b.mark) : 0.25;
+          return (Math.abs(Math.abs(a.delta) - target) + aSpread * 0.02) - (Math.abs(Math.abs(b.delta) - target) + bSpread * 0.02);
+        })[0];
+      }
+      function dot(tone = '') {
+        return `<span class="cop-dot ${tone}" aria-hidden="true"></span>`;
+      }
+      function rebuildObjectives() {
+        objectiveSelect.innerHTML = definitions[type].objectives.map((item) => `<option value="${item.value}">${item.label}</option>`).join('');
+        objective = definitions[type].objectives[0].value;
+        objectiveSelect.value = objective;
+      }
+      function updateSource() {
+        const sourceLabel = market.source === 'image' ? 'Captura analizada' : market.source === 'text' ? 'Texto analizado' : 'Cadena demostrativa';
+        $('#cop-file-icon').textContent = market.ticker.slice(0, 2);
+        $('#cop-source-title').textContent = `${sourceLabel} · ${market.exchange}:${market.ticker}`;
+        $('#cop-source-meta').textContent = `${market.expiry} · ${market.dte} días · ${market.lastEstimated ? 'precio aproximado' : 'último'} ${usd(market.last)}`;
+        $('#cop-private').textContent = market.source === 'image' ? 'Imagen procesada localmente · no almacenada' : market.source === 'text' ? 'Texto procesado localmente · no almacenado' : 'Demostración · sin conexión a una cuenta';
+        const link = `https://www.tradingview.com/symbols/${market.exchange}-${market.ticker}/options-chain/`;
+        $('#cop-source-link').href = link;
+        $('#cop-source-link').textContent = `Abrir la cadena de ${market.exchange}:${market.ticker} en TradingView ↗`;
+      }
+      function updateValidation() {
+        $('#cop-validation').hidden = false;
+        $('#cop-detected-ticker').textContent = `${market.exchange}:${market.ticker}`;
+        $('#cop-detected-last').textContent = `${market.lastEstimated ? '≈ ' : ''}${usd(market.last)}`;
+        $('#cop-detected-expiry').textContent = market.expiry;
+        $('#cop-detected-dte').textContent = String(market.dte);
+        $('#cop-detected-contracts').textContent = `${market.contracts.call.length} CALL · ${market.contracts.put.length} PUT`;
+      }
+      function render() {
+        const group = definitions[type];
+        const goal = optionFor(objective);
+        const contract = selectedContract(goal);
+        updateSource();
+        if (!contract) {
+          status(`No hay suficientes contratos ${group.label} utilizables. Pega una cadena más completa.`, 'error');
+          return;
+        }
+        const m = metrics(contract, type);
+        const absDelta = Math.abs(contract.delta);
+        const deltaLabel = type === 'put' ? `−${delta(absDelta)}` : delta(absDelta);
+        const isWide = m.hasSpread && m.spread > 20;
+
+        typeButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.type === type)));
+        $('#cop-title').textContent = `${group.label} ${String(contract.strike).replace('.', ',')} · Delta ${deltaLabel}`;
+        $('#cop-summary').textContent = `${goal.summary} Este strike queda ${pct(m.distance)} ${type === 'put' ? 'debajo' : 'encima'} del último precio.`;
+        $('#cop-mark').textContent = usd(contract.mark);
+        $('#cop-premium').textContent = `${usd(m.premium, 0)} por contrato`;
+        $('#cop-effective-label').textContent = type === 'put' ? 'Compra efectiva si asignan' : 'Venta efectiva si asignan';
+        $('#cop-effective').textContent = usd(m.effective);
+        $('#cop-capital').textContent = type === 'put' ? `${usd(m.base, 0)} de efectivo inmovilizado` : `${usd(m.base, 0)} de valor actual de 100 acciones`;
+        $('#cop-annual').textContent = pct(m.annual);
+        $('#cop-period').textContent = `${pct(m.period)} en ${market.dte} días · anualización simple`;
+
+        const reportStatus = $('#cop-status');
+        if (contract.position) {
+          reportStatus.dataset.tone = 'red';
+          $('#cop-status-title').textContent = 'El strike coincide con el objetivo, pero ya aparece una posición abierta';
+          $('#cop-status-copy').textContent = 'Antes de vender otra CALL hay que conocer cuántas acciones están disponibles y cuántos contratos ya las cubren.';
+        } else if (!m.hasSpread) {
+          reportStatus.dataset.tone = 'yellow';
+          $('#cop-status-title').textContent = 'El strike coincide por Delta; el spread no está disponible';
+          $('#cop-status-copy').textContent = 'TradingView sí muestra el mark, que permite comparar strikes, pero hay que comprobar bid y ask con el mercado abierto antes de enviar una orden.';
+        } else if (isWide) {
+          reportStatus.dataset.tone = 'red';
+          $('#cop-status-title').textContent = 'Coincide por Delta, pero el precio de ejecución requiere cautela';
+          $('#cop-status-copy').textContent = 'El spread visible es amplio. El mark sirve como referencia, no como precio garantizado de cierre.';
+        } else {
+          reportStatus.dataset.tone = 'yellow';
+          $('#cop-status-title').textContent = 'Coincide con el objetivo; todavía requiere validación';
+          $('#cop-status-copy').textContent = 'Hay que confirmar liquidez, vigencia de los precios y que el strike sea aceptable antes de crear una orden limitada.';
+        }
+
+        $('#cop-why-title').textContent = `Por qué eligió la ${group.label} ${String(contract.strike).replace('.', ',')}`;
+        $('#cop-why').innerHTML = [
+          `<li>${dot('green')}<div><b>Delta ${deltaLabel}:</b> <span>está dentro o es la mejor aproximación al rango ${goal.band} definido para ${goal.target}.</span></div></li>`,
+          `<li>${dot('green')}<div><b>Relación con el mercado:</b> <span>el strike queda ${pct(m.distance)} ${type === 'put' ? 'debajo' : 'encima'} de ${usd(market.last)}.</span></div></li>`,
+          `<li>${dot('green')}<div><b>Prima de referencia:</b> <span>el mark representa ${usd(m.premium, 0)} por contrato antes de costos.</span></div></li>`
+        ].join('');
+
+        const positionCheck = contract.position
+          ? `<li>${dot('red')}<div><b>Cobertura:</b> <span>la captura marca una posición existente; no debe duplicarse sin verificar las 100 acciones por contrato.</span></div></li>`
+          : '';
+        const sourceCheck = market.isDemo
+          ? 'la demostración utiliza una captura histórica. Una operación real exige precios actuales.'
+          : 'la aplicación no puede comprobar el horario desde el contenido pegado. Confirma que los precios sean de la sesión regular y tengan una hora reciente.';
+        $('#cop-checks').innerHTML = [
+          positionCheck,
+          `<li>${dot(isWide ? 'red' : '')}<div><b>Ejecución:</b> <span>${!m.hasSpread ? 'la captura no contiene bid y ask. El mark permite comparar, pero no confirma que exista una orden ejecutable a ese precio.' : isWide ? 'el spread es amplio y puede impedir una ejecución cercana al mark.' : 'el spread es relativamente más contenido, pero el mark sigue sin garantizar ejecución.'}</span></div></li>`,
+          `<li>${dot(contract.volume > 0 ? 'green' : '')}<div><b>Liquidez:</b> <span>${contract.volume > 0 ? `la fila muestra volumen ${contract.volume}; todavía conviene comprobar el interés abierto.` : 'no se detectó volumen ni interés abierto suficientes; hay que verificarlos.'}</span></div></li>`,
+          `<li>${dot()}<div><b>Vigencia:</b> <span>${sourceCheck}</span></div></li>`
+        ].filter(Boolean).join('');
+
+        const target = (goal.min + goal.max) / 2;
+        const candidates = market.contracts[type].slice().sort((a, b) => Math.abs(Math.abs(a.delta) - target) - Math.abs(Math.abs(b.delta) - target)).slice(0, 5).sort((a, b) => a.strike - b.strike);
+        $('#cop-candidates').innerHTML = candidates.map((item) => {
+          const cm = metrics(item, type);
+          const chosen = item.strike === contract.strike;
+          const itemDelta = type === 'put' ? `−${delta(Math.abs(item.delta))}` : delta(item.delta);
+          return `<div class="cop-candidate" role="listitem"><strong>${group.label} ${String(item.strike).replace('.', ',')}${item.position ? ' · POS' : ''}</strong><span>Delta ${itemDelta}</span><span>Mark ${usd(item.mark)}</span><span class="${chosen ? 'cop-choice' : ''}">${chosen ? 'Elegida · ' : ''}${pct(cm.annual)} anual teórico</span></div>`;
+        }).join('');
+
+        const factor = 365 / market.dte;
+        $('#cop-criterion').innerHTML = `<b>${goal.label}:</b> ${goal.criterion}`;
+        $('#cop-formula').innerHTML = type === 'put'
+          ? `<b>Cálculo:</b> prima al mark ÷ (strike × 100) × (365 ÷ ${market.dte}). Para esta PUT: ${usd(m.premium, 0)} ÷ ${usd(m.base, 0)} × ${factor.toLocaleString('es-AR', { maximumFractionDigits: 2 })} = ${pct(m.annual)}.`
+          : `<b>Cálculo:</b> prima al mark ÷ valor actual de 100 acciones × (365 ÷ ${market.dte}). Para esta CALL: ${usd(m.premium, 0)} ÷ ${usd(m.base, 0)} × ${factor.toLocaleString('es-AR', { maximumFractionDigits: 2 })} = ${pct(m.annual)}. No incluye la ganancia o pérdida de las acciones.`;
+      }
+
+      function inferDte(expiryLabel) {
+        const match = String(expiryLabel || '').match(/(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2})(?:\s+(\d{4}))?/i);
+        if (!match) return NaN;
+        const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+        const now = new Date();
+        const month = months[match[1].slice(0, 3).toLowerCase()];
+        let year = match[3] ? Number(match[3]) : now.getFullYear();
+        let expiry = new Date(year, month, Number(match[2]), 23, 59, 59);
+        if (!match[3] && expiry < now) expiry = new Date(year + 1, month, Number(match[2]), 23, 59, 59);
+        return Math.max(1, Math.ceil((expiry - now) / 86400000));
+      }
+      function metadataFromText(compact) {
+        const exchangeTicker = compact.match(/\b(NYSE|NASDAQ|AMEX|ARCA)\s*:\s*([A-Z.]{1,8})\b/i);
+        const tickerPrice = compact.match(/\b([A-Z]{1,6})\s+(?:Pre-market\s+|Market open\s+)?(\d{1,6}(?:[.,]\d+)?)\s+USD\b/i);
+        const tickerHint = selectedTicker();
+        const ticker = String(tickerHint || exchangeTicker?.[2] || tickerPrice?.[1] || '').toUpperCase();
+        const exchange = String(tickerHint ? exchangeFor(ticker) : exchangeTicker?.[1] || exchangeFor(ticker)).toUpperCase();
+        let last = plainNumber(tickerPrice?.[2]);
+        if (!Number.isFinite(last)) {
+          const underlying = compact.match(/\b(\d{1,5}(?:[.,]\d{2,4}))\s+USD\b/i);
+          last = plainNumber(underlying?.[1]);
+        }
+        const withDte = compact.match(/((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:\s+\d{4})?)\s+(\d+)\s*DTE/i);
+        const dateOnly = compact.match(/((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:\s+\d{4})?)/i);
+        const tosExpiry = compact.match(/(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})\s+\(?\s*(\d+)\s*\)?/i);
+        const expiry = withDte?.[1] || tosExpiry?.[1] || dateOnly?.[1] || '';
+        const dte = Math.round(plainNumber(withDte?.[2] || tosExpiry?.[2])) || inferDte(expiry);
+        return { ticker, exchange, last, expiry, dte };
+      }
+      function normalizeStrike(strike, last) {
+        let value = plainNumber(strike);
+        if (Number.isFinite(last) && value > last * 3 && value < last * 20) value /= 10;
+        return value;
+      }
+      function rowsFromHtml(rawHtml, last) {
+        if (!rawHtml || !/<table|<tr|<td/i.test(rawHtml)) return [];
+        const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
+        const rows = [];
+        doc.querySelectorAll('tr').forEach((rowNode) => {
+          const cells = Array.from(rowNode.querySelectorAll('td,th')).map((cell) => (cell.innerText || cell.textContent || '').replace(/\s+/g, ' ').trim());
+          if (cells.length < 15) return;
+          const strike = normalizeStrike(cells[7], last);
+          const callDelta = plainNumber(cells[0]);
+          const putDelta = plainNumber(cells[14]);
+          if (!Number.isFinite(strike) || !Number.isFinite(callDelta) || !Number.isFinite(putDelta)) return;
+          rows.push({
+            strike,
+            callDelta,
+            putDelta,
+            callMark: plainNumber(cells[3]),
+            putMark: plainNumber(cells[11]),
+            callPair: pairValues(cells[4]),
+            putPair: pairValues(cells[10]),
+            callVolume: Math.max(0, Math.round(plainNumber(cells[6]) || 0)),
+            putVolume: Math.max(0, Math.round(plainNumber(cells[8]) || 0))
+          });
+        });
+        return rows;
+      }
+      function rowsFromText(compact, last) {
+        const num = '[-−]?\\d+(?:[.,]\\d+)?';
+        const pair = `(?:—|--|–|=|${num})\\s*[×xX*]\\s*(?:—|--|–|=|${num})`;
+        const rowPattern = new RegExp(`(${num})\\s+(${num})\\s+(${num})%\\s+(${num})\\s+(${pair})\\s+(${num})\\s+(${num})\\s+(${num})\\s+(${num})\\s+(${num})\\s+(${pair})\\s+(${num})\\s+(${num})%\\s+(${num})\\s+(${num})`, 'g');
+        const rows = [];
+        let match;
+        while ((match = rowPattern.exec(compact)) !== null) {
+          const strike = normalizeStrike(match[8], last);
+          if (!Number.isFinite(strike)) continue;
+          rows.push({
+            strike,
+            callDelta: plainNumber(match[1]),
+            putDelta: plainNumber(match[15]),
+            callMark: plainNumber(match[4]),
+            putMark: plainNumber(match[12]),
+            callPair: pairValues(match[5]),
+            putPair: pairValues(match[11]),
+            callVolume: Math.max(0, Math.round(plainNumber(match[7]) || 0)),
+            putVolume: Math.max(0, Math.round(plainNumber(match[9]) || 0))
+          });
+        }
+        return rows;
+      }
+      function rowsFromOcrLines(rawText, last) {
+        const rows = [];
+        String(rawText || '').split(/\n+/).forEach((line) => {
+          const tokens = line.match(/[-−]?\d+(?:[.,]\d+)?%?/g) || [];
+          if (tokens.length < 10 || !line.includes('%')) return;
+          const values = tokens.map(plainNumber);
+          const callDelta = Math.abs(values[0]);
+          const callBreakEven = values[1];
+          const callMark = values[3];
+          const putMark = values.at(-4);
+          const putBreakEven = values.at(-2);
+          const putDelta = -Math.abs(values.at(-1));
+          if (![callDelta, callBreakEven, callMark, putMark, putBreakEven, putDelta].every(Number.isFinite)) return;
+          if (callDelta > 1.05 || Math.abs(putDelta) > 1.05 || callMark <= 0 || putMark <= 0) return;
+          const fromCall = callBreakEven - callMark;
+          const fromPut = putBreakEven + putMark;
+          const expectedStrike = (fromCall + fromPut) / 2;
+          const tolerance = Math.max(0.35, expectedStrike * 0.015);
+          if (!Number.isFinite(expectedStrike) || expectedStrike <= 0 || Math.abs(fromCall - fromPut) > tolerance * 2) return;
+          const middle = values.slice(4, -4).map((value) => normalizeStrike(value, Number.isFinite(last) ? last : expectedStrike));
+          const visibleStrike = middle.filter((value) => Number.isFinite(value) && Math.abs(value - expectedStrike) <= tolerance).sort((a, b) => Math.abs(a - expectedStrike) - Math.abs(b - expectedStrike))[0];
+          const strike = Number.isFinite(visibleStrike) ? visibleStrike : Math.round(expectedStrike * 2) / 2;
+          rows.push({ strike, callDelta, putDelta, callMark, putMark, callPair: null, putPair: null, callVolume: 0, putVolume: 0 });
+        });
+        return Array.from(new Map(rows.map((row) => [row.strike, row])).values());
+      }
+      function inferredLastFromRows(rows) {
+        const usable = rows.filter((row) => Number.isFinite(row.strike) && Number.isFinite(row.callDelta) && Number.isFinite(row.putDelta));
+        if (!usable.length) return NaN;
+        const ordered = usable.slice().sort((a, b) => a.strike - b.strike);
+        const signed = ordered.map((row) => ({ row, difference: Math.abs(row.callDelta) - Math.abs(row.putDelta) }));
+        for (let index = 1; index < signed.length; index += 1) {
+          const before = signed[index - 1];
+          const after = signed[index];
+          if (before.difference === 0) return before.row.strike;
+          if (before.difference > 0 && after.difference < 0) {
+            const span = before.difference - after.difference;
+            const weight = span ? before.difference / span : 0.5;
+            return before.row.strike + (after.row.strike - before.row.strike) * weight;
+          }
+        }
+        return signed.slice().sort((a, b) => Math.abs(a.difference) - Math.abs(b.difference))[0].row.strike;
+      }
+      function parseOptionChain(rawText, source, rawHtml = '') {
+        const text = String(rawText || '').replace(/\u00a0/g, ' ').replace(/\r/g, '\n');
+        const compact = text.replace(/\s+/g, ' ').trim();
+        if (!compact && !rawHtml) throw new Error('No encontramos una tabla o imagen para analizar.');
+        const htmlText = rawHtml ? new DOMParser().parseFromString(rawHtml, 'text/html').body.textContent || '' : '';
+        const metaText = `${compact} ${htmlText.replace(/\s+/g, ' ')}`.trim();
+        const meta = metadataFromText(metaText);
+        const htmlRows = rowsFromHtml(rawHtml, meta.last);
+        const lineRows = rowsFromOcrLines(text, meta.last);
+        const flatRows = rowsFromText(compact, meta.last);
+        const rows = htmlRows.length >= 3 ? htmlRows : lineRows.length >= 3 ? lineRows : flatRows;
+        if ((!Number.isFinite(meta.last) || meta.last <= 0) && rows.length) {
+          meta.last = inferredLastFromRows(rows);
+          meta.lastEstimated = Number.isFinite(meta.last);
+        }
+        const calls = [];
+        const puts = [];
+        rows.forEach((item) => {
+          const callMark = item.callPair?.mark > 0 ? item.callPair.mark : item.callMark;
+          const putMark = item.putPair?.mark > 0 ? item.putPair.mark : item.putMark;
+          if (Number.isFinite(callMark) && callMark > 0) calls.push({ strike: item.strike, delta: item.callDelta, mark: callMark, bid: item.callPair?.bid ?? NaN, ask: item.callPair?.ask ?? NaN, volume: item.callVolume });
+          if (Number.isFinite(putMark) && putMark > 0) puts.push({ strike: item.strike, delta: item.putDelta, mark: putMark, bid: item.putPair?.bid ?? NaN, ask: item.putPair?.ask ?? NaN, volume: item.putVolume });
+        });
+
+        if (rows.length >= 3 && calls.length < 3 && puts.length < 3) {
+          throw new Error('La tabla se puede leer, pero no aparecen al menos tres valores de Mark por cada lado. Amplía la tabla a ±10 strikes y repite la captura sin reducir su tamaño.');
+        }
+        if (rows.length < 3) {
+          throw new Error(source === 'text'
+            ? 'TradingView copió la selección sin conservar filas completas. No tienes que corregir ningún texto: pega una captura de la tabla que incluya el vencimiento y los strikes.'
+            : 'No pudimos separar al menos tres strikes. Recorta solamente la tabla, sin reducir su tamaño, y vuelve a pegarla.');
+        }
+        const problems = [];
+        if (!meta.ticker) problems.push('el ticker');
+        if (!Number.isFinite(meta.last) || meta.last <= 0) problems.push('el último precio');
+        if (!meta.expiry || !Number.isFinite(meta.dte) || meta.dte <= 0) problems.push('el vencimiento');
+        if (calls.length < 3 || puts.length < 3) problems.push('tres valores de Mark por cada lado');
+        if (problems.length) throw new Error(`La tabla está visible, pero no pudimos confirmar ${problems.join(', ')}. Incluye el encabezado del vencimiento, el precio de la acción y las columnas completas.`);
+        return { ...meta, source, isDemo: false, contracts: { call: calls, put: puts } };
+      }
+
+      function applyText(text, source = 'text', html = '') {
+        try {
+          const parsed = parseOptionChain(text, source, html);
+          market = parsed;
+          updateValidation();
+          rebuildObjectives();
+          render();
+          const hasSpreads = parsed.contracts.call.some((item) => Number.isFinite(item.bid) && Number.isFinite(item.ask)) && parsed.contracts.put.some((item) => Number.isFinite(item.bid) && Number.isFinite(item.ask));
+          status(`Cadena reconocida: ${parsed.contracts.call.length} CALL y ${parsed.contracts.put.length} PUT con Mark utilizable.${hasSpreads ? '' : ' El spread no está disponible; compruébalo con el mercado abierto antes de operar.'}`, 'success');
+          return true;
+        } catch (error) {
+          status(error.message || 'No pudimos interpretar la cadena.', 'error');
+          return false;
+        }
+      }
+
+      function queueText(text, html = '') {
+        if (!String(text || '').trim() && !html) {
+          status('No encontramos texto ni una imagen en el portapapeles.', 'error');
+          return;
+        }
+        pendingInput = { kind: 'text', text: String(text || ''), html };
+        pasteInput.value = 'Cadena copiada recibida';
+        analyzeButton.disabled = false;
+        status('Información recibida. Paso 3: presiona “Analizar cadena”.', 'ready');
+      }
+
+      function queueImage(file) {
+        if (!file || !file.type.startsWith('image/')) {
+          status('El archivo seleccionado no es una imagen compatible.', 'error');
+          return;
+        }
+        if (file.size > 12 * 1024 * 1024) {
+          status('La imagen supera 12 MB. Recorta solamente la cadena y vuelve a intentarlo.', 'error');
+          return;
+        }
+        pendingInput = { kind: 'image', file };
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        $('#cop-preview-image').src = previewUrl;
+        $('#cop-image-preview').hidden = false;
+        pasteInput.value = 'Captura recibida';
+        analyzeButton.disabled = false;
+        status('Captura recibida. Paso 3: presiona “Analizar cadena”.', 'ready');
+      }
+
+      function clearPendingInput() {
+        pendingInput = null;
+        pasteInput.value = '';
+        analyzeButton.disabled = true;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = '';
+        $('#cop-preview-image').removeAttribute('src');
+        $('#cop-image-preview').hidden = true;
+        fileInput.value = '';
+        status('Paso 2: copia otra cadena completa y pégala en el recuadro.', 'ready');
+      }
+
+      async function prepareImageForOcr(file) {
+        const bitmap = await createImageBitmap(file);
+        const targetWidth = Math.min(2800, Math.max(bitmap.width, 1800));
+        const scale = targetWidth / bitmap.width;
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = 'high';
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        bitmap.close?.();
+        const image = context.getImageData(0, 0, canvas.width, canvas.height);
+        let luminance = 0;
+        for (let index = 0; index < image.data.length; index += 16) {
+          luminance += image.data[index] * 0.2126 + image.data[index + 1] * 0.7152 + image.data[index + 2] * 0.0722;
+        }
+        const samples = image.data.length / 16;
+        const invert = luminance / samples < 115;
+        for (let index = 0; index < image.data.length; index += 4) {
+          let gray = image.data[index] * 0.2126 + image.data[index + 1] * 0.7152 + image.data[index + 2] * 0.0722;
+          if (invert) gray = 255 - gray;
+          gray = Math.max(0, Math.min(255, (gray - 128) * 1.35 + 128));
+          image.data[index] = gray;
+          image.data[index + 1] = gray;
+          image.data[index + 2] = gray;
+        }
+        context.putImageData(image, 0, 0);
+        return canvas;
+      }
+
+      async function processImage(file) {
+        if (!file || !file.type.startsWith('image/')) {
+          status('El archivo seleccionado no es una imagen compatible.', 'error');
+          return;
+        }
+        if (file.size > 12 * 1024 * 1024) {
+          status('La imagen supera 12 MB. Recorta solamente la cadena y vuelve a intentarlo.', 'error');
+          return;
+        }
+        status('Leyendo la captura en este navegador…', 'working');
+        let worker;
+        try {
+          if (!window.Tesseract) throw new Error('El lector local de imágenes no pudo cargarse. Comprueba la conexión y vuelve a intentarlo.');
+          const prepared = await prepareImageForOcr(file);
+          worker = await window.Tesseract.createWorker('eng', 1, {
+            logger(message) {
+              if (message.status === 'recognizing text') status(`Leyendo la captura… ${Math.round((message.progress || 0) * 100)}%`, 'working');
+            }
+          });
+          await worker.setParameters({ tessedit_pageseg_mode: '6', preserve_interword_spaces: '1' });
+          const result = await worker.recognize(prepared);
+          const recognized = result?.data?.text || '';
+          pasteInput.value = 'Captura recibida';
+          applyText(recognized, 'image');
+        } catch (error) {
+          status(error.message || 'No pudimos leer la captura. Recorta solamente la tabla y vuelve a pegarla.', 'error');
+        } finally {
+          if (worker) await worker.terminate();
+        }
+      }
+
+      typeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          type = button.dataset.type;
+          rebuildObjectives();
+          render();
+        });
+      });
+      objectiveSelect.addEventListener('change', () => {
+        objective = objectiveSelect.value;
+        render();
+      });
+      tickerInput.addEventListener('input', updateTickerSelection);
+      fileButton.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => queueImage(fileInput.files?.[0]));
+      $('#cop-remove-image').addEventListener('click', clearPendingInput);
+      pasteInput.addEventListener('paste', (event) => {
+        event.preventDefault();
+        const imageItem = Array.from(event.clipboardData?.items || []).find((item) => item.type.startsWith('image/'));
+        if (imageItem) {
+          queueImage(imageItem.getAsFile());
+          return;
+        }
+        const html = event.clipboardData?.getData('text/html') || '';
+        const text = event.clipboardData?.getData('text/plain') || '';
+        queueText(text, html);
+      });
+      ['dragenter', 'dragover'].forEach((eventName) => dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropzone.classList.add('is-dragging');
+      }));
+      ['dragleave', 'drop'].forEach((eventName) => dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropzone.classList.remove('is-dragging');
+      }));
+      dropzone.addEventListener('drop', (event) => {
+        const file = Array.from(event.dataTransfer?.files || []).find((item) => item.type.startsWith('image/'));
+        if (file) queueImage(file);
+      });
+      analyzeButton.addEventListener('click', () => {
+        if (!selectedTicker()) {
+          status('Primero selecciona un ticker.', 'error');
+          tickerInput.focus();
+          return;
+        }
+        if (!pendingInput) {
+          status('Todavía no pegaste una cadena o una captura.', 'error');
+          pasteInput.focus();
+          return;
+        }
+        if (pendingInput.kind === 'image') processImage(pendingInput.file);
+        else applyText(pendingInput.text, 'text', pendingInput.html);
+      });
+
+      rebuildObjectives();
+      render();
+      updateTickerSelection();
+    })();
+  </script>
+</section>
+</body>
+</html>
