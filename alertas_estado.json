@@ -1,24 +1,24 @@
 {
-  "updated_iso": "2026-08-29T03:34:09Z",
+  "updated_iso": "2026-09-01T01:04:33Z",
   "states": {
     "ACN": "fail",
     "ADBE": "fail",
-    "GOOGL": "ok",
-    "QCOM": "fail",
-    "META": "fail",
-    "PG": "fail",
+    "GOOGL": "warn",
+    "QCOM": "ok",
     "INTU": "fail",
+    "PG": "fail",
+    "META": "fail",
     "HON": "fail",
     "PEP": "fail",
     "NKE": "fail",
     "IBM": "fail",
     "MSFT": "ok",
+    "NVDA": "ok",
     "JNJ": "ok",
     "V": "ok",
-    "NVDA": "ok",
     "CSCO": "ok",
     "AAPL": "ok",
-    "TXN": "fail",
-    "AVGO": "fail"
+    "TXN": "ok",
+    "AVGO": "warn"
   }
 }
