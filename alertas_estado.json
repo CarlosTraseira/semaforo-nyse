@@ -1,10 +1,10 @@
 {
-  "updated_iso": "2026-09-08T00:03:34Z",
+  "updated_iso": "2026-09-08T23:55:36Z",
   "states": {
     "ACN": "fail",
     "ADBE": "fail",
     "GOOGL": "warn",
-    "QCOM": "warn",
+    "QCOM": "ok",
     "INTU": "fail",
     "PG": "fail",
     "META": "ok",
@@ -19,6 +19,6 @@
     "CSCO": "ok",
     "AAPL": "ok",
     "TXN": "warn",
-    "AVGO": "fail"
+    "AVGO": "warn"
   }
 }
