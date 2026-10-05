@@ -3,45 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Semáforo de Entrada · ¿Qué terreno pisás?</title>
+<title>Semáforo de Entrada · ¿Es buen momento para entrar?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c0c10'/><rect x='11' y='2' width='10' height='28' rx='5' fill='%231a1a24'/><circle cx='16' cy='8' r='4' fill='%2300ff88'/><circle cx='16' cy='16' r='4' fill='%23ffb840'/><circle cx='16' cy='24' r='4' fill='%23ff4070'/></svg>">
 <style>
 :root{
   --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--border:#252538;
-  --text:#f0f0f8;--text2:#9090b0;--text3:#454565;
-  --green:#00ff88;--green-dim:rgba(0,255,136,0.10);--green-glow:rgba(0,255,136,0.25);--green-border:rgba(0,255,136,0.30);
-  --amber:#ffb840;--amber-dim:rgba(255,184,64,0.10);--amber-border:rgba(255,184,64,0.30);
-  --red:#ff4070;--red-dim:rgba(255,64,112,0.10);--red-border:rgba(255,64,112,0.30);
+  --text:#f0f0f8;--text2:#9090b0;--text3:#5a5a7c;
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.10);--green-glow:rgba(0,255,136,0.35);--green-border:rgba(0,255,136,0.30);
+  --amber:#ffb840;--amber-dim:rgba(255,184,64,0.10);--amber-glow:rgba(255,184,64,0.35);--amber-border:rgba(255,184,64,0.30);
+  --red:#ff4070;--red-dim:rgba(255,64,112,0.10);--red-glow:rgba(255,64,112,0.35);--red-border:rgba(255,64,112,0.30);
   --display:'Syne',sans-serif;--mono:'Fira Code',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px}
 body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh;display:flex;flex-direction:column}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 45% at 15% 5%,rgba(99,102,241,0.07) 0%,transparent 60%),radial-gradient(ellipse 55% 40% at 85% 85%,rgba(0,255,136,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
-.app{position:relative;z-index:1;flex:1;max-width:680px;margin:0 auto;padding:36px 20px 0;width:100%}
+.app{position:relative;z-index:1;flex:1;max-width:680px;margin:0 auto;padding:36px 16px 0;width:100%;display:flex;flex-direction:column;gap:16px}
 
 /* Header */
-.header{text-align:center;margin-bottom:26px}
-.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px}
+.header{text-align:center;display:flex;flex-direction:column;gap:12px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px}
 .logo-lights{display:flex;gap:6px;align-items:center}
 .ll{width:13px;height:13px;border-radius:50%}
 .ll.g{background:var(--green);box-shadow:0 0 10px var(--green-glow)}
 .ll.a{background:var(--amber)}
 .ll.r{background:var(--red)}
-.logo-name{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.logo-name{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.05;text-wrap:balance}
 .logo-name span{color:var(--green)}
-.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
-.intro{font-size:16px;color:var(--text2);line-height:1.75;max-width:560px;margin:22px auto 0;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px;text-align:left}
+.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase}
+.intro{font-size:16px;color:var(--text2);line-height:1.75;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px;text-align:left}
 .intro strong{color:var(--text)}
-.intro .lead{display:block;font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
+.intro .lead{display:block;font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
 
-/* Search */
-.search-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:16px}
-.search-label{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;display:block}
+/* Leyenda de las tres luces */
+.legend{display:flex;flex-direction:column;gap:8px}
+.lg{display:grid;grid-template-columns:18px 1fr;gap:12px;align-items:start;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px 15px}
+.lg .dot{width:14px;height:14px;border-radius:50%;margin-top:3px}
+.lg.g .dot{background:var(--green);box-shadow:0 0 8px var(--green-glow)}
+.lg.a .dot{background:var(--amber);box-shadow:0 0 8px var(--amber-glow)}
+.lg.r .dot{background:var(--red);box-shadow:0 0 8px var(--red-glow)}
+.lg b{display:block;font-size:15px;color:var(--text);margin-bottom:2px}
+.lg span{font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.6}
+
+/* Cards e inputs */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:20px}
+.lbl{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:10px}
 .search-row{display:flex;gap:10px}
-.search-input{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;text-transform:uppercase;transition:border-color .2s,box-shadow .2s}
+.search-input{flex:1;min-width:0;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;text-transform:uppercase;transition:border-color .2s,box-shadow .2s}
 .search-input::placeholder{text-transform:none;color:var(--text3)}
 .search-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
 .search-btn{background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:0 24px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
@@ -50,70 +60,99 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
 .chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 11px;cursor:pointer;transition:border-color .15s,color .15s}
 .chip:hover{border-color:var(--green-border);color:var(--green)}
+.search-input:focus-visible,.chip:focus-visible,.search-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 
 /* Loading / error */
-.loading{display:none;text-align:center;padding:40px 0}
+.loading{display:none;text-align:center;padding:30px 0}
 .loading.show{display:block}
 .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading p{font-family:var(--mono);font-size:12px;color:var(--text2)}
-.error-msg{display:none;background:var(--red-dim);border:1px solid var(--red-border);border-radius:12px;padding:16px 18px;font-family:var(--mono);font-size:13px;color:var(--red);line-height:1.6;margin-bottom:16px}
+.error-msg{display:none;background:var(--red-dim);border:1px solid var(--red-border);border-radius:12px;padding:16px 18px;font-family:var(--mono);font-size:13px;color:var(--red);line-height:1.6}
 .error-msg.show{display:block}
-
-/* Results */
-.results{display:none}
-.results.show{display:block}
-.res-ticker{text-align:center;font-family:var(--mono);font-size:13px;color:var(--text2);margin-bottom:14px;letter-spacing:.04em}
-.res-ticker b{color:var(--text);font-size:15px}
-
-/* Summary verdict */
-.verdict{border-radius:16px;padding:24px;margin-bottom:14px;border:1px solid var(--border);background:var(--s1);text-align:center;transition:all .3s}
-.verdict.ok{background:var(--green-dim);border-color:var(--green-border)}
-.verdict.warn{background:var(--amber-dim);border-color:var(--amber-border)}
-.verdict.fail{background:var(--red-dim);border-color:var(--red-border)}
-.verdict-eyebrow{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
-.verdict-title{font-size:clamp(24px,6vw,34px);font-weight:800;line-height:1.1;margin-bottom:10px}
-.verdict.ok .verdict-title{color:var(--green)}
-.verdict.warn .verdict-title{color:var(--amber)}
-.verdict.fail .verdict-title{color:var(--red)}
-.verdict-desc{font-size:14px;color:var(--text2);line-height:1.65;font-family:var(--mono);max-width:520px;margin:0 auto}
-
-/* Aviso instrumento fuera del universo */
-.exotic{display:none;background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:12px;padding:14px 18px;font-family:var(--mono);font-size:12.5px;color:var(--amber);line-height:1.7;margin-bottom:14px}
+.exotic{display:none;font-family:var(--mono);font-size:12px;color:var(--amber);background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:11px;padding:13px 15px;line-height:1.65}
 .exotic.show{display:block}
 
-/* Tarjetas de nivel (clima / ticker) */
-.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-@media(max-width:480px){.tf-grid{grid-template-columns:1fr}}
-.tf-card{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:14px;padding:18px 20px}
-.tf-card.ok{border-left-color:var(--green)}
-.tf-card.warn{border-left-color:var(--amber)}
-.tf-card.fail{border-left-color:var(--red)}
-.tf-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
-.tf-name{font-size:19px;font-weight:800;margin-bottom:12px}
-.lrow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 0;border-top:1px dashed var(--border);font-family:var(--mono);font-size:12px;color:var(--text2)}
-.lval{font-weight:600;white-space:nowrap}
-.lval.ok{color:var(--green)}
-.lval.warn{color:var(--amber)}
-.lval.fail{color:var(--red)}
-.audit{margin-top:12px;padding-top:11px;border-top:1px dashed var(--border);font-family:var(--mono);font-size:11.5px;color:var(--text2);line-height:1.75}
-.audit b{color:var(--text)}
+/* Resultado: el semáforo */
+.results{display:none;flex-direction:column;gap:16px}
+.results.show{display:flex}
+.hero{border-radius:18px;padding:22px;border:1px solid var(--border);background:var(--s1);display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.hero.g{background:var(--green-dim);border-color:var(--green-border)}
+.hero.a{background:var(--amber-dim);border-color:var(--amber-border)}
+.hero.r{background:var(--red-dim);border-color:var(--red-border)}
+.pole{background:#08080b;border:1px solid var(--border);border-radius:34px;padding:12px 10px;display:flex;flex-direction:column;gap:10px}
+.lamp{width:44px;height:44px;border-radius:50%;background:#1e1e2a;opacity:.55;transition:all .3s}
+.hero.g .lamp.g{background:var(--green);opacity:1;box-shadow:0 0 22px var(--green-glow)}
+.hero.a .lamp.a{background:var(--amber);opacity:1;box-shadow:0 0 22px var(--amber-glow)}
+.hero.r .lamp.r{background:var(--red);opacity:1;box-shadow:0 0 22px var(--red-glow)}
+.hero .eyebrow{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px}
+.hero .big{font-size:clamp(26px,6.5vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin-bottom:10px;text-wrap:balance}
+.hero.g .big{color:var(--green)}
+.hero.a .big{color:var(--amber)}
+.hero.r .big{color:var(--red)}
+.hero .where{font-family:var(--mono);font-size:13px;color:var(--text2);line-height:1.65}
+.hero .where b{color:var(--text)}
 
-/* Crosslinks */
-.crosslink{display:block;text-align:center;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-bottom:14px;font-family:var(--display);font-size:14px;font-weight:700;color:var(--green);text-decoration:none;transition:border-color .15s,background .15s}
-.crosslink:hover{border-color:var(--green-border);background:var(--green-dim)}
-.crosslink small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text2);margin-top:4px}
+.todo{border-radius:14px;padding:17px 19px;border:1px solid var(--border);background:var(--s1)}
+.todo h3{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;font-weight:500;margin-bottom:9px}
+.todo p{font-size:15px;color:var(--text2);line-height:1.7}
+.todo p+p{margin-top:8px}
+.todo p b{color:var(--text)}
 
-/* Explainer */
-.explain{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;border-left:3px solid var(--green)}
-.explain.no{border-left-color:var(--red)}
-.explain-title{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.explain p{font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:1.85;margin-bottom:10px}
-.explain p:last-child{margin-bottom:0}
-.explain strong{color:var(--text)}
-.explain .nx{color:var(--red);font-weight:600}
+/* Regla: dónde está el precio respecto de la media */
+.gauge{position:relative;height:18px;border-radius:9px;overflow:hidden;display:flex;margin:0 0 10px}
+.gauge div{height:100%}
+.gz-r{background:linear-gradient(90deg,rgba(255,64,112,.55),rgba(255,64,112,.25))}
+.gz-a{background:rgba(255,184,64,.45)}
+.gz-g{background:linear-gradient(90deg,rgba(0,255,136,.25),rgba(0,255,136,.55))}
+.gwrap{position:relative;padding-top:34px;margin-top:4px}
+.marker{position:absolute;top:0;width:0;height:52px;pointer-events:none}
+.marker .mk-l{position:absolute;top:0;font-family:var(--mono);font-size:11px;color:var(--text);white-space:nowrap;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:2px 7px}
+.marker .mk-p{position:absolute;top:22px;left:-1px;width:2px;height:30px;background:var(--text)}
+.maline{position:absolute;top:34px;width:2px;height:18px;background:#fff;opacity:.6;transform:translateX(-50%)}
+.gscale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--text3)}
+.rows{display:flex;flex-direction:column;margin-top:10px}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2)}
+.row:last-child{border-bottom:none}
+.row small{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.row .rv{font-family:var(--mono);font-size:13px;color:var(--text);text-align:right;font-variant-numeric:tabular-nums}
 
-/* Gate — pantalla de bloqueo */
+/* Evidencia por color */
+.ev h3{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;font-weight:500;margin-bottom:4px}
+.ev .src{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6}
+.evt{width:100%;border-collapse:separate;border-spacing:0 6px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.evt th{font-size:10px;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;text-align:right;padding:0 8px 4px;line-height:1.4;vertical-align:bottom}
+.evt th:first-child{text-align:left}
+.evt td{font-size:14px;color:var(--text2);text-align:right;padding:11px 8px;background:var(--s2)}
+.evt td:first-child{text-align:left;border-radius:9px 0 0 9px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+.evt td:last-child{border-radius:0 9px 9px 0}
+.evt td .d{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.evt tr.g .d{background:var(--green)}.evt tr.a .d{background:var(--amber)}.evt tr.r .d{background:var(--red)}
+.evt tr.on td{color:var(--text)}
+.evt tr.g.on td{background:var(--green-dim)}
+.evt tr.a.on td{background:var(--amber-dim)}
+.evt tr.r.on td{background:var(--red-dim)}
+.evt tr.on td:first-child::after{content:' ← hoy';font-family:var(--mono);font-weight:400;font-size:11px;color:var(--text2)}
+.read{font-size:14px;color:var(--text2);line-height:1.7;margin-top:10px}
+.read b{color:var(--text)}
+
+.note{font-family:var(--mono);font-size:12.5px;line-height:1.7;border-radius:11px;padding:14px 16px;border:1px solid var(--border);background:var(--s2);color:var(--text2)}
+.note b{color:var(--text);font-weight:600}
+
+.crosslink{display:block;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 18px;color:var(--text);text-decoration:none;font-size:15px;font-weight:600;transition:border-color .15s}
+.crosslink:hover{border-color:var(--green-border)}
+.crosslink small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text3);margin-top:4px}
+
+.exp{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:19px 21px;display:flex;flex-direction:column;gap:11px}
+.exp.no{border-color:var(--red-border);background:var(--red-dim)}
+.exp h3{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;font-weight:500}
+.exp p{font-size:14px;color:var(--text2);line-height:1.72}
+.exp p strong{color:var(--text)}
+.exp .nx{color:var(--red);font-weight:600}
+
+footer{position:relative;z-index:1;font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;line-height:1.9;padding:34px 20px 26px;margin-top:20px}
+
+/* Candado */
 .gate{position:fixed;inset:0;z-index:50;background:rgba(8,8,12,0.94);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
 .gate.show{display:flex}
 .gate-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:34px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -126,12 +165,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .gate-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
 .gate-btn{width:100%;background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:14px 24px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
 .gate-btn:hover{opacity:.88}.gate-btn:active{transform:scale(.98)}
-.gate-btn:disabled{opacity:.4;cursor:not-allowed}
-.gate-err{font-family:var(--mono);font-size:12px;color:var(--red);margin-top:14px;min-height:16px;line-height:1.5}
-.gate-foot{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:20px;line-height:1.6}
+.gate-err{font-family:var(--mono);font-size:12px;color:var(--red);min-height:18px;margin-top:10px}
+.gate-foot{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:18px}
 
-footer{position:relative;z-index:1;text-align:center;padding:24px 20px 32px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:28px}
-footer span{color:var(--text2)}
+@media (max-width:520px){
+  .hero{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .pole{flex-direction:row;padding:10px 12px}
+  .lamp{width:38px;height:38px}
+  .evt th,.evt td{padding-left:5px;padding-right:5px}
+  .evt td{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
 </style>
 </head>
 <body>
@@ -155,15 +199,22 @@ footer span{color:var(--text2)}
       <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
       <div class="logo-name">Semáforo de <span>Entrada</span></div>
     </div>
-    <div class="logo-tag">¿Qué terreno pisás? · Riesgo medido, no profecías</div>
-    <p class="intro">
-      <span class="lead">Este semáforo no adivina si va a subir. Mide el terreno.</span>
-      Nadie puede decirte qué hará el precio esta semana — lo medimos: los indicadores más famosos aciertan casi lo mismo que el mercado solo. Lo que <strong>sí</strong> es robusto, en hasta <strong>98 años de datos</strong>, es dónde se concentra la turbulencia. Cuatro luces: el <strong>clima del mercado</strong> y el <strong>estado de tu acción</strong>, medidos con las dos únicas referencias que pasaron la prueba — la <strong>media de 200</strong> y la <strong>zona de máximos de 52 semanas</strong>.
-    </p>
+    <div class="logo-tag">¿Es buen momento para entrar?</div>
   </div>
 
-  <div class="search-card">
-    <div class="search-label">Símbolo de la acción (Ticker)</div>
+  <p class="intro">
+    <span class="lead">Una sola pregunta: ¿el precio está arriba o abajo de su media de 200?</span>
+    Probamos 26 indicadores, soportes, resistencias y máximos de 52 semanas. Ninguno adivina si el precio va a subir. La media de 200 tampoco — pero es lo único que separa de verdad <strong>el terreno calmo del terreno brusco</strong>. Por eso este semáforo tiene una sola luz, y te dice <strong>con cuánto entrar</strong>, no si va a subir.
+  </p>
+
+  <div class="legend" aria-label="Qué significa cada luz">
+    <div class="lg g"><div class="dot"></div><div><b>Verde · Podés entrar</b><span>Arriba de su media, fuera de la zona de duda. Entrá con tu tamaño normal.</span></div></div>
+    <div class="lg a"><div class="dot"></div><div><b>Amarillo · Chequeá</b><span>Pegada a su media: todavía no eligió lado. Entrá con la mitad; completás si pasa a verde.</span></div></div>
+    <div class="lg r"><div class="dot"></div><div><b>Rojo · No entres con todo</b><span>Abajo de su media: el viaje es más brusco. Si entrás, con la mitad — y preparado para verla más abajo en el camino.</span></div></div>
+  </div>
+
+  <div class="card">
+    <span class="lbl">Símbolo de la acción (Ticker)</span>
     <div class="search-row">
       <input class="search-input" id="tickerInput" type="text" placeholder="ej: AAPL, MSFT, KO..." autocomplete="off" autocapitalize="characters"/>
       <button class="search-btn" id="btn" onclick="analyze()">Ver</button>
@@ -175,66 +226,92 @@ footer span{color:var(--text2)}
       <span class="chip" onclick="go('KO')">KO</span>
       <span class="chip" onclick="go('JNJ')">JNJ</span>
       <span class="chip" onclick="go('XOM')">XOM</span>
+      <span class="chip" onclick="go('SPY')">SPY</span>
     </div>
   </div>
 
   <div class="error-msg" id="err"></div>
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <p id="loadTxt">Midiendo el terreno...</p>
+    <p>Midiendo dónde está...</p>
   </div>
 
   <div class="results" id="results">
-    <div class="res-ticker" id="resTicker"></div>
-
-    <div class="verdict" id="verdict">
-      <div class="verdict-eyebrow">Cuatro luces · clima del mercado + estado del ticker</div>
-      <div class="verdict-title" id="vTitle">—</div>
-      <div class="verdict-desc" id="vDesc"></div>
-    </div>
 
     <div class="exotic" id="exotic"></div>
 
-    <div class="tf-grid">
-      <div class="tf-card" id="cIdx">
-        <div class="tf-label">🌍 Clima de mercado</div>
-        <div class="tf-name" id="idxName">—</div>
-        <div class="lrow"><span>Tendencia (media de 200)</span><span class="lval" id="li1">—</span></div>
-        <div class="lrow"><span>Zona (máximo de 52 sem.)</span><span class="lval" id="li2">—</span></div>
-        <div class="audit" id="evIdx"></div>
+    <div class="hero" id="hero">
+      <div class="pole" role="img" id="pole" aria-label="">
+        <div class="lamp r"></div><div class="lamp a"></div><div class="lamp g"></div>
       </div>
-      <div class="tf-card" id="cTk">
-        <div class="tf-label">🎯 Estado del ticker</div>
-        <div class="tf-name" id="tkName">—</div>
-        <div class="lrow"><span>Su tendencia (media de 200)</span><span class="lval" id="lt1">—</span></div>
-        <div class="lrow"><span>Su zona (máx. de 52 sem.)</span><span class="lval" id="lt2">—</span></div>
-        <div class="audit" id="evTk"></div>
+      <div>
+        <div class="eyebrow" id="eyebrow">—</div>
+        <div class="big" id="title">—</div>
+        <div class="where" id="where"></div>
       </div>
     </div>
 
-    <a class="crosslink" id="toNyse" href="#">🏢 Ver Semáforo de Calidad (NYSE) de este ticker →
-      <small>¿Es una buena empresa? El cuándo importa menos que el qué.</small></a>
-
-    <a class="crosslink" href="calculadora.html">⚖️ Pasá al Semáforo de Riesgo →
-      <small>Stop definido, ratio que cierra, tamaño correcto: ahí está tu verdadera ventaja.</small></a>
-
-    <div class="explain">
-      <div class="explain-title">🧭 Cómo leer este semáforo</div>
-      <p>Las cuatro luces miden <strong>riesgo</strong>, no dirección. Verde no significa "va a subir": significa que estás en el terreno donde, históricamente, la turbulencia fue <strong>la mitad</strong> y los desplomes fueron raros. Rojo no significa "va a bajar": significa que estás donde la volatilidad <strong>se duplica</strong> y se concentran los golpes grandes.</p>
-      <p><strong>Terreno favorable</strong> → si la empresa pasó el filtro de Calidad, es el mejor momento para entrar <strong>con plan</strong>: stop y ratio definidos antes. <strong>Zona de tormenta</strong> → no es prohibido, pero el precio del error es más alto: posición chica o esperar. La luz no reemplaza tu plan — te dice cuánto viento hay.</p>
-      <p>La evidencia: media de 200 y zona de máximos medidas sobre el <strong>S&P 500 desde 1928</strong>, el <strong>Nasdaq desde 1971</strong>, el <strong>Dow desde 1992</strong> y 26 acciones grandes durante 10 años. Cada luz se calcula en vivo para cualquier ticker.</p>
+    <div class="todo" id="todo">
+      <h3>Qué hacer</h3>
+      <div id="todoTxt"></div>
     </div>
 
-    <div class="explain no">
-      <div class="explain-title">🚫 Lo que este semáforo NO mira — porque lo medimos y falló</div>
-      <p><span class="nx">✗ Osciladores (RSI, MACD y 24 más):</span> el consenso técnico más usado del mundo acierta casi lo mismo que el mercado solo. En AAPL, seguir sus señales de compra agregó <strong>+1,1 puntos</strong> — y sus señales de venta erraron más que una moneda.</p>
-      <p><span class="nx">✗ Fuerza relativa:</span> "comprá lo que le viene ganando al mercado" funcionó en 2016-2026… y se <strong>invirtió</strong> en 2006-2016. Una señal que cambia de bando según la década no es una señal.</p>
-      <p><span class="nx">✗ Volumen confirmando rupturas:</span> las rupturas <strong>sin</strong> volumen rindieron más que las rupturas con volumen (5.743 casos medidos). El manual dice lo contrario. El manual no lo midió.</p>
-      <a class="crosslink" id="toPrueba" href="prueba.html" style="margin:14px 0 0">🔬 Ver la prueba completa del medidor de TradingView →
+    <div class="card">
+      <span class="lbl">Dónde está hoy</span>
+      <div class="gwrap">
+        <div class="marker" id="marker"><span class="mk-l" id="mkL">—</span><span class="mk-p"></span></div>
+        <div class="maline" id="maline"></div>
+        <div class="gauge"><div class="gz-r" id="gzR"></div><div class="gz-a" id="gzA"></div><div class="gz-g" id="gzG"></div></div>
+      </div>
+      <div class="gscale"><span>← más abajo</span><span>media de 200</span><span>más arriba →</span></div>
+      <div class="rows">
+        <div class="row"><span>Precio</span><span class="rv" id="rPrice">—</span></div>
+        <div class="row"><span>Media de 200 ruedas <small>· ~10 meses</small></span><span class="rv" id="rMa">—</span></div>
+        <div class="row"><span>Zona de duda <small>· ±2 respiraciones</small></span><span class="rv" id="rBand">—</span></div>
+      </div>
+    </div>
+
+    <div class="card ev">
+      <h3>Qué pasó después de cada luz</h3>
+      <div class="src" id="evSrc"></div>
+      <table class="evt">
+        <thead><tr><th>Luz</th><th>Cayó más de 10%<br>en 3 meses</th><th>Estaba más arriba<br>al año</th><th>Cuánto<br>se mueve</th></tr></thead>
+        <tbody id="evBody"></tbody>
+      </table>
+      <p class="read" id="evRead"></p>
+    </div>
+
+    <div class="note" id="years"></div>
+
+    <a class="crosslink" id="toNyse" href="index.html">🏢 Semáforo de Calidad: ¿es una buena empresa? →
+      <small>El qué importa más que el cuándo. Si no pasa este filtro, el color da igual.</small></a>
+    <a class="crosslink" id="toRiesgo" href="calculadora.html">⚖️ Semáforo de Riesgo: ¿dónde pongo el stop y cuánto compro? →
+      <small>Te pasa “con la mitad” a cantidad de acciones, según cuánto se mueve esta acción y cuánto tiempo la vas a sostener.</small></a>
+
+    <div class="exp">
+      <h3>🧭 Cómo se calcula la luz</h3>
+      <p>Mira <strong>una sola cosa</strong>: dónde está el precio respecto de su media de 200 ruedas — el precio promedio de los últimos diez meses, más o menos.</p>
+      <p>La <strong>zona de duda</strong> es una franja alrededor de la media, de 2 “respiraciones diarias” para cada lado (la respiración es cuánto se mueve la acción en un día normal, promedio de 14 ruedas). Una acción tranquila tiene la franja angosta; una nerviosa, ancha. ¿Por qué ahí? Porque adentro de la franja el precio <strong>cruzó la media 2 de cada 3 veces</strong> en el mes siguiente. Afuera, menos de 1 de cada 5. Adentro todavía no eligió lado.</p>
+      <p><strong>El tamaño sigue a la luz.</strong> En rojo la acción se mueve 1,6 veces más en los meses siguientes — y ya se nota el día que entrás: su respiración diaria es 1,8 veces la de una acción en verde. Si medís el stop con esa respiración (eso hace el Semáforo de Riesgo), la posición sale sola más o menos a la mitad, y el golpe en pesos queda parecido al de una luz verde. En amarillo, “la mitad” es prudencia por la duda: no sale de un backtest de rendimiento.</p>
+    </div>
+
+    <div class="exp no">
+      <h3>🚫 Lo que este semáforo NO mira — porque lo medimos y falló</h3>
+      <p><span class="nx">✗ Máximos y mínimos de 52 semanas.</span> La versión anterior los usaba. 9 de cada 10 días decían lo mismo que la media de 200 — y cuando decían algo distinto, se equivocaban: las acciones que la zona pintaba de amarillo rindieron <strong>el doble</strong> a 3 meses (8,2%) que las que dejaba en verde (4,1%).</p>
+      <p><span class="nx">✗ Osciladores (RSI, MACD y 24 más).</span> El consenso técnico más usado del mundo acierta casi lo mismo que el mercado solo.</p>
+      <p><span class="nx">✗ Soportes y resistencias.</span> Un nivel real aguantó el 19,3% de las veces; uno inventado a 3% de distancia, el 17,5%. La diferencia se la come la comisión.</p>
+      <p><span class="nx">✗ El clima del mercado.</span> Sumar si el S&amp;P 500 está arriba o abajo de su propia media no mejoró la luz de la acción de forma pareja. Una luz menos, menos confusión.</p>
+      <a class="crosslink" id="toPrueba" href="prueba.html" style="margin-top:4px">🔬 Ver la prueba completa del medidor de TradingView →
         <small>Señal por señal, con su historial real de aciertos en 10 años.</small></a>
     </div>
-  </div>
 
+    <div class="exp">
+      <h3>⚠️ Los límites de esta medición</h3>
+      <p><strong>Supervivencia.</strong> Las acciones son empresas que hoy cotizan. Metimos castigadas de verdad — Intel, cruceros, aerolíneas, retail — pero las que quebraron o fueron compradas no están en los datos. El S&amp;P 500 no tiene ese problema.</p>
+      <p><strong>Ventanas solapadas.</strong> Los días medidos son muchos pero no independientes. Lo que sostiene la regla es que se repite en dos décadas distintas (2006-2016 con la crisis de 2008 adentro, y 2016-2026) y en casi cien años de S&amp;P 500.</p>
+    </div>
+
+  </div>
 </div>
 
 <footer>
@@ -248,6 +325,7 @@ footer span{color:var(--text2)}
 const PROXY='https://yahoo-proxy.webmaster-c89.workers.dev';
 const ACCESS_LS='snse_access_code';        // candado COMPARTIDO con el NYSE
 let CLIENT_CODE='';
+let pendingSymbol='';
 
 /* ---- Puerta de acceso (código de alumno) ---- */
 function storedCode(){try{return localStorage.getItem(ACCESS_LS)||'';}catch(e){return'';}}
@@ -289,182 +367,172 @@ async function initGate(){
 }
 
 /* ============================================================
-   Evidencia medida (backtests propios, sin survivorship en índices)
-   - Índices: ^GSPC 1928-2026 · ^IXIC 1971-2026 · ^DJI 1992-2026
-   - Acciones: 26 large caps 2016-2026 (survivorship declarado)
+   La luz: precio vs media de 200, con zona de duda de ±2 ATR.
+   Evidencia: Documents\semaforo_research\semaforo_simple.py (29-sep-2026)
+   - acciones: 118 de EE.UU. fuera del curso, 2006-2026, 536.292 días
+   - índice:   S&P 500 1929-2026, 24.530 días
+   Columnas: cae10 = % de veces que tocó -10% en las 63 ruedas siguientes ·
+             sube1a = % de veces que estaba más arriba 252 ruedas después ·
+             vol = volatilidad de los 3 meses siguientes, relativa al verde
    ============================================================ */
-const CLIMA={
-  QQQ:{name:'Nasdaq',ev:'<b>Nasdaq, 55 años medidos:</b> arriba de la media de 200 la volatilidad fue 15,5% anual; abajo, 28,5% — y el <b>73%</b> de los desplomes diarios de −3% ocurrió abajo. En zona de máximos la vol fue 11%; hundido, 38%.'},
-  SPY:{name:'S&P 500',ev:'<b>S&P 500, 98 años medidos:</b> arriba de la media de 200 la volatilidad fue 14,8% anual; abajo, 25,4% — y el <b>73%</b> de los desplomes diarios de −3% ocurrió abajo. En zona de máximos la vol fue 10%; hundido, 43%.'},
-  DIA:{name:'Dow Jones',ev:'<b>Dow Jones, 34 años medidos:</b> arriba de la media de 200 la volatilidad fue 12,5% anual; abajo, 27,5% — y el <b>86%</b> de los desplomes diarios de −3% ocurrió abajo. En zona de máximos la vol fue 10%; hundido, 47%.'}
+const BANDA_ATR=2;
+const EVID={
+  acc:{src:'118 acciones de EE. UU. que no son las del curso — incluye castigadas como Intel, cruceros y aerolíneas · 2006-2026 · 536.000 días medidos.',
+       g:{cae10:30,sube1a:69,vol:'normal'},a:{cae10:34,sube1a:64,vol:'1,1×'},r:{cae10:47,sube1a:63,vol:'1,6×'},
+       med1a:{g:12,r:12}},
+  idx:{src:'S&P 500 · 1929-2026 · casi 100 años y 24.500 días medidos, con 1929, 1973, 2000 y 2008 adentro.',
+       g:{cae10:8,sube1a:73,vol:'normal'},a:{cae10:20,sube1a:67,vol:'1,1×'},r:{cae10:29,sube1a:64,vol:'1,5×'},
+       med1a:{g:9,r:11}}
 };
-const EV_TICKER='<b>Acciones grandes (26 medidas, 10 años):</b> abajo de su media de 200 la volatilidad salta de 26,6% a 37,7% anual, y ahí se concentra la mitad de los desplomes. En zona hundida (−25% o más del máximo) la vol llega a <b>51%</b> y los trimestres positivos caen de 66% a 56%.';
+/* ETFs de índice amplio: usan la evidencia del S&P 500 */
 const PLAIN_ETF=new Set(['SPY','QQQ','DIA','VOO','IVV','VTI','IWM','VIG','SCHD','VYM','VEA','VWO','RSP','MDY']);
 
-/* ============================================================
-   Luces
-   ============================================================ */
-const nf=x=>x.toFixed(1).replace('.',',');
+const nf=(x,d)=>Number(x).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const $=id=>document.getElementById(id);
 
-function lightTrend(price,sma){
-  if(price==null||sma==null||!isFinite(price/sma))return{level:'warn',txt:'sin datos'};
-  const d=(price/sma-1)*100;
-  return d>=0?{level:'ok',txt:`arriba (+${nf(d)}%)`}:{level:'fail',txt:`abajo (−${nf(-d)}%)`};
-}
-function lightZone(price,hi){
-  if(price==null||hi==null||!isFinite(price/hi))return{level:'warn',txt:'sin datos'};
-  const d=(price/hi-1)*100;
-  const t=`(−${nf(Math.abs(d))}%)`;
-  if(d>=-2)  return{level:'ok',txt:`en máximos ${t}`};
-  if(d>=-10) return{level:'ok',txt:`cerca ${t}`};
-  if(d>=-25) return{level:'warn',txt:`lejos ${t}`};
-  return{level:'fail',txt:`hundida ${t}`};
-}
-
-/* Veredicto = combinación simple de las 4 luces */
-function combinedVerdict(lights){
-  const fails=lights.filter(l=>l.level==='fail').length;
-  const warns=lights.filter(l=>l.level==='warn').length;
-  if(fails>0)return{level:'fail',title:'🔴 Zona de tormenta',
-    desc:'Al menos una luz está en la zona donde, históricamente, la volatilidad se duplica y se concentran los desplomes. No significa que vaya a bajar — significa que si entrás, lo hacés donde los golpes son más grandes y más frecuentes. Posición chica o esperar; el stop no es negociable.'};
-  if(warns>0)return{level:'warn',title:'🟡 Terreno mixto',
-    desc:'Ninguna luz en zona de tormenta, pero tampoco todas en verde. El riesgo histórico acá es intermedio: se puede entrar, con el plan completo — Calidad confirmada, stop definido y ratio que cierre.'};
-  return{level:'ok',title:'🟢 Terreno favorable',
-    desc:'Clima calmo y acción en zona sana: históricamente, acá la turbulencia fue la mitad y los desplomes fueron raros. Ojo — esto no predice la suba: es el terreno, no el pronóstico. Si la empresa pasó el filtro de Calidad, entrá con stop y ratio definidos antes.'};
+/* ---- Indicadores desde el histórico ---- */
+function indicadores(d){
+  const h=d.h,l=d.l,c=d.c,n=c.length;
+  if(n<200)return null;
+  let tr=0;
+  for(let i=n-14;i<n;i++)tr+=Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1]));
+  const price=c[n-1];
+  const atr=tr/14/price;                     // respiración diaria, fracción
+  let s=0;for(let i=n-200;i<n;i++)s+=c[i];
+  const sma=s/200;
+  const dist=price/sma-1;
+  const banda=BANDA_ATR*atr;
+  const luz=dist>banda?'g':dist<-banda?'r':'a';
+  return{price,atr,sma,dist,banda,luz};
 }
 
-/* Aviso instrumento fuera del universo medido */
-function exoticNote(t,type,cap){
-  if(type==='EQUITY'&&cap!=null&&cap<2e9)
-    return `⚠️ ${t} es una empresa chica (menos de $2 mil millones). La evidencia de este semáforo está medida sobre acciones grandes e índices: el estado es real, las probabilidades son orientativas.`;
-  if(type==='ETF'&&!PLAIN_ETF.has(t))
-    return `⚠️ ${t} es un ETF especializado. Si sigue un activo volátil (cripto, apalancados, un solo commodity), la estadística de acciones grandes e índices no le calza: estado real, probabilidades orientativas.`;
-  if(type!=='EQUITY'&&type!=='ETF')
-    return `⚠️ ${t} no es una acción común ni un ETF de índice. La evidencia de este semáforo está medida sobre acciones grandes de EE. UU. e índices: tomá las luces como referencia, no como historial propio.`;
+/* ---- Aviso de instrumento fuera del universo medido ---- */
+function exoticNote(t,tipo){
+  const tp=(tipo||'').toUpperCase();
+  if(tp&&tp!=='EQUITY'&&tp!=='ETF')
+    return `⚠️ ${t} no es una acción común ni un ETF. La luz se calcula igual, pero la evidencia de abajo está medida sobre acciones de EE. UU. y el S&P 500: tomala como orientativa.`;
+  if(tp==='ETF'&&!PLAIN_ETF.has(t))
+    return `⚠️ ${t} es un ETF sectorial, temático, apalancado o de materias primas. La luz se calcula igual, pero la evidencia está medida sobre acciones y el S&P 500: tomala como orientativa.`;
   return'';
 }
 
 /* ============================================================
-   Datos (Worker → Yahoo quoteSummary)
+   Datos (Worker → Yahoo chart)
    ============================================================ */
-function fx(j){
-  const r=j&&j.quoteSummary&&j.quoteSummary.result&&j.quoteSummary.result[0];
-  if(!r)return null;
-  const raw=v=>(v&&typeof v==='object')?v.raw:v;
-  const sd=r.summaryDetail||{},pr=r.price||{};
-  return{
-    price:raw(pr.regularMarketPrice),
-    sma:raw(sd.twoHundredDayAverage),
-    hi:raw(sd.fiftyTwoWeekHigh),
-    cap:raw(pr.marketCap)??raw(sd.marketCap),
-    type:pr.quoteType||'',
-    exch:pr.exchangeName||'',
-    name:pr.shortName||pr.longName||''
-  };
-}
-async function fetchSym(s){
-  const k=CLIENT_CODE?`&k=${encodeURIComponent(CLIENT_CODE)}`:'';
-  const r=await fetch(`${PROXY}/?symbol=${encodeURIComponent(s)}${k}`);
-  const j=await r.json();
-  if(!r.ok||j.error)throw new Error(j&&j.error?j.error:('HTTP '+r.status));
-  const d=fx(j);
-  if(!d||d.price==null)throw new Error('sin datos de precio');
-  return d;
-}
-function proxyFor(t,exch){
-  if(CLIMA[t])return t;                       // SPY/QQQ/DIA: su clima es él mismo
-  return /nasdaq/i.test(exch||'')?'QQQ':'SPY';
+async function fetchHist(sym){
+  const r=await fetch(`${PROXY}/?hist=${encodeURIComponent(sym)}&k=${encodeURIComponent(CLIENT_CODE)}`);
+  const j=await r.json().catch(()=>null);
+  if(!r.ok||!j||j.error)throw new Error((j&&j.error)||`HTTP ${r.status}`);
+  if(!j.c||j.c.length<200)throw new Error('necesita al menos 200 ruedas de historia');
+  return j;
 }
 
-/* ============================================================
-   Flujo principal
-   ============================================================ */
-let pendingSymbol='';
-function go(t){document.getElementById('tickerInput').value=t;analyze();}
-function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('show');}
-function hideErr(){document.getElementById('err').classList.remove('show');}
+function go(t){$('tickerInput').value=t;analyze();}
 
 async function analyze(){
-  const t=document.getElementById('tickerInput').value.trim().toUpperCase();
-  if(!t){showErr('Escribí un símbolo (ej: AAPL).');return;}
-  if(!/^[A-Z0-9.\-]{1,12}$/.test(t)){showErr('Símbolo inválido.');return;}
-  hideErr();
-  document.getElementById('results').classList.remove('show');
-  document.getElementById('loading').classList.add('show');
-  document.getElementById('btn').disabled=true;
-  try{
-    const dT=await fetchSym(t);
-    const px=proxyFor(t,dT.exch);
-    const dI=(px===t)?dT:await fetchSym(px);
-    render(t,dT,px,dI);
-  }catch(e){
-    showErr('No se pudieron obtener datos para '+t+'. '+(e.message||e)+' (verificá el ticker; cubre NYSE/NASDAQ/AMEX).');
-  }finally{
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('btn').disabled=false;
+  const t=($('tickerInput').value||'').trim().toUpperCase();
+  const err=$('err'),load=$('loading'),res=$('results');
+  err.classList.remove('show');
+  if(!/^[A-Z0-9.\-]{1,12}$/.test(t)){
+    err.textContent='Escribí un símbolo válido (ej: AAPL).';err.classList.add('show');return;
   }
-}
-
-function setLight(id,l){
-  const el=document.getElementById(id);
-  el.textContent=l.txt;
-  el.className='lval '+l.level;
-}
-function cardLevel(a,b){
-  if(a.level==='fail'||b.level==='fail')return'fail';
-  if(a.level==='warn'||b.level==='warn')return'warn';
-  return'ok';
-}
-
-function render(t,dT,px,dI){
-  const li1=lightTrend(dI.price,dI.sma), li2=lightZone(dI.price,dI.hi);
-  const lt1=lightTrend(dT.price,dT.sma), lt2=lightZone(dT.price,dT.hi);
-
-  document.getElementById('resTicker').innerHTML=
-    `<b>${t}</b>${dT.exch?(' · '+dT.exch):''}${dT.name?(' · '+dT.name):''}`;
-
-  const cv=combinedVerdict([li1,li2,lt1,lt2]);
-  const v=document.getElementById('verdict');
-  v.classList.remove('ok','warn','fail');
-  v.classList.add(cv.level);
-  document.getElementById('vTitle').textContent=cv.title;
-  document.getElementById('vDesc').textContent=cv.desc;
-
-  const ex=document.getElementById('exotic');
-  const note=exoticNote(t,dT.type,dT.cap);
-  ex.textContent=note;
-  ex.classList.toggle('show',!!note);
-
-  document.getElementById('idxName').textContent=CLIMA[px].name;
-  setLight('li1',li1);setLight('li2',li2);
-  document.getElementById('evIdx').innerHTML=CLIMA[px].ev;
-  const cI=document.getElementById('cIdx');
-  cI.classList.remove('ok','warn','fail');cI.classList.add(cardLevel(li1,li2));
-
-  document.getElementById('tkName').textContent=t;
-  setLight('lt1',lt1);setLight('lt2',lt2);
-  document.getElementById('evTk').innerHTML=(t===px)?CLIMA[px].ev:EV_TICKER;
-  const cT=document.getElementById('cTk');
-  cT.classList.remove('ok','warn','fail');cT.classList.add(cardLevel(lt1,lt2));
-
-  document.getElementById('toNyse').href='index.html?symbol='+encodeURIComponent(t);
-  document.getElementById('toPrueba').href='prueba.html?symbol='+encodeURIComponent(t);
-
-  document.getElementById('results').classList.add('show');
-  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+  res.classList.remove('show');load.classList.add('show');$('btn').disabled=true;
+  try{
+    const j=await fetchHist(t);
+    const d=indicadores(j);
+    if(!d)throw new Error('necesita al menos 200 ruedas de historia');
+    load.classList.remove('show');
+    render(t,d,j.quoteType);
+    res.classList.add('show');
+    res.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    load.classList.remove('show');
+    err.textContent=`No pude leer ${t}. ${String(e.message||e)}. Probá con otro símbolo.`;
+    err.classList.add('show');
+  }finally{$('btn').disabled=false;}
 }
 
 /* ============================================================
-   Init: candado + lectura de ?symbol= (conexión con el NYSE)
+   Render
    ============================================================ */
-document.getElementById('tickerInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyze();});
-document.getElementById('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
+const TXT={
+  g:{nom:'verde',title:'Podés entrar.'},
+  a:{nom:'amarilla',title:'Chequeá: todavía no eligió lado.'},
+  r:{nom:'roja',title:'No entres con todo.'}
+};
+
+function render(t,d,tipo){
+  const L=d.luz,ev=PLAIN_ETF.has(t)?EVID.idx:EVID.acc,e=ev[L];
+  const pct=Math.abs(d.dist*100),resp=Math.abs(d.dist/d.atr);
+  const lo=d.sma*(1-d.banda),hi=d.sma*(1+d.banda);
+
+  const ex=$('exotic'),note=exoticNote(t,tipo);
+  ex.textContent=note;ex.classList.toggle('show',!!note);
+
+  $('hero').className='hero '+L;
+  $('pole').setAttribute('aria-label','Luz '+TXT[L].nom);
+  $('eyebrow').textContent=`${t} · $${nf(d.price,2)}`;
+  $('title').textContent=TXT[L].title;
+  const lado=d.dist>=0?'arriba':'abajo';
+  $('where').innerHTML=L==='a'
+    ? `Está <b>${nf(pct,1)}% ${lado}</b> de su media de 200 — adentro de la zona de duda, que para ${t} va de $${nf(lo,2)} a $${nf(hi,2)}.`
+    : `Está <b>${nf(pct,1)}% ${lado}</b> de su media de 200 — ${nf(resp,1)} respiraciones diarias, ${resp<3?'apenas':'bien'} afuera de la zona de duda.`;
+
+  let todo;
+  if(L==='g'){
+    todo=`<p><b>Entrá con tu tamaño normal</b>, con el stop definido antes de comprar. Es el terreno más calmo: el precio se mueve menos y las caídas grandes son más raras.</p>
+          <p>Verde no quiere decir “va a subir”. Quiere decir que, si te equivocás, el golpe suele ser más chico. Igual cayó más de 10% en algún momento de los 3 meses siguientes ${e.cae10} de cada 100 veces: el stop va siempre.</p>`;
+  }else if(L==='a'){
+    todo=`<p><b>Entrá con la mitad del tamaño.</b> Si en las próximas semanas pasa a verde, completás. Si pasa a rojo, ya estás con el tamaño correcto.</p>
+          <p>Amarillo no es mala señal: entrar acá rindió parecido a entrar en verde. Es una señal de <b>duda</b> — 2 de cada 3 veces el precio cruzó la media en el mes siguiente. La luz puede cambiar en días.</p>`;
+  }else{
+    todo=`<p><b>Si entrás, con la mitad del tamaño — y preparado para verla más abajo en el camino.</b> Si no querés ese viaje, esperá a que la luz se ponga verde. El Semáforo de Riesgo te dice cuántas acciones son.</p>
+          <p>Rojo no quiere decir “va a bajar”: al año estaba más arriba ${e.sube1a} de cada 100 veces (en verde, ${ev.g.sube1a}). Quiere decir que el viaje es más brusco: se mueve ${e.vol.replace('×',' veces')} más, y <b>cayó más de 10% en algún momento de los 3 meses siguientes ${e.cae10} de cada 100 veces</b>.</p>`;
+  }
+  $('todoTxt').innerHTML=todo;
+  $('todo').style.borderColor=L==='g'?'var(--green-border)':L==='a'?'var(--amber-border)':'var(--red-border)';
+
+  /* Regla: escala simétrica que siempre muestra la franja y el precio */
+  const span=Math.max(3*d.banda,Math.abs(d.dist)*1.25);
+  const x=v=>Math.min(100,Math.max(0,(v+span)/(2*span)*100));
+  const bL=x(-d.banda),bR=x(d.banda);
+  $('gzR').style.width=bL+'%';
+  $('gzA').style.width=(bR-bL)+'%';
+  $('gzG').style.width=(100-bR)+'%';
+  $('maline').style.left='50%';
+  const mx=x(d.dist);
+  $('marker').style.left=mx+'%';
+  $('mkL').style.transform=mx<18?'translateX(-10px)':mx>82?'translateX(calc(-100% + 10px))':'translateX(-50%)';
+  $('mkL').textContent=`${t} $${nf(d.price,2)}`;
+  $('rPrice').textContent='$'+nf(d.price,2);
+  $('rMa').textContent='$'+nf(d.sma,2)+' · '+(d.dist>=0?'+':'−')+nf(pct,1)+'%';
+  $('rBand').textContent='$'+nf(lo,2)+' – $'+nf(hi,2);
+
+  /* Evidencia: las tres luces, con la de hoy resaltada */
+  $('evSrc').textContent=ev.src;
+  const fila=(k,nom)=>`<tr class="${k}${k===L?' on':''}"><td><span class="d"></span>${nom}</td>`+
+    `<td>${ev[k].cae10}%</td><td>${ev[k].sube1a}%</td><td>${ev[k].vol}</td></tr>`;
+  $('evBody').innerHTML=fila('g','Verde')+fila('a','Amarillo')+fila('r','Rojo');
+  $('evRead').innerHTML=`Al año, la suba típica entrando en rojo fue de +${ev.med1a.r}%; entrando en verde, +${ev.med1a.g}%. La diferencia grande está en la primera columna: <b>lo que cambia no es el destino, es el viaje.</b>`;
+
+  $('years').innerHTML=`<b>¿La pensás sostener años?</b> Entonces el color casi no importa. En el S&amp;P 500 desde 1929, entrar en rojo rindió a 3 años, en promedio, lo mismo que entrar en verde (+27% contra +25%) y a 5 años también (+50% contra +46%). El rojo no te cambia el resultado: te cambia el susto en el camino — y el tamaño que podés aguantar sin vender en el peor momento.`;
+
+  $('toNyse').href='index.html?symbol='+encodeURIComponent(t);
+  $('toRiesgo').href='calculadora.html?symbol='+encodeURIComponent(t);
+  $('toPrueba').href='prueba.html?symbol='+encodeURIComponent(t);
+}
+
+/* ============================================================
+   Init
+   ============================================================ */
+$('tickerInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyze();});
+$('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
 
 document.addEventListener('DOMContentLoaded',async()=>{
   const sym=(new URLSearchParams(location.search).get('symbol')||'').trim().toUpperCase();
   const open=await initGate();
   if(sym && /^[A-Z0-9.\-]{1,12}$/.test(sym)){
-    if(open){go(sym);}else{pendingSymbol=sym;} // si está bloqueado, carga al desbloquear
+    if(open){go(sym);}else{pendingSymbol=sym;}
   }
 });
 </script>

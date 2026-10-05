@@ -10,7 +10,7 @@
 <style>
 :root{
   --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--border:#252538;
-  --text:#f0f0f8;--text2:#9090b0;--text3:#454565;
+  --text:#f0f0f8;--text2:#9090b0;--text3:#5a5a7c;
   --green:#00ff88;--green-dim:rgba(0,255,136,0.10);--green-glow:rgba(0,255,136,0.25);--green-border:rgba(0,255,136,0.30);
   --amber:#ffb840;--amber-dim:rgba(255,184,64,0.10);--amber-border:rgba(255,184,64,0.30);
   --red:#ff4070;--red-dim:rgba(255,64,112,0.10);--red-border:rgba(255,64,112,0.30);
@@ -20,11 +20,11 @@
 html{font-size:16px}
 body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh;display:flex;flex-direction:column}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 45% at 15% 5%,rgba(99,102,241,0.07) 0%,transparent 60%),radial-gradient(ellipse 55% 40% at 85% 85%,rgba(0,255,136,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
-.app{position:relative;z-index:1;flex:1;max-width:680px;margin:0 auto;padding:36px 20px 0;width:100%}
+.app{position:relative;z-index:1;flex:1;max-width:680px;margin:0 auto;padding:36px 16px 0;width:100%;display:flex;flex-direction:column;gap:16px}
 
 /* Header */
-.header{text-align:center;margin-bottom:26px}
-.logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px}
+.header{text-align:center;display:flex;flex-direction:column;gap:12px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px}
 .logo-lights{display:flex;gap:6px;align-items:center}
 .ll{width:13px;height:13px;border-radius:50%}
 .ll.g{background:var(--green);box-shadow:0 0 10px var(--green-glow)}
@@ -32,24 +32,113 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .ll.r{background:var(--red)}
 .logo-name{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.05}
 .logo-name span{color:var(--green)}
-.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
-.intro{font-size:16px;color:var(--text2);line-height:1.75;max-width:560px;margin:22px auto 0;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px;text-align:left}
+.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase}
+.intro{font-size:16px;color:var(--text2);line-height:1.75;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px;text-align:left}
 .intro strong{color:var(--text)}
-.intro .lead{display:block;font-family:var(--display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
+.intro .lead{display:block;font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.steps div{font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:9px 10px}
+.steps b{display:block;color:var(--text);font-family:var(--display);font-size:13px}
 
-/* Inputs */
-.inputs{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:22px 22px 20px;margin-bottom:16px}
-.in-row{margin-bottom:16px}
-.in-row:last-child{margin-bottom:0}
-.in-label{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:block}
-.in-label small{color:var(--text3);text-transform:none;letter-spacing:0;font-size:11px}
-.in-wrap{position:relative}
-.in-wrap .pre{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-family:var(--mono);color:var(--text3);font-size:16px;pointer-events:none}
-.in-field{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px 14px 34px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
-.in-field:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+/* Secciones */
+.sec{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.14em;margin-top:10px;display:flex;align-items:center;gap:10px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec .opt{font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:none}
 
-/* Verdict */
-.verdict{border-radius:16px;padding:22px 24px;margin-bottom:14px;border:1px solid var(--border);background:var(--s1);text-align:center;transition:all .3s}
+/* Cards e inputs */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:20px}
+.lbl{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:10px}
+.lbl small{text-transform:none;letter-spacing:0;color:var(--text3)}
+.search-row{display:flex;gap:10px}
+.search-input{flex:1;min-width:0;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;text-transform:uppercase;transition:border-color .2s,box-shadow .2s}
+.search-input::placeholder{text-transform:none;color:var(--text3)}
+.search-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+.search-btn{background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:0 22px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
+.search-btn:hover{opacity:.88}.search-btn:active{transform:scale(.98)}
+.search-btn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 11px;cursor:pointer;transition:border-color .15s,color .15s}
+.chip:hover{border-color:var(--green-border);color:var(--green)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:18px}
+.seg button{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 6px;cursor:pointer;transition:border-color .15s,color .15s,background .15s;display:flex;flex-direction:column;gap:3px;align-items:center}
+.seg button span{font-family:var(--mono);font-size:10px;font-weight:400;color:var(--text3);letter-spacing:.04em}
+.seg button:hover{border-color:var(--green-border)}
+.seg button[aria-pressed="true"]{background:var(--green-dim);border-color:var(--green-border);color:var(--green)}
+.seg button[aria-pressed="true"] span{color:var(--green)}
+.money{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mw{position:relative;display:flex;align-items:center}
+.mw .pre{position:absolute;left:13px;font-family:var(--mono);font-size:15px;color:var(--text3);pointer-events:none}
+.num{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 13px 12px 28px;font-family:var(--mono);font-size:16px;color:var(--text);outline:none;transition:border-color .2s}
+.num:focus{border-color:var(--green)}
+.cap{font-family:var(--mono);font-size:10.5px;color:var(--text3);margin-top:6px;letter-spacing:.04em;line-height:1.5}
+.search-input:focus-visible,.num:focus-visible,.seg button:focus-visible,.chip:focus-visible,.search-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+/* Candado en línea (solo para la parte con datos en vivo) */
+.lock{display:none;margin-top:16px;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.lock.show{display:block}
+.lock p{font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:12px}
+.lock .search-input{letter-spacing:.06em;font-size:15px}
+.lock-err{font-family:var(--mono);font-size:12px;color:var(--red);min-height:16px;margin-top:8px}
+
+/* Loading / error */
+.loading{display:none;text-align:center;padding:24px 0 6px}
+.loading.show{display:block}
+.spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-family:var(--mono);font-size:12px;color:var(--text2)}
+.error-msg{display:none;margin-top:14px;background:var(--red-dim);border:1px solid var(--red-border);border-radius:12px;padding:14px 16px;font-family:var(--mono);font-size:13px;color:var(--red);line-height:1.6}
+.error-msg.show{display:block}
+
+/* Resultado del stop */
+.tk-res{display:none;flex-direction:column;gap:14px}
+.tk-res.show{display:flex}
+.luz{display:flex;gap:12px;align-items:center;border-radius:12px;padding:12px 15px;border:1px solid var(--border);background:var(--s2);text-decoration:none;color:var(--text2);font-family:var(--mono);font-size:12.5px;line-height:1.55}
+.luz .dot{width:14px;height:14px;border-radius:50%;flex:none}
+.luz.g{border-color:var(--green-border)}.luz.g .dot{background:var(--green);box-shadow:0 0 8px var(--green-glow)}
+.luz.a{border-color:var(--amber-border)}.luz.a .dot{background:var(--amber)}
+.luz.r{border-color:var(--red-border)}.luz.r .dot{background:var(--red)}
+.luz b{color:var(--text)}
+.breathe{font-family:var(--mono);font-size:13px;color:var(--text2);line-height:1.6;text-align:center}
+.breathe b{color:var(--text)}
+.hero{border-radius:16px;padding:24px 20px 20px;border:1px solid var(--border);background:var(--s2);text-align:center;display:flex;flex-direction:column;gap:9px}
+.hero.ok{background:var(--green-dim);border-color:var(--green-border)}
+.hero.warn{background:var(--amber-dim);border-color:var(--amber-border)}
+.hero.bad{background:var(--red-dim);border-color:var(--red-border)}
+.hero .eyebrow{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.16em}
+.hero .big{font-size:clamp(44px,13vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.hero.ok .big{color:var(--green)}
+.hero.warn .big{color:var(--amber)}
+.hero.bad .big{color:var(--red)}
+.hero .sub{font-family:var(--mono);font-size:13px;color:var(--text2)}
+.hero .sub b{color:var(--text)}
+.ticks{display:flex;gap:3px;justify-content:center;align-items:flex-end;height:24px;color:var(--text3)}
+.tick{width:5px;border-radius:2px;background:var(--text3);opacity:.45}
+.tick.on{background:currentColor;opacity:1}
+.hero.ok .ticks{color:var(--green)}
+.hero.warn .ticks{color:var(--amber)}
+.hero.bad .ticks{color:var(--red)}
+.ticknote{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.03em}
+.note{font-family:var(--mono);font-size:12.5px;line-height:1.7;border-radius:11px;padding:14px 16px;border:1px solid var(--border);background:var(--s2);color:var(--text2)}
+.note.warn{background:var(--amber-dim);border-color:var(--amber-border);color:var(--amber)}
+.note.bad{background:var(--red-dim);border-color:var(--red-border);color:var(--red)}
+.note b{font-weight:600;color:var(--text)}
+.note.warn b,.note.bad b{color:inherit}
+.exotic{display:none;font-family:var(--mono);font-size:12px;color:var(--amber);background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:11px;padding:13px 15px;line-height:1.65}
+.exotic.show{display:block}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.met{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;gap:5px}
+.met .k{font-family:var(--mono);font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;line-height:1.4}
+.met .v{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.met .x{font-family:var(--mono);font-size:10.5px;color:var(--text3)}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2)}
+.row:last-child{border-bottom:none}
+.row small{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.row .rv{font-family:var(--mono);font-size:13px;color:var(--text);text-align:right;font-variant-numeric:tabular-nums}
+.carried{font-family:var(--mono);font-size:12px;color:var(--green);text-align:center}
+
+/* Paso 3: ¿cierra? */
+.verdict{border-radius:16px;padding:22px 24px;border:1px solid var(--border);background:var(--s1);text-align:center;transition:all .3s}
 .verdict.ok{background:var(--green-dim);border-color:var(--green-border)}
 .verdict.warn{background:var(--amber-dim);border-color:var(--amber-border)}
 .verdict.fail{background:var(--red-dim);border-color:var(--red-border)}
@@ -59,10 +148,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .verdict.warn .verdict-title{color:var(--amber)}
 .verdict.fail .verdict-title{color:var(--red)}
 .verdict-desc{font-size:14px;color:var(--text2);line-height:1.6;font-family:var(--mono)}
-
-/* Metrics grid */
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-@media(max-width:480px){.metrics{grid-template-columns:1fr}}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .metric{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
 .metric-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .metric-val{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--text);line-height:1}
@@ -71,18 +157,23 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .metric-val.red{color:var(--red)}
 .metric-note{font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.5;margin-top:6px}
 
-/* Explainer */
-.explain{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px}
-.explain.amber{border-left:3px solid var(--amber)}
-.explain.green{border-left:3px solid var(--green)}
-.explain-title{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.explain p{font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:1.85;margin-bottom:10px}
-.explain p:last-child{margin-bottom:0}
-.explain strong{color:var(--text)}
-.explain .ex-green{color:var(--green)}
+.crosslink{display:block;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 18px;color:var(--text);text-decoration:none;font-size:15px;font-weight:600;transition:border-color .15s}
+.crosslink:hover{border-color:var(--green-border)}
+.crosslink small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text3);margin-top:4px}
 
-footer{position:relative;z-index:1;text-align:center;padding:24px 20px 32px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:28px}
+.exp{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:19px 21px;display:flex;flex-direction:column;gap:11px}
+.exp.amber{border-left:3px solid var(--amber)}
+.exp h3{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;font-weight:500}
+.exp p{font-size:14px;color:var(--text2);line-height:1.72}
+.exp p strong{color:var(--text)}
+.exp .ex-green{color:var(--green)}
+.exp code{font-family:var(--mono);font-size:13px;color:var(--green);background:var(--s2);padding:2px 7px;border-radius:5px}
+
+footer{position:relative;z-index:1;font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;line-height:1.9;padding:34px 20px 26px;margin-top:20px}
 footer span{color:var(--text2)}
+
+@media (max-width:520px){.grid3{grid-template-columns:1fr}.money{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
 </style>
 </head>
 <body>
@@ -93,32 +184,116 @@ footer span{color:var(--text2)}
       <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
       <div class="logo-name">Semáforo de <span>Riesgo</span></div>
     </div>
-    <div class="logo-tag">Decidí con números, no con intuición</div>
-    <p class="intro">
-      <span class="lead">No necesitás acertar siempre. Necesitás que tus aciertos valgan más que tus errores.</span>
-      Antes de entrar, esta calculadora te dice si la relación entre lo que podés ganar y lo que podés perder juega a tu favor. Si la matemática no cierra, no es una operación: es una apuesta.
-    </p>
+    <div class="logo-tag">¿Dónde salgo y cuánto pongo?</div>
   </div>
 
-  <div class="inputs">
-    <div class="in-row">
-      <label class="in-label" for="capital">Capital de la cuenta <small>· para medir el tamaño del riesgo</small></label>
-      <div class="in-wrap"><span class="pre">$</span><input class="in-field" id="capital" type="number" inputmode="decimal" placeholder="10000" oninput="calc()"></div>
+  <div class="intro">
+    <span class="lead">No necesitás acertar siempre. Necesitás que tus aciertos valgan más que tus errores.</span>
+    Antes de entrar hay tres cuentas que deciden la operación. Ninguna adivina el precio: las tres las controlás vos.
+    <div class="steps">
+      <div><b>1 · El stop</b>Dónde muere la idea, sin que te saque el ruido.</div>
+      <div><b>2 · El tamaño</b>Cuánto comprar para que un error no te lastime.</div>
+      <div><b>3 · ¿Cierra?</b>Si lo que podés ganar justifica lo que arriesgás.</div>
     </div>
-    <div class="in-row">
-      <label class="in-label" for="ganancia">Ganancia potencial (prima) <small>· lo que podés ganar</small></label>
-      <div class="in-wrap"><span class="pre">$</span><input class="in-field" id="ganancia" type="number" inputmode="decimal" placeholder="100" oninput="calc()"></div>
+  </div>
+
+  <div class="card">
+    <span class="lbl">Tu cuenta <small>· se guarda en este navegador</small></span>
+    <div class="money">
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="capital" type="number" inputmode="decimal" value="10000" min="100" step="500" aria-label="Capital de la cuenta"></div>
+        <div class="cap">Capital de la cuenta</div>
+      </div>
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="rsk" type="number" inputmode="decimal" value="200" min="10" step="50" aria-label="Riesgo por operación"></div>
+        <div class="cap">Lo máximo que aceptás perder por operación <span id="rskPct"></span></div>
+      </div>
     </div>
-    <div class="in-row">
-      <label class="in-label" for="riesgo">Pérdida máxima (riesgo) <small>· lo máximo que perdés si sale mal</small></label>
-      <div class="in-wrap"><span class="pre">$</span><input class="in-field" id="riesgo" type="number" inputmode="decimal" placeholder="80" oninput="calc()"></div>
+  </div>
+
+  <div class="sec">1 y 2 · El stop y el tamaño <span class="opt">· con una acción</span></div>
+
+  <div class="card">
+    <span class="lbl">Símbolo de la acción (Ticker)</span>
+    <div class="search-row">
+      <input class="search-input" id="tickerInput" type="text" placeholder="ej: AAPL, MSFT, KO..." autocomplete="off" autocapitalize="characters"/>
+      <button class="search-btn" id="btn" onclick="analyze()">Medir</button>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="go('AAPL')">AAPL</span>
+      <span class="chip" onclick="go('MSFT')">MSFT</span>
+      <span class="chip" onclick="go('KO')">KO</span>
+      <span class="chip" onclick="go('JNJ')">JNJ</span>
+      <span class="chip" onclick="go('SPY')">SPY</span>
+    </div>
+    <div class="seg" id="pls" role="group" aria-label="¿Cuánto tiempo pensás sostenerla?"></div>
+    <div class="cap" style="text-align:center;margin-top:8px">¿Cuánto tiempo pensás sostenerla?</div>
+
+    <div class="lock" id="lock">
+      <p>🔒 Esta parte usa datos de mercado en vivo y es para alumnos. Ingresá el código de acceso que figura en tu área de miembros. El paso 3 funciona sin código.</p>
+      <div class="search-row">
+        <input class="search-input" id="gateInput" type="text" placeholder="Código de acceso" autocomplete="off" autocapitalize="characters"/>
+        <button class="search-btn" id="gateBtn" onclick="submitGate()">Abrir</button>
+      </div>
+      <div class="lock-err" id="gateErr"></div>
+    </div>
+
+    <div class="error-msg" id="err"></div>
+    <div class="loading" id="loading"><div class="spinner"></div><p>Midiendo cuánto respira...</p></div>
+  </div>
+
+  <div class="tk-res" id="tkRes">
+    <a class="luz" id="luz" href="entrada.html"><span class="dot"></span><span id="luzTxt"></span></a>
+    <p class="breathe" id="breathe"></p>
+    <div class="exotic" id="exotic"></div>
+
+    <div class="hero" id="hero">
+      <div class="eyebrow">Tu stop mínimo · el ancho que no es ruido</div>
+      <div class="big" id="stopPct">—</div>
+      <div class="sub" id="stopUsd"></div>
+      <div class="ticks" id="ticks"></div>
+      <div class="ticknote" id="tickNote"></div>
+    </div>
+
+    <div class="note" id="verdictStop"></div>
+    <div class="note warn" id="conc" style="display:none"></div>
+    <div class="note" id="sizeLuz" style="display:none"></div>
+
+    <div class="grid3">
+      <div class="met"><div class="k">Objetivo para 2:1</div><div class="v" id="mTarget">—</div><div class="x" id="mTargetX"></div></div>
+      <div class="met"><div class="k">Posición</div><div class="v" id="mPos">—</div><div class="x" id="mPosX"></div></div>
+      <div class="met"><div class="k">Acciones</div><div class="v" id="mQty">—</div><div class="x" id="mQtyX"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="rows">
+        <div class="row"><span>Precio</span><span class="rv" id="rPrice">—</span></div>
+        <div class="row"><span>Respiración diaria <small>· promedio de 14 ruedas</small></span><span class="rv" id="rAtr">—</span></div>
+        <div class="row"><span>Resultado histórico a este plazo</span><span class="rv" id="rEdge">—</span></div>
+      </div>
+    </div>
+    <div class="carried">↓ Llevamos estos números al paso 3</div>
+  </div>
+
+  <div class="sec">3 · ¿La operación cierra? <span class="opt">· sirve también para opciones</span></div>
+
+  <div class="card">
+    <div class="money">
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="ganancia" type="number" inputmode="decimal" placeholder="100" oninput="calc()" aria-label="Ganancia potencial"></div>
+        <div class="cap">Ganancia potencial (o prima) · lo que podés ganar</div>
+      </div>
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="riesgo" type="number" inputmode="decimal" placeholder="80" oninput="calc()" aria-label="Pérdida máxima"></div>
+        <div class="cap">Pérdida máxima · lo que perdés si sale mal</div>
+      </div>
     </div>
   </div>
 
   <div class="verdict" id="verdict">
     <div class="verdict-eyebrow">Veredicto</div>
     <div class="verdict-title" id="vTitle">Completá los datos</div>
-    <div class="verdict-desc" id="vDesc">Ingresá ganancia y pérdida para ver si la operación tiene sentido.</div>
+    <div class="verdict-desc" id="vDesc">Medí una acción arriba, o ingresá ganancia y pérdida a mano.</div>
   </div>
 
   <div class="metrics" id="metrics" style="display:none">
@@ -144,66 +319,331 @@ footer span{color:var(--text2)}
     </div>
   </div>
 
-  <div class="explain amber">
-    <div class="explain-title">⚖️ La regla del 100/80 — una convención con vos mismo</div>
-    <p>No existe un número mágico universal. El <strong>100/80</strong> (apuntar a ganar 100 arriesgando como máximo 80) es un <strong>compromiso que asumís con vos mismo</strong>: entrás solo cuando lo que podés ganar pesa más que lo que podés perder. Es la barrera que te separa de las operaciones "emocionantes" pero matemáticamente perdedoras.</p>
-    <p><strong>📌 El ejemplo que lo deja claro:</strong> apuntás a ganar <strong class="ex-green">$100</strong> y definís que, si sale mal, perdés como máximo <strong>$80</strong>. Tu relación es 100 : 80 = <strong>1,25</strong>.</p>
-    <p>¿Qué significa? Que tu <strong>punto de equilibrio es ganar apenas el 44% de las veces</strong>. En otras palabras: <strong class="ex-green">podés equivocarte en más de la mitad de tus operaciones y aun así no perder dinero.</strong></p>
-    <p>Esa es la matemática que trabaja a tu favor: no se trata de acertarle siempre a la dirección del precio, sino de que cada acierto valga más que cada error. La disciplina le gana a la adivinación.</p>
+  <a class="crosslink" id="toEntrada" href="entrada.html">🚦 Semáforo de Entrada: ¿es buen momento? →
+    <small>La luz te dice con cuánto entrar. Esta herramienta te dice cuánto es eso en acciones.</small></a>
+  <a class="crosslink" id="toNyse" href="index.html">🏢 Semáforo de Calidad: ¿es una buena empresa? →
+    <small>El qué importa más que el cuándo.</small></a>
+
+  <div class="exp">
+    <h3>🧭 De dónde sale el stop</h3>
+    <p>El precio se dispersa con la <strong>raíz</strong> del tiempo, no con el tiempo. Por eso el stop se mide en <code>0,5 × ATR × √ruedas</code>: media respiración diaria por cada raíz de rueda que la vayas a sostener. Probamos seis anchos en tres plazos, sobre <strong>130 acciones que no son las del curso</strong> y en dos décadas separadas — con la crisis de 2008 adentro. En 10 de las 12 pruebas ganó el mismo ancho; en las otras dos la diferencia fue de 0,02 R.</p>
+    <p><strong>La ventaja está en el tiempo, no en el momento.</strong> Con el stop correcto para cada plazo, el mismo método rindió <strong>+0,15 R a un mes y +0,39 R a un año</strong>, sin una sola excepción en las 12 particiones. Sostener más tiempo hizo más diferencia que elegir el día.</p>
+    <p><strong>El tamaño se ajusta solo a la luz de Entrada.</strong> Una acción en luz roja llega con una respiración diaria 1,8 veces la de una en verde. Con el stop medido así, el stop sale más ancho y la posición más chica — en promedio, más o menos la mitad. Por eso acá no se achica dos veces.</p>
+  </div>
+
+  <div class="exp amber">
+    <h3>⚖️ La regla del 100/80 — una convención con vos mismo</h3>
+    <p>No existe un número mágico universal. El <strong>100/80</strong> (apuntar a ganar 100 arriesgando como máximo 80) es un <strong>compromiso que asumís con vos mismo</strong>: entrás solo cuando lo que podés ganar pesa más que lo que podés perder.</p>
+    <p><strong>📌 El ejemplo:</strong> apuntás a ganar <strong class="ex-green">$100</strong> y, si sale mal, perdés como máximo <strong>$80</strong>. Tu relación es 100 : 80 = <strong>1,25</strong>. Tu punto de equilibrio es ganar apenas el 44% de las veces: <strong class="ex-green">podés equivocarte en más de la mitad de tus operaciones y aun así no perder dinero.</strong></p>
+    <p>El stop del paso 1 apunta a 2:1 — más exigente que el 100/80. No se trata de acertarle a la dirección del precio, sino de que cada acierto valga más que cada error.</p>
+  </div>
+
+  <div class="exp">
+    <h3>⚠️ Los límites de esta medición</h3>
+    <p><strong>Supervivencia.</strong> La muestra son tickers que hoy cotizan. Metimos castigadas de verdad — Intel, cruceros, aerolíneas, retail — pero las empresas que quebraron o fueron compradas no están en los datos.</p>
+    <p><strong>Sin comisiones ni spread.</strong> Y eso golpea más fuerte al plazo corto, que opera más veces. Con costos, la ventaja del plazo largo se abre todavía más.</p>
+    <p><strong>El tope del 25%.</strong> “No más de un cuarto de la cuenta en una sola acción” es una convención de prudencia, no un resultado del backtest: la medición dice cuánto aire necesita el stop, no cuántos huevos van en cada canasta.</p>
   </div>
 
 </div>
 
 <footer>
-  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Uso educativo — no es recomendación de inversión
+  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Datos: Yahoo Finance · Uso educativo — no es recomendación de inversión
 </footer>
 
 <script>
-function val(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;}
+/* ============================================================
+   Worker proxy (mismo que el Semáforo de Calidad y el de Entrada)
+   Solo lo usa la parte "con una acción". El paso 3 funciona sin código.
+   ============================================================ */
+const PROXY='https://yahoo-proxy.webmaster-c89.workers.dev';
+const ACCESS_LS='snse_access_code';        // candado COMPARTIDO con los otros semáforos
+const PREF_LS='sem_riesgo_prefs';
+const PREF_OLD='sem_entrada_prefs';        // preferencias de la vieja entrada-nueva.html
+let CLIENT_CODE=null;                      // null = todavía no verificado
+let pendingSymbol='';
+
+const $=id=>document.getElementById(id);
+const nf=(x,d)=>Number(x).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd=x=>'$'+Math.round(x).toLocaleString('es-AR');
+
+/* ---- Candado en línea ---- */
+function storedCode(){try{return localStorage.getItem(ACCESS_LS)||'';}catch(e){return'';}}
+async function checkCode(code){
+  try{
+    const r=await fetch(`${PROXY}/?check=1&k=${encodeURIComponent(code)}`);
+    if(!r.ok)return false;
+    const j=await r.json();
+    return !!j.ok;
+  }catch(e){return true;} // si el Worker no responde, no bloqueamos al alumno legítimo
+}
+async function ensureAccess(){
+  if(CLIENT_CODE!==null)return true;
+  const saved=storedCode();
+  if(saved && await checkCode(saved)){CLIENT_CODE=saved;return true;}
+  if(await checkCode('')){CLIENT_CODE='';return true;}     // Worker en modo abierto
+  return false;
+}
+async function submitGate(){
+  const inp=$('gateInput'),btn=$('gateBtn'),err=$('gateErr');
+  const code=inp.value.trim().toUpperCase();
+  if(!code){err.textContent='Ingresá tu código de acceso.';return;}
+  btn.disabled=true;err.textContent='Verificando...';
+  const ok=await checkCode(code);
+  btn.disabled=false;
+  if(ok){
+    CLIENT_CODE=code;
+    try{localStorage.setItem(ACCESS_LS,code);}catch(e){}
+    err.textContent='';$('lock').classList.remove('show');
+    if(pendingSymbol){go(pendingSymbol);pendingSymbol='';}
+  }else{
+    err.textContent='Código incorrecto. Revisá tu área de miembros.';
+    inp.select();
+  }
+}
+
+/* ============================================================
+   La regla: stop = 0,5 x ATR x raíz(ruedas)
+   Resultados medidos sobre 130 tickers fuera del curso
+   (Documents\semaforo_research\validacion.py, 27-ago-2026)
+   ============================================================ */
+const PLAZOS=[{k:'1 mes',n:21,r:0.15},{k:'3 meses',n:63,r:0.23},{k:'1 año',n:252,r:0.39}];
+const K_STOP=0.5, RATIO=2;
+/* Tope de concentración: convención de prudencia, NO sale del backtest. */
+const LIMITE_CONC=25;
+/* Luz de Entrada: misma regla que entrada.html (media de 200 ± 2 ATR) */
+const BANDA_ATR=2;
+let PL=1, DATA=null, TICKER='';
+
+/* ---- Preferencias (plazo, capital, riesgo) ---- */
+function loadPrefs(){
+  try{
+    const p=JSON.parse(localStorage.getItem(PREF_LS)||localStorage.getItem(PREF_OLD)||'{}');
+    if(p.pl!=null&&p.pl>=0&&p.pl<PLAZOS.length)PL=p.pl;
+    if(p.cap)$('capital').value=p.cap;
+    if(p.rsk)$('rsk').value=p.rsk;
+  }catch(e){}
+}
+function savePrefs(){
+  try{localStorage.setItem(PREF_LS,JSON.stringify({pl:PL,cap:$('capital').value,rsk:$('rsk').value}));}catch(e){}
+}
+
+/* ---- Indicadores desde el histórico ---- */
+function indicadores(d){
+  const h=d.h,l=d.l,c=d.c,n=c.length;
+  if(n<40)return null;
+  const tr=[];
+  for(let i=1;i<n;i++)tr.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));
+  const atrPct=[];
+  for(let i=13;i<tr.length;i++){
+    let s=0;for(let j=i-13;j<=i;j++)s+=tr[j];
+    atrPct.push((s/14)/c[i+1]*100);
+  }
+  const price=c[n-1];
+  const atr=atrPct[atrPct.length-1];
+  const orden=atrPct.slice().sort((a,b)=>a-b);
+  const mediana=orden[Math.floor(orden.length/2)];
+  let sma200=null,luz=null;
+  if(n>=200){
+    let s=0;for(let i=n-200;i<n;i++)s+=c[i];sma200=s/200;
+    const dist=price/sma200-1,banda=BANDA_ATR*atr/100;
+    luz=dist>banda?'g':dist<-banda?'r':'a';
+  }
+  return{price,atr,rel:mediana>0?atr/mediana:1,sma200,luz};
+}
+
+function exoticNote(t,tipo){
+  const tp=(tipo||'').toUpperCase();
+  if(tp&&tp!=='EQUITY'&&tp!=='ETF')
+    return `⚠️ ${t} no es una acción común ni un ETF. La regla del stop está medida sobre acciones de EE. UU. e índices: el ancho que ves es real para este papel, pero el respaldo histórico no le calza igual.`;
+  return'';
+}
+
+/* ============================================================
+   Datos (Worker → Yahoo chart)
+   ============================================================ */
+async function fetchHist(sym){
+  const r=await fetch(`${PROXY}/?hist=${encodeURIComponent(sym)}&k=${encodeURIComponent(CLIENT_CODE||'')}`);
+  const j=await r.json().catch(()=>null);
+  if(!r.ok||!j||j.error)throw new Error((j&&j.error)||`HTTP ${r.status}`);
+  if(!j.c||j.c.length<40)throw new Error('historial insuficiente');
+  return j;
+}
+
+function go(t){$('tickerInput').value=t;analyze();}
+
+async function analyze(){
+  const t=($('tickerInput').value||'').trim().toUpperCase();
+  const err=$('err'),load=$('loading'),res=$('tkRes');
+  err.classList.remove('show');
+  if(!/^[A-Z0-9.\-]{1,12}$/.test(t)){
+    err.textContent='Escribí un símbolo válido (ej: AAPL).';err.classList.add('show');return;
+  }
+  $('btn').disabled=true;
+  if(!(await ensureAccess())){
+    $('btn').disabled=false;
+    pendingSymbol=t;
+    $('lock').classList.add('show');
+    setTimeout(()=>$('gateInput').focus(),60);
+    return;
+  }
+  res.classList.remove('show');load.classList.add('show');
+  try{
+    const j=await fetchHist(t);
+    const ind=indicadores(j);
+    if(!ind)throw new Error('historial insuficiente');
+    DATA={...ind,tipo:j.quoteType};TICKER=t;
+    load.classList.remove('show');
+    render();
+    res.classList.add('show');
+    res.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    load.classList.remove('show');
+    err.textContent=`No pude leer ${t}. ${String(e.message||e)}. Probá con otro símbolo.`;
+    err.classList.add('show');
+  }finally{$('btn').disabled=false;}
+}
+
+/* ============================================================
+   Render del stop y el tamaño
+   ============================================================ */
+function segs(){
+  $('pls').innerHTML=PLAZOS.map((p,i)=>
+    `<button type="button" data-i="${i}" aria-pressed="${i===PL}">${p.k}<span>${p.n} ruedas</span></button>`).join('');
+}
+
+function render(){
+  const cap=Math.max(+$('capital').value||0,1),rsk=Math.max(+$('rsk').value||0,1);
+  $('rskPct').textContent=`· ${nf(rsk/cap*100,1)}% de tu capital`;
+  if(!DATA)return;
+  const d=DATA,p=PLAZOS[PL];
+  const stop=K_STOP*d.atr*Math.sqrt(p.n);
+  const stopUsd=d.price*stop/100,target=d.price*(1+RATIO*stop/100);
+  const posRiesgo=rsk/(stop/100);          // lo que permite tu riesgo por operación
+  const posConc=cap*LIMITE_CONC/100;       // lo que permite no poner todo en una
+  const mandaConc=posRiesgo>posConc;
+  const pos=Math.min(posRiesgo,posConc);
+  const qty=Math.floor(pos/d.price);
+  const share=pos/cap*100;
+  const riesgoReal=pos*stop/100;           // lo que arriesgás de verdad con esa posición
+  const atrs=stop/d.atr;
+
+  /* Luz de Entrada, con link a la explicación */
+  const luz=$('luz');
+  if(d.luz){
+    luz.style.display='';
+    luz.className='luz '+d.luz;
+    luz.href='entrada.html?symbol='+encodeURIComponent(TICKER);
+    $('luzTxt').innerHTML={
+      g:`Semáforo de Entrada: <b>luz verde</b> — podés entrar con tu tamaño normal. Ver por qué →`,
+      a:`Semáforo de Entrada: <b>luz amarilla</b> — todavía no eligió lado. Ver por qué →`,
+      r:`Semáforo de Entrada: <b>luz roja</b> — el viaje es más brusco. Ver por qué →`}[d.luz];
+  }else{luz.style.display='none';}
+
+  $('breathe').innerHTML=`<b>${TICKER}</b> — respira <b>${nf(d.atr,2)}% por día</b>, promedio de las últimas 14 ruedas. `+
+    (d.rel<0.85?'Está más tranquila que de costumbre.':d.rel>1.2?'Está más agitada que de costumbre.':'Es lo normal para ella.');
+
+  const ex=$('exotic'),note=exoticNote(TICKER,d.tipo);
+  ex.textContent=note;ex.classList.toggle('show',!!note);
+
+  $('stopPct').textContent=nf(stop,1)+'%';
+  $('stopUsd').innerHTML=`Precio hoy <b>$${nf(d.price,2)}</b> → stop en <b>$${nf(d.price-stopUsd,2)}</b> · $${nf(stopUsd,2)} abajo`;
+  const nT=Math.min(Math.round(atrs),18);let tk='';
+  for(let i=0;i<18;i++)tk+=`<div class="tick${i<nT?' on':''}" style="height:${i<nT?22:12}px"></div>`;
+  $('ticks').innerHTML=tk;
+  $('tickNote').textContent=`= ${nf(atrs,1)} respiraciones diarias de margen · si entrás a otro precio, sostené el ${nf(stop,1)}%`;
+
+  let cls='ok';
+  let v=`<b>El stop entra cómodo.</b> Podés poner ${usd(pos)} — el ${nf(share,0)}% de tu capital, ${qty} ${qty===1?'acción':'acciones'} — y arriesgás ${usd(riesgoReal)}. Stop en $${nf(d.price-stopUsd,2)}, objetivo en $${nf(target,2)}.`;
+  if(stop>=35){
+    cls='bad';
+    v=`<b>Esto ya no es un stop.</b> ${TICKER} necesita ${nf(stop,1)}% de aire para ${p.k}. A ese ancho, históricamente solo te sacan el 5% de las veces: no te está protegiendo de nada. Si la vas a sostener ${p.k}, protegete con el tamaño de la posición, no con el stop.`;
+  }else if(PL===0){
+    cls='warn';
+    v=`<b>A un mes la aritmética es la peor de las tres.</b> El resultado medio fue +0,15 R contra +0,39 R a un año, con la misma acción y el mismo método. Y todavía no contamos comisiones, que a este plazo pesan el triple. ¿Hay apuro?`;
+  }else if(stop>=20){
+    cls='warn';
+    v=`<b>Necesita mucho aire.</b> Con ${nf(stop,1)}% de stop, tu posición queda en ${usd(pos)} (${nf(share,0)}% del capital) y arriesgás ${usd(riesgoReal)}. Es correcto — pero si querés poner más, estás arriesgando más de lo que decidiste.`;
+  }
+  $('hero').className='hero '+cls;
+  $('verdictStop').className='note'+(cls==='ok'?'':' '+cls);
+  $('verdictStop').innerHTML=v;
+
+  const cn=$('conc');
+  if(mandaConc){
+    cn.style.display='';
+    cn.innerHTML=`<b>Acá no manda tu stop, manda la concentración.</b> Tu riesgo de ${usd(rsk)} te permitiría ${usd(posRiesgo)}, pero eso es el ${nf(posRiesgo/cap*100,0)}% de tu cuenta en una sola acción. Con el tope del ${LIMITE_CONC}% la posición queda en ${usd(pos)} y arriesgás ${usd(riesgoReal)}.`;
+  }else{
+    cn.style.display='none';
+  }
+
+  /* Tamaño según la luz: en rojo ya está achicado por el stop más ancho;
+     en amarillo, la regla de Entrada es arrancar con la mitad. */
+  const sl=$('sizeLuz');
+  if(d.luz==='a'){
+    const q2=Math.floor(qty/2);
+    sl.style.display='';sl.className='note warn';
+    sl.innerHTML=`<b>Luz amarilla: arrancá con la mitad.</b> Hoy serían ${q2} ${q2===1?'acción':'acciones'} (${usd(q2*d.price)}), arriesgando ${usd(q2*stopUsd)}. Si pasa a verde, completás hasta ${qty}.`;
+  }else if(d.luz==='r'){
+    sl.style.display='';sl.className='note bad';
+    sl.innerHTML=`<b>Luz roja: este tamaño ya es el de la luz roja.</b> Como ${TICKER} se mueve más, el stop sale más ancho y la posición más chica. No la achiques de nuevo. Lo que sí: preparate para verla más abajo en el camino.`;
+  }else{
+    sl.style.display='none';
+  }
+
+  $('mTarget').textContent='$'+nf(target,2);
+  $('mTargetX').textContent='+'+nf(RATIO*stop,1)+'%';
+  $('mPos').textContent=usd(pos);
+  $('mPosX').textContent=nf(share,0)+'% del capital · límite: '+(mandaConc?'concentración':'riesgo');
+  $('mQty').textContent=qty.toLocaleString('es-AR');
+  $('mQtyX').textContent='a $'+nf(d.price,2);
+  $('rPrice').textContent='$'+nf(d.price,2);
+  $('rAtr').textContent=nf(d.atr,2)+'% · '+(d.rel<0.85?'más tranquila que de costumbre':d.rel>1.2?'más agitada que de costumbre':'lo normal para ella');
+  $('rEdge').textContent='+'+nf(p.r,2)+' R por unidad arriesgada';
+
+  /* Paso 3 con los números REALES de esta operación */
+  $('riesgo').value=Math.round(riesgoReal);
+  $('ganancia').value=Math.round(riesgoReal*RATIO);
+  calc();
+
+  $('toEntrada').href='entrada.html?symbol='+encodeURIComponent(TICKER);
+  $('toNyse').href='index.html?symbol='+encodeURIComponent(TICKER);
+}
+
+/* ============================================================
+   Paso 3: ¿la operación cierra?
+   ============================================================ */
+function val(id){const v=parseFloat($(id).value);return isNaN(v)?null:v;}
 
 function calc(){
   const capital=val('capital');
   const g=val('ganancia');
   const r=val('riesgo');
-
-  const v=document.getElementById('verdict');
-  const t=document.getElementById('vTitle');
-  const d=document.getElementById('vDesc');
-  const metrics=document.getElementById('metrics');
+  const v=$('verdict'),t=$('vTitle'),d=$('vDesc'),metrics=$('metrics');
   v.classList.remove('ok','warn','fail');
 
   if(g==null||r==null||g<=0||r<=0){
     t.textContent='Completá los datos';
-    d.textContent='Ingresá ganancia y pérdida (mayores a 0) para ver si la operación tiene sentido.';
+    d.textContent='Medí una acción arriba, o ingresá ganancia y pérdida a mano.';
     metrics.style.display='none';
     return;
   }
-
   metrics.style.display='grid';
 
   const rr=g/r;
   const be=r/(g+r)*100;          // punto de equilibrio (% de aciertos necesarios)
   const margin=100-be;           // margen de error (% que podés fallar)
 
-  // Relación R:R
-  document.getElementById('mRR').textContent=rr.toFixed(2)+' : 1';
-  const rrEl=document.getElementById('mRR');
-  rrEl.className='metric-val '+(rr>=1.25?'green':rr>=1?'amber':'red');
-  document.getElementById('mRRnote').textContent=`Ganás $${rr.toFixed(2)} por cada $1 que arriesgás.`;
+  $('mRR').textContent=rr.toFixed(2)+' : 1';
+  $('mRR').className='metric-val '+(rr>=1.25?'green':rr>=1?'amber':'red');
+  $('mRRnote').textContent=`Ganás $${rr.toFixed(2)} por cada $1 que arriesgás.`;
+  $('mBE').textContent=be.toFixed(0)+'%';
+  $('mBEnote').textContent=`Ganando el ${be.toFixed(0)}% de las veces ya quedás en cero.`;
+  $('mMargin').textContent=margin.toFixed(0)+'%';
+  $('mMargin').className='metric-val '+(margin>=50?'green':margin>=40?'amber':'red');
+  $('mMarginNote').textContent=`Podés equivocarte hasta el ${margin.toFixed(0)}% de las veces y no perder.`;
 
-  // Punto de equilibrio
-  document.getElementById('mBE').textContent=be.toFixed(0)+'%';
-  document.getElementById('mBEnote').textContent=`Ganando el ${be.toFixed(0)}% de las veces ya quedás en cero.`;
-
-  // Margen de error
-  const mEl=document.getElementById('mMargin');
-  mEl.textContent=margin.toFixed(0)+'%';
-  mEl.className='metric-val '+(margin>=50?'green':margin>=40?'amber':'red');
-  document.getElementById('mMarginNote').textContent=`Podés equivocarte hasta el ${margin.toFixed(0)}% de las veces y no perder.`;
-
-  // Riesgo sobre capital
-  const capEl=document.getElementById('mCap');
-  const capNote=document.getElementById('mCapNote');
+  const capEl=$('mCap'),capNote=$('mCapNote');
   let capPct=null;
   if(capital!=null&&capital>0){
     capPct=r/capital*100;
@@ -217,20 +657,17 @@ function calc(){
     capNote.textContent='Ingresá tu capital para medir el tamaño del riesgo.';
   }
 
-  // ---- Veredicto: combina la relación 100/80 con el riesgo sobre capital ----
-  // Nivel base por R:R
-  let base = rr>=1.25?'ok' : rr>=1?'warn' : 'fail';
-  // Override por riesgo sobre capital: >10% bloquea, >5% degrada a advertencia
-  let capLevel = null;
-  if(capPct!=null){ capLevel = capPct>10?'fail' : capPct>5?'warn' : null; }
-  // Nivel final = el peor de los dos
+  // Veredicto = el peor entre la relación 100/80 y el riesgo sobre capital
+  const base=rr>=1.25?'ok':rr>=1?'warn':'fail';
+  let capLevel=null;
+  if(capPct!=null){capLevel=capPct>10?'fail':capPct>5?'warn':null;}
   const rank={ok:0,warn:1,fail:2};
-  let level = base;
-  if(capLevel && rank[capLevel]>rank[level]) level=capLevel;
+  let level=base;
+  if(capLevel&&rank[capLevel]>rank[level])level=capLevel;
 
   if(level==='fail'){
     v.classList.add('fail');
-    if(capPct!=null && capPct>10){
+    if(capPct!=null&&capPct>10){
       t.textContent='🔴 NO AVANZAR';
       d.textContent=`Estás arriesgando el ${capPct.toFixed(1)}% de tu capital en una sola operación. Aunque la relación fuera buena (${rr.toFixed(2)}:1), una pérdida así compromete tu cuenta. Reducí el tamaño de la posición antes de entrar.`;
     }else{
@@ -239,7 +676,7 @@ function calc(){
     }
   }else if(level==='warn'){
     v.classList.add('warn');
-    if(capPct!=null && capPct>5 && rr>=1.25){
+    if(capPct!=null&&capPct>5&&rr>=1.25){
       t.textContent='🟡 ACHICÁ LA POSICIÓN';
       d.textContent=`La relación juega a tu favor (${rr.toFixed(2)}:1), pero estás arriesgando el ${capPct.toFixed(1)}% de tu capital. Es mucho para una sola operación: reducí el tamaño y volvé a evaluar.`;
     }else{
@@ -253,16 +690,31 @@ function calc(){
   }
 }
 
-/* Prellenado desde el Semáforo de Entrada:
-   calculadora.html?capital=10000&riesgo=500&ganancia=1000 */
+/* ============================================================
+   Init
+   - ?symbol=AAPL  → mide el stop de ese ticker (pide código si hace falta)
+   - ?capital=&riesgo=&ganancia=  → prellena el paso 3 (links viejos)
+   ============================================================ */
+$('pls').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  PL=+b.dataset.i;segs();savePrefs();render();
+});
+$('capital').addEventListener('input',()=>{savePrefs();render();if(!DATA)calc();});
+$('rsk').addEventListener('input',()=>{savePrefs();render();});
+$('tickerInput').addEventListener('keydown',e=>{if(e.key==='Enter')analyze();});
+$('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
+
 document.addEventListener('DOMContentLoaded',()=>{
+  loadPrefs();segs();render();
   const q=new URLSearchParams(location.search);
   let algo=false;
   ['capital','ganancia','riesgo'].forEach(id=>{
     const v=parseFloat(q.get(id));
-    if(isFinite(v)&&v>0){document.getElementById(id).value=v;algo=true;}
+    if(isFinite(v)&&v>0){$(id).value=v;algo=true;}
   });
   if(algo)calc();
+  const sym=(q.get('symbol')||'').trim().toUpperCase();
+  if(sym&&/^[A-Z0-9.\-]{1,12}$/.test(sym))go(sym);
 });
 </script>
 </body>
