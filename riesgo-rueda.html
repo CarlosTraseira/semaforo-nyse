@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Semáforo de Riesgo · La rueda · Semáforo del Inversor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c0c10'/><rect x='11' y='2' width='10' height='28' rx='5' fill='%231a1a24'/><circle cx='16' cy='8' r='4' fill='%2300ff88'/><circle cx='16' cy='16' r='4' fill='%23ffb840'/><circle cx='16' cy='24' r='4' fill='%23ff4070'/></svg>">
+<style>
+:root{
+  --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--border:#252538;
+  --text:#f0f0f8;--text2:#9090b0;--text3:#5a5a7c;
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.10);--green-glow:rgba(0,255,136,0.25);--green-border:rgba(0,255,136,0.30);
+  --amber:#ffb840;--amber-dim:rgba(255,184,64,0.10);--amber-border:rgba(255,184,64,0.30);
+  --red:#ff4070;--red-dim:rgba(255,64,112,0.10);--red-border:rgba(255,64,112,0.30);
+  --display:'Syne',sans-serif;--mono:'Fira Code',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 45% at 15% 5%,rgba(99,102,241,0.07) 0%,transparent 60%),radial-gradient(ellipse 55% 40% at 85% 85%,rgba(0,255,136,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;flex:1;max-width:680px;margin:0 auto;padding:36px 16px 0;width:100%;display:flex;flex-direction:column;gap:16px}
+[hidden]{display:none !important}
+
+.header{text-align:center;display:flex;flex-direction:column;gap:12px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:14px}
+.logo-lights{display:flex;gap:6px;align-items:center}
+.ll{width:13px;height:13px;border-radius:50%}
+.ll.g{background:var(--green);box-shadow:0 0 10px var(--green-glow)}
+.ll.a{background:var(--amber)}
+.ll.r{background:var(--red)}
+.logo-name{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.logo-name span{color:var(--green)}
+.logo-tag{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.14em;text-transform:uppercase}
+
+/* Solapas */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tabs button,.tabs a{font-family:var(--display);font-size:15px;font-weight:700;color:var(--text2);background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 6px;cursor:pointer;text-align:center;text-decoration:none;display:flex;flex-direction:column;gap:3px;align-items:center;transition:border-color .15s,color .15s,background .15s}
+.tabs span{font-family:var(--mono);font-size:10px;font-weight:400;color:var(--text3)}
+.tabs button:hover,.tabs a:hover{border-color:var(--green-border)}
+.tabs button[aria-pressed="true"]{background:var(--green-dim);border-color:var(--green-border);color:var(--green)}
+.tabs button[aria-pressed="true"] span{color:var(--green)}
+
+.intro{font-size:15px;color:var(--text2);line-height:1.75;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:18px 22px}
+.intro .lead{display:block;font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.4}
+
+.sec{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.14em;margin-top:10px;display:flex;align-items:center;gap:10px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec .opt{font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:none}
+
+.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.lbl{font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;display:block}
+.lbl small{text-transform:none;letter-spacing:0;color:var(--text3)}
+.help{font-size:13.5px;color:var(--text2);line-height:1.65}
+.help a{color:var(--green)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mw{position:relative;display:flex;align-items:center}
+.mw .pre{position:absolute;left:13px;font-family:var(--mono);font-size:15px;color:var(--text3);pointer-events:none}
+.num{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 13px 12px 28px;font-family:var(--mono);font-size:16px;color:var(--text);outline:none;transition:border-color .2s}
+.num.nopre{padding-left:13px}
+.num:focus{border-color:var(--green)}
+.cap{font-family:var(--mono);font-size:10.5px;color:var(--text3);margin-top:6px;letter-spacing:.04em;line-height:1.5}
+.search-row{display:flex;gap:10px}
+.search-input{flex:1;min-width:0;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--mono);font-size:17px;font-weight:500;color:var(--text);outline:none;text-transform:uppercase;transition:border-color .2s}
+.search-input::placeholder{text-transform:none;color:var(--text3)}
+.search-input:focus{border-color:var(--green)}
+.btn{background:var(--green);color:#0c0c10;border:none;border-radius:10px;padding:0 22px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;min-height:48px;transition:opacity .15s}
+.btn:hover{opacity:.88}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:var(--s2);color:var(--text2);border:1px solid var(--border);font-size:13px;font-family:var(--mono);font-weight:500;min-height:38px;padding:0 14px}
+.btn.ghost:hover{border-color:var(--green-border);color:var(--text);opacity:1}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.link{font-family:var(--mono);font-size:12.5px;color:var(--green);text-decoration:none}
+.link:hover{text-decoration:underline}
+input:focus-visible,button:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+.lock{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.lock p{font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.65}
+.lock p a{color:var(--green)}
+.lock-err{font-family:var(--mono);font-size:12px;color:var(--red);min-height:16px}
+.msg{font-family:var(--mono);font-size:12.5px;line-height:1.6;border-radius:10px;padding:11px 14px;background:var(--s2);border:1px solid var(--border);color:var(--text2)}
+.msg[data-tone="error"]{background:var(--red-dim);border-color:var(--red-border);color:var(--red)}
+.msg[data-tone="ok"]{background:var(--green-dim);border-color:var(--green-border);color:var(--green)}
+.msg[data-tone="working"]{color:var(--amber)}
+.stock{font-family:var(--mono);font-size:13px;color:var(--text2);line-height:1.7}
+.stock b{color:var(--text)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:baseline;background:var(--text3)}
+.dot.g{background:var(--green);box-shadow:0 0 8px var(--green-glow)}.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+
+.drop{border:1px dashed var(--border);border-radius:12px;padding:14px;background:var(--s2);display:flex;flex-direction:column;gap:8px}
+.drop.is-dragging{border-color:var(--green)}
+.catch{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:14px;font-family:var(--mono);font-size:13px;color:var(--text);text-align:center;outline:none}
+.catch:focus{border-color:var(--green)}
+.catch::placeholder{color:var(--text3)}
+.preview img{max-width:100%;border-radius:8px;border:1px solid var(--border)}
+.file-input{display:none}
+select{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-family:var(--mono);font-size:14px;color:var(--text);outline:none}
+.cands{display:flex;flex-direction:column;gap:6px}
+.cand{display:grid;grid-template-columns:1.1fr 1fr 1fr 1.3fr;gap:8px;align-items:center;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--text2);cursor:pointer;text-align:left}
+.cand b{color:var(--text);font-weight:600}
+.cand:hover{border-color:var(--green-border)}
+.cand[aria-pressed="true"]{background:var(--green-dim);border-color:var(--green-border);color:var(--green)}
+.cand[aria-pressed="true"] b{color:var(--green)}
+
+/* Resultado */
+.hero{border-radius:16px;padding:22px 20px;border:1px solid var(--border);background:var(--s2);display:flex;flex-direction:column;gap:8px;text-align:center}
+.hero.ok{background:var(--green-dim);border-color:var(--green-border)}
+.hero.warn{background:var(--amber-dim);border-color:var(--amber-border)}
+.hero.bad{background:var(--red-dim);border-color:var(--red-border)}
+.hero .eyebrow{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.16em}
+.hero .title{font-size:clamp(21px,5vw,27px);font-weight:800;line-height:1.15}
+.hero.ok .title{color:var(--green)}.hero.warn .title{color:var(--amber)}.hero.bad .title{color:var(--red)}
+.hero .title .dot{width:14px;height:14px;margin-right:10px;vertical-align:middle}
+.hero .desc{font-family:var(--mono);font-size:13px;color:var(--text2);line-height:1.65}
+.hero .desc b{color:var(--text)}
+.hero ul{list-style:none;font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:1.6;text-align:left;display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.met{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:5px}
+.met .k{font-family:var(--mono);font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;line-height:1.4}
+.met .v{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.met .v.green{color:var(--green)}.met .v.red{color:var(--red)}.met .v.amber{color:var(--amber)}
+.met .x{font-family:var(--mono);font-size:10.5px;color:var(--text3);line-height:1.5}
+.box{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.box h3{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;font-weight:500}
+.box p{font-size:14px;color:var(--text2);line-height:1.7}
+.box p strong,.box p b{color:var(--text)}
+.box .big{font-family:var(--mono);font-size:15px;color:var(--text);line-height:1.6}
+.box.warnb{border-left:3px solid var(--amber)}
+.box.badb{border-left:3px solid var(--red)}
+.box.okb{border-left:3px solid var(--green)}
+.checks{display:flex;flex-direction:column;gap:8px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2);line-height:1.55;cursor:pointer}
+.chk input{margin-top:4px;accent-color:#00ff88;width:16px;height:16px;flex:none}
+.chk a{color:var(--green);font-family:var(--mono);font-size:12px}
+.chk b{color:var(--text)}
+.auto{font-family:var(--mono);font-size:12.5px;color:var(--text2);line-height:1.6}
+
+.exp{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:19px 21px;display:flex;flex-direction:column;gap:11px}
+.exp h3{font-family:var(--mono);font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.12em;font-weight:500}
+.exp p{font-size:14px;color:var(--text2);line-height:1.72}
+.exp p strong{color:var(--text)}
+.exp ul{font-size:14px;color:var(--text2);line-height:1.72;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.exp ul strong{color:var(--text)}
+.pruebas{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;color:var(--text2)}
+.pruebas th,.pruebas td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:center}
+.pruebas th{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.pruebas th small{display:block;text-transform:none;letter-spacing:0;font-size:9.5px}
+.pruebas td:first-child,.pruebas th:first-child{text-align:left}
+.pruebas tr:last-child td{border-bottom:none}
+.ver{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.7;padding:0 4px}
+.ver summary{cursor:pointer;text-align:center;color:var(--text2)}
+.ver ul{margin-top:10px;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.ver b{color:var(--text2);font-weight:500}
+footer{position:relative;z-index:1;font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;line-height:1.9;padding:34px 20px 26px;margin-top:20px}
+footer span{color:var(--text2)}
+
+@media (max-width:520px){.row2{grid-template-columns:1fr}.tabs button,.tabs a{font-size:13px}.cand{grid-template-columns:1fr 1fr;row-gap:2px}.pruebas{font-size:11px}.pruebas th,.pruebas td{padding:7px 3px}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-lights"><div class="ll g"></div><div class="ll a"></div><div class="ll r"></div></div>
+      <div class="logo-name">Semáforo de <span>Riesgo</span></div>
+    </div>
+    <div class="logo-tag">La rueda · ¿te conviene que te asignen?</div>
+  </div>
+
+  <nav class="tabs" aria-label="Tipo de operación">
+    <button type="button" data-type="put" aria-pressed="true">Vendo un put<span>antes de tener las acciones</span></button>
+    <button type="button" data-type="call" aria-pressed="false">Vendo un call<span>sobre acciones que tengo</span></button>
+    <a href="calculadora.html">Compro acciones<span>stop, tamaño y salida ↗</span></a>
+  </nav>
+
+  <div class="intro" id="intro"></div>
+
+  <!-- Tu cuenta / tu posición -->
+  <div class="card">
+    <span class="lbl">Tu cuenta <small>· se guarda en este navegador</small></span>
+    <div class="row2">
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="capital" type="number" inputmode="decimal" value="10000" min="100" step="500" aria-label="Capital de la cuenta"></div>
+        <div class="cap">Capital de la cuenta</div>
+      </div>
+      <div data-only="put">
+        <div class="mw"><input class="num nopre" id="contratos" type="number" inputmode="numeric" value="1" min="1" step="1" aria-label="Contratos"></div>
+        <div class="cap">Contratos que pensás vender · 1 contrato = 100 acciones</div>
+      </div>
+      <div data-only="call" hidden>
+        <div class="mw"><input class="num nopre" id="acciones" type="number" inputmode="numeric" value="100" min="100" step="100" aria-label="Acciones que tenés"></div>
+        <div class="cap">Acciones que tenés · cada call cubre 100</div>
+      </div>
+    </div>
+    <div class="row2" data-only="call" hidden>
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="precioAsig" type="number" inputmode="decimal" step="0.01" placeholder="ej. 45,00" aria-label="Precio al que compraste las acciones"></div>
+        <div class="cap">Precio al que compraste las acciones (o el strike del put que te asignaron)</div>
+      </div>
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="primasCob" type="number" inputmode="decimal" step="0.01" value="0" aria-label="Primas ya cobradas por acción"></div>
+        <div class="cap">Primas que ya cobraste, por acción (el put y los calls anteriores)</div>
+      </div>
+    </div>
+    <div class="row2" data-only="call" hidden>
+      <div>
+        <div class="mw"><span class="pre">$</span><input class="num" id="limiteCall" type="number" inputmode="decimal" step="10" aria-label="Lo máximo que aceptás perder si cerrás el call"></div>
+        <div class="cap">Lo máximo que aceptás perder si tenés que cerrar el call</div>
+      </div>
+      <div class="auto" id="costoTxt"></div>
+    </div>
+  </div>
+
+  <!-- 1 · La acción -->
+  <div class="sec">1 · La acción <span class="opt">· cuánto se mueve y en qué luz está</span></div>
+  <div class="card">
+    <div class="search-row">
+      <input class="search-input" id="ticker" type="text" placeholder="ej: KO, JPM, B..." autocomplete="off" autocapitalize="characters" maxlength="8" aria-label="Ticker de la acción">
+      <button class="btn" id="btnMedir" type="button">Medir</button>
+    </div>
+    <div class="lock" id="lock" hidden>
+      <p>🔒 Medir la acción usa datos de mercado en vivo. Ingresá tu código de acceso: está en tu área de miembros o en la confirmación de tu compra. ¿No lo encontrás? Escribinos por <a href="https://wa.me/5491161029299" target="_blank" rel="noopener">WhatsApp</a>.</p>
+      <div class="search-row">
+        <input class="search-input" id="gateInput" type="text" placeholder="Código de acceso" autocomplete="off" autocapitalize="characters">
+        <button class="btn" id="gateBtn" type="button">Abrir</button>
+      </div>
+      <div class="lock-err" id="gateErr"></div>
+    </div>
+    <div class="stock" id="stockTxt">Escribí el ticker y tocá <b>Medir</b>. Sin esto la app igual calcula la prima y el capital, pero no puede medir el riesgo de que te asignen.</div>
+  </div>
+
+  <!-- 2 · La cadena -->
+  <div class="sec">2 · La cadena de opciones <span class="opt">· desde TradingView</span></div>
+  <div class="card">
+    <p class="help">En TradingView elegí el vencimiento, mostrá ±10 strikes y copiá toda la tabla (o sacale una captura). Hacelo con el mercado abierto, así los precios son recientes. <a id="tvLink" href="#" target="_blank" rel="noopener" hidden>Abrir la cadena en TradingView ↗</a></p>
+    <div class="drop" id="drop">
+      <input class="catch" id="paste" type="text" readonly placeholder="Hacé clic acá y pegá la tabla o la captura (Ctrl+V)" aria-label="Pegar la cadena de opciones">
+      <div class="btns">
+        <button class="btn ghost" id="fileBtn" type="button">Elegir captura</button>
+        <input class="file-input" id="file" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Elegir una captura de la cadena">
+        <button class="btn ghost" id="demoBtn" type="button">Probar con una cadena de ejemplo</button>
+      </div>
+      <div class="preview" id="preview" hidden><img id="previewImg" alt="Vista previa de la captura"></div>
+    </div>
+    <button class="btn" id="analyze" type="button" disabled>Analizar cadena</button>
+    <div class="msg" id="status" aria-live="polite">La información se procesa en este navegador y no se guarda.</div>
+  </div>
+
+  <!-- 3 · Objetivo y resultado -->
+  <div id="res" hidden>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="sec">3 · Tu objetivo</div>
+      <div class="card">
+        <div class="cap" id="srcTxt" style="margin-top:0"></div>
+        <select id="objective" aria-label="Objetivo de la operación"></select>
+        <p class="help" id="objHelp"></p>
+        <div class="cands" id="cands" role="group" aria-label="Strikes cercanos al objetivo"></div>
+      </div>
+
+      <div class="hero" id="hero">
+        <div class="eyebrow" id="heroEyebrow">¿Te conviene que te asignen?</div>
+        <div class="title" id="heroTitle"></div>
+        <div class="desc" id="heroDesc"></div>
+        <ul id="heroList" hidden></ul>
+      </div>
+
+      <div class="grid4" id="mets"></div>
+
+      <div class="box" id="ifBox"></div>
+
+      <div class="box" id="checksBox" data-only="put">
+        <h3>Antes de vender el put</h3>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="chkCal"><span><b>La acción pasa el Semáforo de Calidad.</b> En la rueda te pueden asignar: vendé puts solo sobre empresas que querés tener. <a id="calLink" href="index.html" target="_blank" rel="noopener">Revisar Calidad ↗</a></span></label>
+          <label class="chk"><input type="checkbox" id="chkBal"><span><b>No hay balance antes del vencimiento.</b> El día del balance es el de los saltos grandes. <a id="balLink" href="#" target="_blank" rel="noopener">Ver la fecha ↗</a></span></label>
+        </div>
+        <div class="auto" id="sizeTxt"></div>
+      </div>
+
+      <div class="box warnb" id="stopBox" data-only="call" hidden>
+        <h3>Tu regla: stop para recomprar el call</h3>
+        <p>El strike queda por debajo de tu umbral. Para no vender las acciones, ponés una orden que <strong>recompra el call si la acción sube un poco por encima del strike</strong>. Un poco por encima, y no justo en el strike, para que un toque y vuelta no te haga recomprar en vano.</p>
+        <div class="row2">
+          <div>
+            <div class="mw"><span class="pre">$</span><input class="num" id="stopCall" type="number" inputmode="decimal" step="0.01" aria-label="Precio de la acción que dispara la recompra del call"></div>
+            <div class="cap" id="stopCap">Precio de la acción que dispara la recompra</div>
+          </div>
+          <div class="auto" id="stopTxt"></div>
+        </div>
+        <div class="auto" id="stopStats"></div>
+      </div>
+
+      <div class="msg" id="execTxt"></div>
+    </div>
+  </div>
+
+  <a class="link" href="index.html" style="text-align:center">🏢 Semáforo de Calidad: ¿es una buena empresa? →</a>
+
+  <div class="exp">
+    <h3>🎯 Para qué te sirve esta app</h3>
+    <p>En la rueda no apostás a que la acción suba: <strong>cobrás por esperar</strong>. Vendés un put y cobrás una prima. Si la acción cae por debajo del strike, te asignan y comprás 100 acciones por contrato. Con las acciones, vendés calls y cobrás otra prima. Si el strike del call queda en tu umbral (lo que pagaste más las primas cobradas) o arriba, dejás que te las compren. Si queda abajo, lo vendés con un stop para recomprarlo y quedarte con las acciones.</p>
+    <p>La pregunta que decide todo es una sola: <strong>¿te conviene que te asignen?</strong> Esta app te la responde con números, antes de mandar la orden:</p>
+    <ul>
+      <li><strong>Con el put:</strong> cuánta plata te bloquea, a qué precio comprarías, qué renta cobrás, cada cuánto te asignan a esa distancia y cuánto puede estar cayendo la acción cuando te asignan.</li>
+      <li><strong>Con el call:</strong> si el strike queda arriba o abajo de tu umbral, cuánto ganás si te las compran, dónde poner el stop para recomprar el call y cuánto te puede costar si salta.</li>
+    </ul>
+    <p>El contrato lo elige el mismo criterio del Copiloto de Opciones: el delta según tu objetivo. Lo nuevo es la capa de riesgo.</p>
+  </div>
+
+  <div class="exp" id="como">
+    <h3>🧭 Cómo medimos el riesgo de que te asignen</h3>
+    <p><strong>La distancia del strike, en la escala de cada acción.</strong> Un strike 5% abajo no es lo mismo en una acción tranquila que en una volátil. Por eso medimos la distancia en "respiraciones del plazo": cuánto se mueve la acción por día (el ATR de 14 ruedas) por la raíz de las ruedas que faltan para el vencimiento. Es la misma escala del stop de la pestaña "Compro acciones".</p>
+    <p><strong>De dónde salen los números.</strong> Para unas 130 acciones y ETFs de EE. UU. de todo tipo, entre 2016 y 2026 (con la caída de 2020 adentro), simulamos strikes a distintas distancias y miramos el precio al vencimiento: cuántas veces terminó por debajo del strike (te asignaban) y cuánto por debajo. Repetimos en 2006–2016, con la crisis de 2008: las probabilidades dan casi iguales.</p>
+    <p>Ejemplo para una acción que se mueve 2% por día, a un mes:</p>
+    <table class="pruebas">
+      <tr><th>Strike debajo del precio</th><th>Te asignan</th><th>Cuando te asignan, cae en promedio…<small>debajo del strike</small></th><th>…y en el peor 5%</th></tr>
+      <tr><td>Al precio (0%)</td><td>44%</td><td>5,5%</td><td>14,5%</td></tr>
+      <tr><td>4,6% abajo</td><td>20%</td><td>5,3%</td><td>14,6%</td></tr>
+      <tr><td>9,2% abajo</td><td>8%</td><td>6,0%</td><td>18,0%</td></tr>
+      <tr><td>13,8% abajo</td><td>3%</td><td>8,1%</td><td>24,3%</td></tr>
+    </table>
+    <p><strong>La lección: alejar el strike baja la probabilidad de que te asignen, pero no achica el golpe cuando pasa.</strong> Cuanto más lejos, más raro, y cuando llega suele ser un derrumbe. Vender un put es como comprar la acción con descuento: si cae fuerte, perdés casi lo mismo que si la hubieras comprado. Por eso la pregunta no es "¿me van a asignar?", sino "¿quiero esta empresa a este precio, con este tamaño?".</p>
+    <p><strong>El delta y la historia.</strong> La cadena muestra el delta, que el mercado usa como probabilidad de terminar por debajo del strike. La app te muestra al lado lo que pasó de verdad a esa distancia. Suelen diferir: el mercado cobra un seguro, y las acciones tienden a subir con el tiempo.</p>
+  </div>
+
+  <div class="exp">
+    <h3>🛑 El stop del call: lo que medimos</h3>
+    <p>Cuando el strike queda debajo de tu umbral, la regla es poner un stop sobre la acción <strong>un poco por encima del strike</strong> (con strike 45, en 45,50 o 46) que recompra el call. La idea: si el precio toca el strike y vuelve, que no te haga recomprar en vano.</p>
+    <p>Lo probamos con calls a un mes sobre las mismas ~130 acciones, entre 2016 y 2026. Para un call de delta 0,28 (el "equilibrio"):</p>
+    <table class="pruebas">
+      <tr><th>Stop en la acción</th><th>Te venden las acciones</th><th>Salta el stop</th><th>…y fue en vano<small>el call igual vencía sin valor</small></th></tr>
+      <tr><td>Sin stop</td><td>27%</td><td>—</td><td>—</td></tr>
+      <tr><td>En el strike</td><td>0%</td><td>48%</td><td>44%</td></tr>
+      <tr><td>Strike +0,5%</td><td>0,2%</td><td>44%</td><td>39%</td></tr>
+      <tr><td>Strike +1%</td><td>0,8%</td><td>40%</td><td>35%</td></tr>
+      <tr><td>Strike +2%</td><td>3%</td><td>33%</td><td>28%</td></tr>
+      <tr><td>Strike +5%</td><td>12%</td><td>18%</td><td>17%</td></tr>
+    </table>
+    <p><strong>La regla funciona para lo que busca:</strong> con el stop un 1% arriba del strike, te vendieron las acciones menos del 1% de las veces, contra 27% sin stop. Alejar el stop baja las recompras en vano, pero empiezan a venderte las acciones. Por eso la app propone strike + 1%, y lo podés cambiar.</p>
+    <p><strong>Lo que cuesta:</strong> cuando salta, recomprar el call sale caro. Con delta 0,28 cuesta en promedio 2,5 veces la prima que cobraste (un 2,3% del valor de las acciones). Con delta 0,15 llega a 5,6 veces, porque la acción tuvo que subir mucho para llegar. Por eso el tope está acá: decidí cuánto aceptás perder si tenés que cerrar el call, y la app te dice si el peor caso entra.</p>
+  </div>
+
+  <div class="exp">
+    <h3>🧩 Para qué operaciones sirve (y para cuáles no)</h3>
+    <p><strong>Sirve para la rueda:</strong> vender puts cubiertos con efectivo sobre acciones que querés tener, y vender calls cubiertos sobre acciones que ya tenés.</p>
+    <p><strong>No sirve para spreads, compras de opciones ni ventas descubiertas.</strong> Ahí el riesgo se mide distinto.</p>
+    <p><strong>Si comprás acciones directo</strong> (sin opciones), usá la pestaña <a class="link" href="calculadora.html">Compro acciones</a>: te da el stop, el tamaño y la salida.</p>
+  </div>
+
+  <div class="exp">
+    <h3>⚠️ Los límites de esta medición</h3>
+    <p><strong>La prima es la de la cadena, no una simulación.</strong> Usamos el mark que muestra TradingView. Es una referencia: tu orden puede ejecutarse a otro precio, sobre todo si la diferencia entre compra y venta es amplia.</p>
+    <p><strong>Medimos al vencimiento.</strong> En acciones de EE. UU. te pueden asignar antes, sobre todo cerca de un dividendo. La medición mira dónde terminó el precio el día del vencimiento.</p>
+    <p><strong>Supervivencia.</strong> La muestra son acciones que hoy cotizan. Incluimos castigadas de verdad (Intel, cruceros, aerolíneas), pero las que quebraron no están: en la vida real el peor caso puede ser peor.</p>
+    <p><strong>Sin comisiones ni impuestos.</strong> Y el anualizado es teórico: supone repetir la misma operación todo el año, sin meses vacíos ni asignaciones.</p>
+    <p><strong>Las primas del test del stop son estimadas.</strong> No hay precios históricos de opciones para 130 acciones, así que el costo de recomprar el call se calculó con la fórmula de Black-Scholes y una volatilidad parecida a la real. Lo que más se puede confiar es cuántas veces salta el stop y cuántas te venden las acciones, que salen solo de precios.</p>
+    <p><strong>No hay tope para el put.</strong> Si vendés el put es porque querés esas acciones: que te asignen es el plan. El tope lo ponés vos en el call: cuánto aceptás perder si tenés que recomprarlo.</p>
+  </div>
+
+  <details class="ver">
+    <summary>Semáforo de Riesgo · La rueda · versión 1 (prototipo) · 12-oct-2026 · qué cambió</summary>
+    <ul>
+      <li><b>v1 · 12-oct-2026.</b> Primera versión. El lector de cadenas y el criterio por delta vienen del Copiloto de Opciones. Suma la capa de riesgo: tu cuenta, tu umbral (lo pagado + primas), la probabilidad medida de asignación, el golpe cuando te asignan y el stop del call (strike + 1% por defecto, medido) con su tope.</li>
+    </ul>
+  </details>
+
+</div>
+
+<footer>
+  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Semáforo de Riesgo · La rueda v1 · Datos: Yahoo Finance y TradingView · Uso educativo — no es recomendación de inversión
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script>
+/* ============================================================
+   Semáforo de Riesgo · La rueda (put vendido → acciones → call cubierto)
+   - Lector de cadenas y criterio por delta: copiados del Copiloto de Opciones
+     (copiloto-opciones.html), sin cambios de lógica.
+   - Capa de riesgo: tabla RUEDA medida en Documents\semaforo_research\
+     (rueda_asignacion.py + resultados_rueda_w.json, 2016-2026, ~130 tickers
+     fuera de las 26 del curso). Distancia u = ln(S/K) / (ATR% × √ruedas).
+   ============================================================ */
+const VERSION='rueda-1';
+const PROXY='https://yahoo-proxy.webmaster-c89.workers.dev';
+const ACCESS_LS='snse_access_code';       // candado COMPARTIDO con los otros semáforos
+const PREF_LS='sem_riesgo_prefs';         // compartido con la pestaña "Compro acciones" (capital)
+const RUEDA_LS='sem_rueda_prefs';
+/* Put: no hay tope de concentración (si te asignan, quedarte con las acciones ES el plan).
+   El tope va en el call: cuánto podés perder si tenés que recomprarlo (lo fija el alumno). */
+
+/* Stop del call cuando el strike queda debajo del umbral (lo pagado + primas cobradas):
+   stop sobre la ACCIÓN en strike × (1 + b) que dispara la recompra del call.
+   Medido en Documents\semaforo_research\stop_call.py y stop_call_costo.py (2016-2026, call a ~1 mes,
+   strike por delta). Primas con Black-Scholes e IV ≈ vol. realizada × 1,1: APROXIMACIÓN, no hay primas
+   históricas reales. SIN = te venden sin stop. STOPC = [b, te venden, salta el stop, salta en vano].
+   COSTO = [b, pérdida media al recomprar, peor 5%] cuando salta, en fracción del precio de la acción. */
+const BUF_DEF=0.01;
+const SIN={0.15:0.137,0.28:0.268,0.5:0.514};
+const STOPC={0.15:[[0,0,.248,.45],[.005,.002,.221,.39],[.01,.007,.197,.34],[.02,.022,.157,.27],[.03,.04,.125,.22],[.05,.068,.083,.16]],
+  0.28:[[0,0,.481,.44],[.005,.002,.439,.39],[.01,.008,.40,.35],[.02,.031,.331,.28],[.03,.06,.271,.23],[.05,.117,.182,.17]],
+  0.5:[[0,0,.914,.44],[.005,.001,.867,.41],[.01,.004,.819,.38],[.02,.021,.724,.32],[.03,.053,.631,.27],[.05,.138,.468,.20]]};
+const COSTO={0.15:[[.005,.0257,.0681],[.01,.0296,.0748],[.02,.0387,.0883]],
+  0.28:[[.005,.020,.0549],[.01,.0232,.059],[.02,.0304,.0695]],
+  0.5:[[.005,.0061,.0194],[.01,.0082,.0224],[.02,.0133,.0298]]};
+function interp(rows,x,k){
+  if(x<=rows[0][0])return rows[0][k];if(x>=rows[rows.length-1][0])return rows[rows.length-1][k];
+  let i=0;while(rows[i+1][0]<x)i++;const a=rows[i],b=rows[i+1];return a[k]+(b[k]-a[k])*(x-a[0])/(b[0]-a[0]);
+}
+function porDelta(fn,d){const D=[0.15,0.28,0.5];const x=Math.max(D[0],Math.min(D[2],d));const i=x<=0.28?0:1;const a=D[i],b=D[i+1];return fn(a)+(fn(b)-fn(a))*(x-a)/(b-a);}
+function stopStats(delta,buf){
+  return{sin:porDelta(d=>SIN[d],delta),venden:porDelta(d=>interp(STOPC[d],buf,1),delta),salta:porDelta(d=>interp(STOPC[d],buf,2),delta),
+    vano:porDelta(d=>interp(STOPC[d],buf,3),delta),costoM:porDelta(d=>interp(COSTO[d],buf,1),delta),costo95:porDelta(d=>interp(COSTO[d],buf,2),delta)};
+}
+
+/* [u, P(asignan put), caída media/w, peor5%/w, P(llaman call), se perdió media/w] por ruedas */
+const RUEDA={10:[[0.0,0.4459,0.582,1.594,0.5524,0.607],[0.25,0.3102,0.548,1.551,0.4017,0.523],[0.5,0.2043,0.535,1.561,0.2606,0.477],[0.75,0.1309,0.533,1.567,0.1548,0.461],[1.0,0.0832,0.536,1.624,0.087,0.468],[1.25,0.052,0.554,1.713,0.0478,0.498],[1.5,0.0326,0.578,1.85,0.0269,0.532],[2.0,0.0133,0.654,2.182,0.0092,0.627]],21:[[0.0,0.4389,0.599,1.581,0.5602,0.644],[0.25,0.3077,0.574,1.553,0.415,0.553],[0.5,0.204,0.575,1.591,0.2768,0.497],[0.75,0.1308,0.6,1.726,0.1686,0.471],[1.0,0.0821,0.659,1.963,0.097,0.466],[1.25,0.0512,0.759,2.209,0.0538,0.481],[1.5,0.033,0.888,2.649,0.0295,0.514],[2.0,0.0145,1.318,3.552,0.0088,0.694]],32:[[0.0,0.429,0.6,1.565,0.5704,0.667],[0.25,0.2987,0.584,1.584,0.4253,0.573],[0.5,0.1975,0.597,1.666,0.2884,0.512],[0.75,0.1243,0.654,1.8,0.1788,0.48],[1.0,0.078,0.75,2.033,0.104,0.472],[1.25,0.0496,0.891,2.399,0.0575,0.488],[1.5,0.0322,1.092,2.751,0.0312,0.532],[2.0,0.0154,1.627,3.259,0.0092,0.769]]};
+
+const $=id=>document.getElementById(id);
+const nf=(x,d)=>Number(x).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd=(x,d=0)=>(x<0?'−':'')+'$'+nf(Math.abs(x),d);
+const pc=(x,d=0)=>nf(x*100,d)+'%';
+
+/* ---- Estado ---- */
+let type='put', objective=null, market=null, picked=null, STOCK=null, CLIENT_CODE=null, pending=null, previewUrl='';
+
+/* ---- Criterio por delta (del Copiloto) ---- */
+const definitions={
+  put:{label:'PUT',objectives:[
+    {value:'premium',label:'Conservar la prima',min:0.10,max:0.20,band:'0,10–0,20',summary:'Strikes más lejos del precio: menos prima, menos chances de que te asignen.'},
+    {value:'balance',label:'Equilibrio',min:0.21,max:0.35,band:'0,21–0,35',summary:'Más prima a cambio de más chances de que te asignen.'},
+    {value:'assignment',label:'Comprar las acciones si asignan',min:0.40,max:0.60,band:'0,40–0,60',summary:'Strike cerca del precio: la prima más alta, y muchas chances de comprar. Solo si querés esas acciones a ese precio.'}]},
+  call:{label:'CALL',objectives:[
+    {value:'shares',label:'Conservar las acciones',min:0.10,max:0.20,band:'0,10–0,20',summary:'Strikes más lejos: menos prima, menos chances de que te las compren.'},
+    {value:'balance',label:'Equilibrio',min:0.21,max:0.35,band:'0,21–0,35',summary:'Más prima a cambio de más chances de que te las compren.'},
+    {value:'assignment',label:'Vender las acciones si asignan',min:0.40,max:0.60,band:'0,40–0,60',summary:'Strike cerca del precio: la prima más alta y muchas chances de vender. Solo si querés vender a ese precio.'}]}
+};
+const demoMarket={ticker:'B',exchange:'NYSE',last:45.65,expiry:'18 sep 2026',dte:20,source:'demo',isDemo:true,
+  contracts:{
+    put:[{strike:42,delta:-0.18,mark:0.42,bid:0.31,ask:0.53,volume:0},{strike:43,delta:-0.26,mark:0.75,bid:0.68,ask:0.82,volume:0},{strike:44,delta:-0.34,mark:1.145,bid:1.08,ask:1.21,volume:0},{strike:46,delta:-0.51,mark:2.07,bid:1.88,ask:2.26,volume:0}],
+    call:[{strike:46,delta:0.49,mark:1.675,bid:1.59,ask:1.76,volume:0},{strike:49,delta:0.25,mark:0.65,bid:0.50,ask:0.80,volume:0},{strike:50,delta:0.21,mark:0.53,bid:0.45,ask:0.61,volume:0},{strike:51,delta:0.16,mark:0.40,bid:0.34,ask:0.46,volume:0}]}};
+
+function goal(){return definitions[type].objectives.find(o=>o.value===objective)||definitions[type].objectives[0];}
+function bestContract(g){
+  const cs=market.contracts[type].filter(c=>Number.isFinite(c.mark)&&c.mark>0&&Number.isFinite(c.delta));
+  const inside=cs.filter(c=>Math.abs(c.delta)>=g.min&&Math.abs(c.delta)<=g.max);
+  const pool=inside.length?inside:cs, target=(g.min+g.max)/2;
+  const sp=c=>c.mark&&Number.isFinite(c.ask)&&Number.isFinite(c.bid)?Math.max(0,(c.ask-c.bid)/c.mark):0.25;
+  return pool.slice().sort((a,b)=>(Math.abs(Math.abs(a.delta)-target)+sp(a)*0.02)-(Math.abs(Math.abs(b.delta)-target)+sp(b)*0.02))[0];
+}
+
+/* ---- Lector de cadenas (del Copiloto, sin cambios de lógica) ---- */
+function plainNumber(v){if(typeof v==='number')return v;const n=String(v||'').replace(/−/g,'-').replace(/%/g,'').replace(/\s/g,'').replace(',','.');const p=Number.parseFloat(n);return Number.isFinite(p)?p:NaN;}
+function pairValues(v){const parts=String(v||'').replace(/−/g,'-').split(/[×xX]/).map(plainNumber);if(parts.length!==2||!parts.every(Number.isFinite))return null;if(parts[0]<0||parts[1]<=0||parts[1]<parts[0])return null;return{bid:parts[0],ask:parts[1],mark:(parts[0]+parts[1])/2};}
+function exchangeFor(t){const nasdaq=new Set(['AAPL','MSFT','NVDA','AMZN','GOOGL','GOOG','META','TSLA','AMD','NFLX','INTC','CSCO','QCOM','ADBE','INTU','AVGO','TXN','AMGN','CMCSA','COST','PEP','SBUX','PYPL','QQQ']);return nasdaq.has(t)?'NASDAQ':'NYSE';}
+function selectedTicker(){return String($('ticker').value||'').trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,8);}
+function inferDte(label){
+  const m=String(label||'').match(/(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2})(?:\s+(\d{4}))?/i);
+  if(!m)return NaN;const months={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  const now=new Date();const mo=months[m[1].slice(0,3).toLowerCase()];let y=m[3]?Number(m[3]):now.getFullYear();
+  let ex=new Date(y,mo,Number(m[2]),23,59,59);if(!m[3]&&ex<now)ex=new Date(y+1,mo,Number(m[2]),23,59,59);
+  return Math.max(1,Math.ceil((ex-now)/86400000));
+}
+function metadataFromText(compact){
+  const exT=compact.match(/\b(NYSE|NASDAQ|AMEX|ARCA)\s*:\s*([A-Z.]{1,8})\b/i);
+  const tP=compact.match(/\b([A-Z]{1,6})\s+(?:Pre-market\s+|Market open\s+)?(\d{1,6}(?:[.,]\d+)?)\s+USD\b/i);
+  const hint=selectedTicker();
+  const ticker=String(hint||exT?.[2]||tP?.[1]||'').toUpperCase();
+  const exchange=String(hint?exchangeFor(ticker):exT?.[1]||exchangeFor(ticker)).toUpperCase();
+  let last=plainNumber(tP?.[2]);
+  if(!Number.isFinite(last)){const u=compact.match(/\b(\d{1,5}(?:[.,]\d{2,4}))\s+USD\b/i);last=plainNumber(u?.[1]);}
+  const withDte=compact.match(/((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:\s+\d{4})?)\s+(\d+)\s*DTE/i);
+  const dateOnly=compact.match(/((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:\s+\d{4})?)/i);
+  const tos=compact.match(/(\d{1,2}\s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{2,4})\s+\(?\s*(\d+)\s*\)?/i);
+  const expiry=withDte?.[1]||tos?.[1]||dateOnly?.[1]||'';
+  const dte=Math.round(plainNumber(withDte?.[2]||tos?.[2]))||inferDte(expiry);
+  return{ticker,exchange,last,expiry,dte};
+}
+function normalizeStrike(s,last){let v=plainNumber(s);if(Number.isFinite(last)&&v>last*3&&v<last*20)v/=10;return v;}
+function rowsFromHtml(raw,last){
+  if(!raw||!/<table|<tr|<td/i.test(raw))return[];
+  const doc=new DOMParser().parseFromString(raw,'text/html');const rows=[];
+  doc.querySelectorAll('tr').forEach(r=>{
+    const cells=Array.from(r.querySelectorAll('td,th')).map(c=>(c.innerText||c.textContent||'').replace(/\s+/g,' ').trim());
+    if(cells.length<15)return;
+    const strike=normalizeStrike(cells[7],last),callDelta=plainNumber(cells[0]),putDelta=plainNumber(cells[14]);
+    if(!Number.isFinite(strike)||!Number.isFinite(callDelta)||!Number.isFinite(putDelta))return;
+    rows.push({strike,callDelta,putDelta,callMark:plainNumber(cells[3]),putMark:plainNumber(cells[11]),callPair:pairValues(cells[4]),putPair:pairValues(cells[10]),callVolume:Math.max(0,Math.round(plainNumber(cells[6])||0)),putVolume:Math.max(0,Math.round(plainNumber(cells[8])||0))});
+  });
+  return rows;
+}
+function rowsFromText(compact,last){
+  const num='[-−]?\\d+(?:[.,]\\d+)?';const pair=`(?:—|--|–|=|${num})\\s*[×xX*]\\s*(?:—|--|–|=|${num})`;
+  const re=new RegExp(`(${num})\\s+(${num})\\s+(${num})%\\s+(${num})\\s+(${pair})\\s+(${num})\\s+(${num})\\s+(${num})\\s+(${num})\\s+(${num})\\s+(${pair})\\s+(${num})\\s+(${num})%\\s+(${num})\\s+(${num})`,'g');
+  const rows=[];let m;
+  while((m=re.exec(compact))!==null){const strike=normalizeStrike(m[8],last);if(!Number.isFinite(strike))continue;
+    rows.push({strike,callDelta:plainNumber(m[1]),putDelta:plainNumber(m[15]),callMark:plainNumber(m[4]),putMark:plainNumber(m[12]),callPair:pairValues(m[5]),putPair:pairValues(m[11]),callVolume:Math.max(0,Math.round(plainNumber(m[7])||0)),putVolume:Math.max(0,Math.round(plainNumber(m[9])||0))});}
+  return rows;
+}
+function rowsFromOcrLines(raw,last){
+  const rows=[];
+  String(raw||'').split(/\n+/).forEach(line=>{
+    const tokens=line.match(/[-−]?\d+(?:[.,]\d+)?%?/g)||[];
+    if(tokens.length<10||!line.includes('%'))return;
+    const v=tokens.map(plainNumber);
+    const callDelta=Math.abs(v[0]),callBE=v[1],callMark=v[3],putMark=v.at(-4),putBE=v.at(-2),putDelta=-Math.abs(v.at(-1));
+    if(![callDelta,callBE,callMark,putMark,putBE,putDelta].every(Number.isFinite))return;
+    if(callDelta>1.05||Math.abs(putDelta)>1.05||callMark<=0||putMark<=0)return;
+    const fromCall=callBE-callMark,fromPut=putBE+putMark,exp=(fromCall+fromPut)/2,tol=Math.max(0.35,exp*0.015);
+    if(!Number.isFinite(exp)||exp<=0||Math.abs(fromCall-fromPut)>tol*2)return;
+    const middle=v.slice(4,-4).map(x=>normalizeStrike(x,Number.isFinite(last)?last:exp));
+    const vis=middle.filter(x=>Number.isFinite(x)&&Math.abs(x-exp)<=tol).sort((a,b)=>Math.abs(a-exp)-Math.abs(b-exp))[0];
+    rows.push({strike:Number.isFinite(vis)?vis:Math.round(exp*2)/2,callDelta,putDelta,callMark,putMark,callPair:null,putPair:null,callVolume:0,putVolume:0});
+  });
+  return Array.from(new Map(rows.map(r=>[r.strike,r])).values());
+}
+function inferredLastFromRows(rows){
+  const u=rows.filter(r=>Number.isFinite(r.strike)&&Number.isFinite(r.callDelta)&&Number.isFinite(r.putDelta));
+  if(!u.length)return NaN;const o=u.slice().sort((a,b)=>a.strike-b.strike);
+  const s=o.map(r=>({r,d:Math.abs(r.callDelta)-Math.abs(r.putDelta)}));
+  for(let i=1;i<s.length;i++){const a=s[i-1],b=s[i];if(a.d===0)return a.r.strike;
+    if(a.d>0&&b.d<0){const span=a.d-b.d,w=span?a.d/span:0.5;return a.r.strike+(b.r.strike-a.r.strike)*w;}}
+  return s.slice().sort((a,b)=>Math.abs(a.d)-Math.abs(b.d))[0].r.strike;
+}
+function parseOptionChain(rawText,source,rawHtml=''){
+  const text=String(rawText||'').replace(/ /g,' ').replace(/\r/g,'\n');const compact=text.replace(/\s+/g,' ').trim();
+  if(!compact&&!rawHtml)throw new Error('No encontramos una tabla o una imagen para analizar.');
+  const htmlText=rawHtml?new DOMParser().parseFromString(rawHtml,'text/html').body.textContent||'':'';
+  const meta=metadataFromText(`${compact} ${htmlText.replace(/\s+/g,' ')}`.trim());
+  const hr=rowsFromHtml(rawHtml,meta.last),lr=rowsFromOcrLines(text,meta.last),fr=rowsFromText(compact,meta.last);
+  const rows=hr.length>=3?hr:lr.length>=3?lr:fr;
+  if((!Number.isFinite(meta.last)||meta.last<=0)&&rows.length){meta.last=inferredLastFromRows(rows);meta.lastEstimated=Number.isFinite(meta.last);}
+  const calls=[],puts=[];
+  rows.forEach(it=>{const cm=it.callPair?.mark>0?it.callPair.mark:it.callMark,pm=it.putPair?.mark>0?it.putPair.mark:it.putMark;
+    if(Number.isFinite(cm)&&cm>0)calls.push({strike:it.strike,delta:it.callDelta,mark:cm,bid:it.callPair?.bid??NaN,ask:it.callPair?.ask??NaN,volume:it.callVolume});
+    if(Number.isFinite(pm)&&pm>0)puts.push({strike:it.strike,delta:it.putDelta,mark:pm,bid:it.putPair?.bid??NaN,ask:it.putPair?.ask??NaN,volume:it.putVolume});});
+  if(rows.length>=3&&calls.length<3&&puts.length<3)throw new Error('La tabla se puede leer, pero no aparecen al menos tres valores de Mark por cada lado. Ampliá la tabla a ±10 strikes y repetí la captura sin achicarla.');
+  if(rows.length<3)throw new Error(source==='text'?'TradingView copió la selección sin las filas completas. No tenés que corregir nada: pegá una captura de la tabla con el vencimiento y los strikes.':'No pudimos separar al menos tres strikes. Recortá solo la tabla, sin achicarla, y volvé a pegarla.');
+  const prob=[];
+  if(!meta.ticker)prob.push('el ticker');
+  if(!Number.isFinite(meta.last)||meta.last<=0)prob.push('el último precio');
+  if(!meta.expiry||!Number.isFinite(meta.dte)||meta.dte<=0)prob.push('el vencimiento');
+  if(calls.length<3||puts.length<3)prob.push('tres valores de Mark por cada lado');
+  if(prob.length)throw new Error(`La tabla está visible, pero no pudimos confirmar ${prob.join(', ')}. Incluí el encabezado del vencimiento, el precio de la acción y las columnas completas.`);
+  return{...meta,source,isDemo:false,contracts:{call:calls,put:puts}};
+}
+
+/* ---- Lectura de capturas (OCR local, del Copiloto) ---- */
+async function prepareImageForOcr(file){
+  const bmp=await createImageBitmap(file);const tw=Math.min(2800,Math.max(bmp.width,1800));const sc=tw/bmp.width;
+  const cv=document.createElement('canvas');cv.width=Math.round(bmp.width*sc);cv.height=Math.round(bmp.height*sc);
+  const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(bmp,0,0,cv.width,cv.height);bmp.close?.();
+  const img=ctx.getImageData(0,0,cv.width,cv.height);let lum=0;
+  for(let i=0;i<img.data.length;i+=16)lum+=img.data[i]*0.2126+img.data[i+1]*0.7152+img.data[i+2]*0.0722;
+  const invert=lum/(img.data.length/16)<115;
+  for(let i=0;i<img.data.length;i+=4){let g=img.data[i]*0.2126+img.data[i+1]*0.7152+img.data[i+2]*0.0722;if(invert)g=255-g;g=Math.max(0,Math.min(255,(g-128)*1.35+128));img.data[i]=img.data[i+1]=img.data[i+2]=g;}
+  ctx.putImageData(img,0,0);return cv;
+}
+async function processImage(file){
+  status('Leyendo la captura en este navegador…','working');let w;
+  try{
+    if(!window.Tesseract)throw new Error('El lector de imágenes no pudo cargarse. Revisá la conexión y probá de nuevo.');
+    const prep=await prepareImageForOcr(file);
+    w=await window.Tesseract.createWorker('eng',1,{logger(m){if(m.status==='recognizing text')status(`Leyendo la captura… ${Math.round((m.progress||0)*100)}%`,'working');}});
+    await w.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});
+    const r=await w.recognize(prep);applyText(r?.data?.text||'','image');
+  }catch(e){status(e.message||'No pudimos leer la captura. Recortá solo la tabla y volvé a pegarla.','error');}
+  finally{if(w)await w.terminate();}
+}
+function status(m,tone='ready'){const n=$('status');n.textContent=m;n.dataset.tone=tone;}
+
+/* ---- Candado y datos de la acción (mismo Worker que los otros semáforos) ---- */
+function storedCode(){try{return localStorage.getItem(ACCESS_LS)||'';}catch(e){return'';}}
+async function checkCode(code){
+  try{const r=await fetch(`${PROXY}/?check=1&k=${encodeURIComponent(code)}`);if(!r.ok)return false;const j=await r.json();return!!j.ok;}
+  catch(e){return true;}
+}
+async function ensureAccess(){
+  if(CLIENT_CODE!==null)return true;
+  const saved=storedCode();
+  if(saved&&await checkCode(saved)){CLIENT_CODE=saved;return true;}
+  if(await checkCode('')){CLIENT_CODE='';return true;}
+  return false;
+}
+async function submitGate(){
+  const code=$('gateInput').value.trim().toUpperCase();const err=$('gateErr');
+  if(!code){err.textContent='Ingresá tu código de acceso.';return;}
+  $('gateBtn').disabled=true;err.textContent='Verificando...';
+  const ok=await checkCode(code);$('gateBtn').disabled=false;
+  if(ok){CLIENT_CODE=code;try{localStorage.setItem(ACCESS_LS,code);}catch(e){}err.textContent='';$('lock').hidden=true;medir();}
+  else{err.textContent='Código incorrecto. Revisá tu área de miembros.';}
+}
+async function fetchHist(sym){
+  const r=await fetch(`${PROXY}/?hist=${encodeURIComponent(sym)}&k=${encodeURIComponent(CLIENT_CODE||'')}`);
+  const j=await r.json().catch(()=>null);
+  if(!r.ok||!j||j.error)throw new Error((j&&j.error)||`HTTP ${r.status}`);
+  if(!j.c||j.c.length<40)throw new Error('historial insuficiente');
+  return j;
+}
+function indicadores(d){
+  const h=d.h,l=d.l,c=d.c,n=c.length;const tr=[];
+  for(let i=1;i<n;i++)tr.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));
+  let s=0;for(let j=tr.length-14;j<tr.length;j++)s+=tr[j];
+  const price=c[n-1],atr=(s/14)/price;          // ATR como fracción del precio (mismo cálculo que "Compro acciones")
+  let sma200=null,luz=null;
+  if(n>=200){let t=0;for(let i=n-200;i<n;i++)t+=c[i];sma200=t/200;const dist=price/sma200-1,b=2*atr;luz=dist>b?'g':dist<-b?'r':'a';}
+  return{price,atr,sma200,luz};
+}
+async function medir(){
+  const t=selectedTicker();
+  if(!/^[A-Z][A-Z0-9.]{0,7}$/.test(t)){$('stockTxt').innerHTML='Escribí un ticker válido (ej: KO).';return;}
+  updateLinks();
+  $('btnMedir').disabled=true;
+  if(!(await ensureAccess())){$('btnMedir').disabled=false;$('lock').hidden=false;setTimeout(()=>$('gateInput').focus(),60);return;}
+  $('stockTxt').textContent='Midiendo cuánto se mueve…';
+  try{
+    const ind=indicadores(await fetchHist(t));STOCK={...ind,ticker:t};
+    const luzTxt={g:'verde',a:'amarilla',r:'roja'}[ind.luz]||'sin datos';
+    $('stockTxt').innerHTML=`<b>${t}</b> · precio $${nf(ind.price,2)} · se mueve <b>${nf(ind.atr*100,2)}% por día</b> (promedio de 14 ruedas)<br>`+
+      (ind.luz?`<span class="dot ${ind.luz}"></span>Semáforo de Entrada: luz ${luzTxt}${ind.luz==='r'?' — se mueve más que de costumbre: la prima es más alta por algo':''}`:'');
+    render();
+  }catch(e){STOCK=null;$('stockTxt').textContent=`No pude leer ${t}: ${e.message||e}. Probá de nuevo o con otro ticker.`;}
+  finally{$('btnMedir').disabled=false;}
+}
+function updateLinks(){
+  const t=selectedTicker();const ok=/^[A-Z][A-Z0-9.]{0,7}$/.test(t);
+  $('tvLink').hidden=!ok;
+  if(ok){$('tvLink').href=`https://www.tradingview.com/symbols/${exchangeFor(t)}-${t}/options-chain/`;$('tvLink').textContent=`Abrir la cadena de ${t} en TradingView ↗`;
+    $('calLink').href=`index.html?symbol=${encodeURIComponent(t)}`;$('balLink').href=`https://finance.yahoo.com/quote/${encodeURIComponent(t)}/`;}
+}
+
+/* ---- La medición: interpolación en la tabla RUEDA ---- */
+function rueda(dte,u){
+  const n=Math.max(1,Math.round(dte*252/365));
+  const N=n<=15?10:n<=26?21:32, T=RUEDA[N];
+  const uu=Math.max(0,Math.min(2,u));
+  let i=0;while(i<T.length-2&&T[i+1][0]<uu)i++;
+  const a=T[i],b=T[i+1],f=(uu-a[0])/(b[0]-a[0]);
+  const L=k=>a[k]+(b[k]-a[k])*f;
+  return{n,N,pp:L(1),pm:L(2),p95:L(3),pcall:L(4),cm:L(5),lejos:u>2};
+}
+
+/* ---- Render ---- */
+function num(id){const v=parseFloat($(id).value);return Number.isFinite(v)?v:null;}
+function setOnly(){document.querySelectorAll('[data-only]').forEach(el=>{el.hidden=el.dataset.only!==type;});
+  if(type==='call'&&market)$('stopBox').hidden=true; }
+function intro(){
+  $('intro').innerHTML=type==='put'
+    ?'<span class="lead">Vendés el put y cobrás por esperar. La pregunta es una sola: ¿te conviene que te asignen?</span>Si te asignan, comprás 100 acciones por contrato al strike. Antes de vender, la app te muestra cuánta plata bloqueás, a qué precio comprarías y qué tan feo puede estar el panorama cuando te asignan.'
+    :'<span class="lead">Ya tenés las acciones. Vendés un call y cobrás otra prima.</span>Tu umbral es lo que pagaste más las primas que ya cobraste. Si el strike queda en el umbral o arriba, que te las compren está bien. Si queda abajo, ponés un stop un poco arriba del strike para recomprar el call y quedarte con las acciones.';
+}
+function rebuildObjectives(){
+  $('objective').innerHTML=definitions[type].objectives.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+  objective=definitions[type].objectives[0].value;$('objective').value=objective;picked=null;
+}
+/* Umbral de la regla de Carlos: lo que pagaste por las acciones + las primas que ya cobraste.
+   Strike en el umbral o más arriba: dejás que te las compren. Más abajo: stop para recomprar el call. */
+function umbral(){const a=num('precioAsig');if(a==null||a<=0)return null;const pr=num('primasCob')||0;return{pagado:a,primas:pr,u:a+pr};}
+
+function render(){
+  savePrefs();
+  const cap=Math.max(num('capital')||0,0);
+  if(type==='call'){const U=umbral();$('costoTxt').innerHTML=U?`Tu umbral: $${nf(U.pagado,2)} que pagaste + $${nf(U.primas,2)} de primas = <b>$${nf(U.u,2)}</b>. Strike en el umbral o más arriba: dejás que te las compren. Más abajo: stop para recomprar el call.`:'Cargá el precio al que compraste para calcular tu umbral.';}
+  if(!market)return;
+  $('res').hidden=false;
+  const g=goal();const best=bestContract(g);
+  const c=(picked&&market.contracts[type].find(x=>x.strike===picked))||best;
+  if(!c){status(`No hay suficientes contratos ${definitions[type].label} utilizables. Pegá una cadena más completa.`,'error');return;}
+  $('srcTxt').textContent=`${market.isDemo?'cadena de ejemplo':'tu cadena'} · ${market.ticker} · vence ${market.expiry} (${market.dte} días)`;
+  $('objHelp').textContent=`${g.summary} La app elige el strike con el delta más cerca de ${g.band}; podés tocar otro de la lista.`;
+
+  /* candidatos */
+  const target=(g.min+g.max)/2;
+  const cands=market.contracts[type].slice().sort((a,b)=>Math.abs(Math.abs(a.delta)-target)-Math.abs(Math.abs(b.delta)-target)).slice(0,5).sort((a,b)=>a.strike-b.strike);
+  $('cands').innerHTML=cands.map(x=>`<button type="button" class="cand" data-k="${x.strike}" aria-pressed="${x.strike===c.strike}"><b>${definitions[type].label} ${nf(x.strike,x.strike%1?1:0)}</b><span>Delta ${nf(Math.abs(x.delta),2)}</span><span>Prima $${nf(x.mark,2)}</span><span>${pc(x.mark/(type==='put'?x.strike:market.last)*365/market.dte,1)} anual teórico</span></button>`).join('');
+
+  const S=market.last,K=c.strike,p=c.mark,dte=market.dte;
+  const hasAtr=!!(STOCK&&STOCK.ticker===market.ticker);
+  const tickerMismatch=STOCK&&STOCK.ticker!==market.ticker;
+  let m=null;
+  if(hasAtr){
+    const u=(type==='put'?Math.log(S/K):Math.log(K/S))/(STOCK.atr*Math.sqrt(Math.max(1,Math.round(dte*252/365))));
+    m=rueda(dte,Math.abs(u));
+    /* Strike del otro lado del precio (put arriba / call abajo): la probabilidad es el
+       complemento del lado opuesto a la misma distancia; el golpe se toma del strike al precio (piso). */
+    if(u<0){const o=rueda(dte,0);m={...m,pp:1-m.pcall,pcall:1-m.pp,pm:o.pm,p95:o.p95,cm:o.cm,dentro:true};}
+  }
+  const w=hasAtr?STOCK.atr*Math.sqrt(m.n):null;
+  const spread=Number.isFinite(c.bid)&&Number.isFinite(c.ask)&&c.ask>=c.bid&&p>0?(c.ask-c.bid)/p:NaN;
+  const reasons=[];let level='ok',title='',desc='';
+
+  if(type==='put'){
+    const ctr=Math.max(1,Math.round(num('contratos')||1)),sh=100*ctr;
+    const blocked=K*sh,share=cap>0?blocked/cap:Infinity,prima=p*sh,ef=K-p;
+    const per=p/K,anual=per*365/dte,dist=(S-K)/S;
+    $('mets').innerHTML=
+      `<div class="met"><div class="k">Prima que cobrás</div><div class="v green">${usd(prima)}</div><div class="x">$${nf(p,2)} × ${sh} acciones</div></div>`+
+      `<div class="met"><div class="k">Si te asignan, comprás a</div><div class="v">$${nf(ef,2)}</div><div class="x">strike $${nf(K,2)} menos la prima · ${pc(dist,1)} debajo de hoy</div></div>`+
+      `<div class="met"><div class="k">Renta sobre lo bloqueado</div><div class="v">${pc(per,2)}</div><div class="x">en ${dte} días · ${pc(anual,1)} anual teórico</div></div>`+
+      `<div class="met"><div class="k">Plata que bloqueás</div><div class="v ${blocked>cap?'red':''}">${usd(blocked)}</div><div class="x">${cap>0?pc(share,0)+' de tu cuenta':'cargá tu capital'}</div></div>`;
+    $('sizeTxt').innerHTML=cap>0?`<span class="dot ${blocked>cap?'r':'g'}"></span>Tamaño: ${ctr} ${ctr===1?'contrato bloquea':'contratos bloquean'} <b>${usd(blocked)}</b>, el ${pc(share,0)} de tu cuenta. ${blocked>cap?'No te alcanza para pagar las acciones si te asignan.':`Si te asignan, quedás con ${sh} acciones: en la rueda eso es el plan, así que acá no hay tope. El tope va en el call.`}`:'';
+
+    /* Si te asignan */
+    if(hasAtr){
+      const dm=m.pm*w,d95=m.p95*w;
+      const lossM=(K*dm-p)*sh,loss95=(K*d95-p)*sh;
+      $('ifBox').className='box';
+      $('ifBox').innerHTML=`<h3>Si te asignan</h3>`+
+        `<p class="big">A esta distancia, te asignaron <b>${pc(m.pp,0)}</b> de las veces <span style="color:var(--text3)">(el delta de la cadena dice ${pc(Math.abs(c.delta),0)})</span>.</p>`+
+        (m.dentro?`<p>El strike está por encima del precio de hoy: más que vender un put, es casi comprar las acciones.</p>`:'')+
+        (m.lejos?`<p>El strike está muy lejos: casi nunca te asignan, pero cuando pasa es un derrumbe. Tomá los números de abajo como piso.</p>`:'')+
+        `<p>Cuando te asignaron, la acción terminó en promedio <b>${pc(dm,1)}</b> debajo del strike: tus ${sh} acciones valían <b>${usd(Math.abs(lossM))} ${lossM>0?'menos':'más'}</b> de lo que pagaste, ya descontada la prima.</p>`+
+        `<p>En el peor 5% de las asignaciones cayó <b>${pc(d95,1)}</b> debajo del strike: <b>${usd(loss95)}</b> de pérdida en el papel${cap>0?`, el ${pc(loss95/cap,1)} de tu cuenta`:''}.</p>`+
+        `<p style="font-size:13px">Por eso vendé puts solo sobre empresas que querés tener: si te asignan, no es un error, es el plan. Y si no te asignan (el ${pc(1-m.pp,0)} de las veces), te quedás con la prima: ${usd(prima)}.</p>`;
+    }else{
+      $('ifBox').className='box warnb';
+      $('ifBox').innerHTML=`<h3>Si te asignan</h3><p>${tickerMismatch?`Mediste <b>${STOCK.ticker}</b>, pero la cadena es de <b>${market.ticker}</b>. Medí ${market.ticker} en el paso 1`:'Medí la acción en el paso 1'} para ver cada cuánto te asignan a esta distancia y cuánto puede estar cayendo cuando pasa.</p>`;
+    }
+
+    /* La luz */
+    const cal=$('chkCal').checked,bal=$('chkBal').checked;
+    if(cap<=0){level='warn';title='Cargá tu capital';desc='Sin el capital no se puede saber si este put te entra.';}
+    else if(blocked>cap){level='bad';title='No te alcanza';desc=`Este put bloquea <b>${usd(blocked)}</b> y tu cuenta tiene ${usd(cap)}. Si te asignan, no podés pagar las acciones.`;}
+    else{
+      if(!cal)reasons.push('Confirmá que la acción pasa el Semáforo de Calidad.');
+      if(!bal)reasons.push('Revisá que no haya balance antes del vencimiento.');
+      if(isFinite(spread)&&spread>0.2)reasons.push('La diferencia entre compra y venta es amplia: la prima real puede ser menor.');
+      if(reasons.length){level='warn';title='Revisá antes de vender';desc='Hay puntos a confirmar:';}
+      else{level='ok';title='Te conviene';desc=`Si te asignan, comprás una empresa que pasa Calidad a <b>$${nf(ef,2)}</b> y la podés pagar. Si no te asignan, cobrás ${usd(prima)}.`;}
+    }
+  }else{
+    const sh=Math.max(100,Math.floor((num('acciones')||100)/100)*100),ctr=sh/100;
+    const U=umbral(),prima=p*sh;
+    const base=U?U.pagado:S;
+    const per=p/base,anual=per*365/dte;
+    const res=U?(K-U.pagado+U.primas+p)*sh:null;          // resultado de toda la rueda si te las compran
+    const debajo=!!U&&K<U.u;
+    $('mets').innerHTML=
+      `<div class="met"><div class="k">Prima que cobrás</div><div class="v green">${usd(prima)}</div><div class="x">$${nf(p,2)} × ${sh} acciones · ${ctr} ${ctr===1?'contrato':'contratos'}</div></div>`+
+      `<div class="met"><div class="k">Strike vs. tu umbral</div><div class="v ${!U?'':debajo?'amber':'green'}">${!U?'—':(debajo?'−':'+')+'$'+nf(Math.abs(K-U.u),2)}</div><div class="x">${!U?'cargá lo que pagaste arriba':`strike $${nf(K,2)} · umbral $${nf(U.u,2)}`}</div></div>`+
+      `<div class="met"><div class="k">Renta sobre ${U?'lo que pagaste':'el precio de hoy'}</div><div class="v">${pc(per,2)}</div><div class="x">en ${dte} días · ${pc(anual,1)} anual teórico</div></div>`+
+      `<div class="met"><div class="k">Si te las compran</div><div class="v ${res==null?'':res>=0?'green':'red'}">${res==null?'—':usd(res)}</div><div class="x">${res==null?'necesita lo que pagaste':'resultado de toda la rueda'}</div></div>`;
+
+    /* Si te las compran */
+    const callTxt=hasAtr?`<p class="big">A esta distancia, te las compraron <b>${pc(m.pcall,0)}</b> de las veces <span style="color:var(--text3)">(el delta dice ${pc(Math.abs(c.delta),0)})</span>.</p>`+
+      (m.dentro?`<p>El strike está por debajo del precio de hoy: más que vender un call, es casi vender las acciones.</p>`:'')+
+      `<p>Cuando te las compraron, la acción terminó en promedio <b>${pc(m.cm*w,1)}</b> por encima del strike: es lo que dejaste de ganar por haber vendido el call.</p>`
+      :`<p>${tickerMismatch?`Mediste <b>${STOCK.ticker}</b>, pero la cadena es de <b>${market.ticker}</b>.`:''} Medí la acción en el paso 1 para ver cada cuánto te las compran a esta distancia.</p>`;
+    let extra='';
+    const neto=U?U.pagado-U.primas:null;
+    if(neto!=null&&S<neto&&p>0){const n=Math.ceil((neto-S)/p);extra=`<p>La acción está ${usd(neto-S,2)} debajo de lo que pagaste menos las primas. Con primas como esta, te faltan unos <b>${n} ${n===1?'vencimiento':'vencimientos'}</b> para recuperarlo.</p>`;}
+    $('ifBox').className='box'+(hasAtr?'':' warnb');
+    $('ifBox').innerHTML=`<h3>Si te las compran</h3>`+callTxt+extra;
+
+    /* Stop para recomprar el call (strike debajo del umbral) */
+    let st=null,T=null,buf=0,loss95=null,lossM=null;
+    const lim=num('limiteCall');
+    if(debajo){
+      const def=Math.round(K*(1+BUF_DEF)*100)/100;
+      $('stopCall').placeholder=nf(def,2);
+      T=num('stopCall');if(!(T>0))T=def;
+      buf=Math.max(0,T/K-1);
+      st=stopStats(Math.abs(c.delta),buf);
+      lossM=st.costoM*S*sh;loss95=st.costo95*S*sh;
+      $('stopCap').textContent=`Precio de la acción que dispara la recompra · strike $${nf(K,2)} + ${pc(buf,1)}${T<=K?' (tiene que ir arriba del strike)':''}`;
+      $('stopTxt').innerHTML=`Si la acción toca <b>$${nf(T,2)}</b>, recomprás el call y te quedás con las acciones. Recomprarlo te cuesta, en promedio, <b>${usd(lossM)}</b> más que la prima que cobraste; en el peor 5%, <b>${usd(loss95)}</b>. Ojo: si salta es porque la acción subió, así que en ese momento tus acciones valen al menos <b>${usd((T-S)*sh)}</b> más que hoy.`+
+        (lim>0?` Tu límite: ${usd(lim)}${loss95>lim?` — <b style="color:var(--red)">el peor caso lo supera</b>`:' — entra'}.`:'');
+      $('stopStats').innerHTML=`Medido con el stop en strike + ${pc(buf,1)}: te vendieron las acciones el <b>${pc(st.venden,1)}</b> de las veces (sin stop: ${pc(st.sin,0)}). El stop saltó el <b>${pc(st.salta,0)}</b> de las veces, y en ${pc(st.vano,0)} de esas el call igual vencía sin valor (recompraste en vano).`;
+    }
+
+    if(!U){level='warn';title='Cargá lo que pagaste';desc='Para saber si te conviene que te compren las acciones, la app necesita saber a cuánto las pagaste y qué primas ya cobraste.';}
+    else if(!debajo){level='ok';title='Si te las compran, está bien';desc=`El strike queda en tu umbral o arriba (+$${nf(K-U.u,2)}). Si te las compran, cerrás la rueda ganando <b>${usd(res)}</b> (${pc(res/(U.pagado*sh),1)} sobre lo que pagaste). Si no, cobrás ${usd(prima)} y seguís con las acciones.`;}
+    else if(lim>0&&loss95>lim){
+      const maxC=Math.floor(lim/(st.costo95*S*100));
+      level='bad';title='El stop puede costarte más que tu límite';
+      desc=`El strike queda <b>$${nf(U.u-K,2)}</b> debajo de tu umbral, así que va con stop en <b>$${nf(T,2)}</b>. Si salta, en el peor 5% recomprar el call te cuesta <b>${usd(loss95)}</b>, más que tu límite de ${usd(lim)}. ${maxC>0?`Con tu límite te entran ${maxC} ${maxC===1?'contrato':'contratos'}.`:'Con tu límite no te entra ni un contrato: buscá un strike en tu umbral o esperá.'}`;
+    }else{
+      level='warn';title='Debajo de tu umbral: vendelo con stop';
+      desc=`El strike queda <b>$${nf(U.u-K,2)}</b> debajo de tu umbral ($${nf(U.u,2)}). Para no vender las acciones, poné el stop en <b>$${nf(T,2)}</b>. Si salta, recomprar el call te cuesta en promedio ${usd(lossM)} (peor 5%: ${usd(loss95)}).`;
+      if(!(lim>0))reasons.push('Cargá cuánto aceptás perder si tenés que cerrar el call, para saber si el peor caso te entra.');
+    }
+    if(isFinite(spread)&&spread>0.2&&level!=='bad'){if(level==='ok')level='warn';reasons.push('La diferencia entre compra y venta es amplia: la prima real puede ser menor.');}
+  }
+
+  /* hero */
+  const h=$('hero');h.className='hero '+level;
+  $('heroEyebrow').textContent=type==='put'?'¿Te conviene que te asignen?':'¿Te conviene que te compren las acciones?';
+  $('heroTitle').innerHTML=`<span class="dot ${level==='ok'?'g':level==='warn'?'a':'r'}"></span>${title}`;
+  $('heroDesc').innerHTML=desc;
+  $('heroList').hidden=!reasons.length;
+  $('heroList').innerHTML=reasons.map(r=>`<li>· ${r}</li>`).join('');
+
+  /* ejecución */
+  $('execTxt').innerHTML=`<b>${definitions[type].label} ${nf(K,K%1?1:0)}</b> · delta ${nf(Math.abs(c.delta),2)} · prima de referencia (mark) $${nf(p,2)}`+
+    (isFinite(spread)?` · diferencia compra/venta ${pc(spread,0)}${spread>0.2?' (amplia)':''}`:' · sin compra/venta en la captura: confirmá el precio con el mercado abierto')+
+    (market.isDemo?' · <b>cadena de ejemplo con precios viejos</b>: no sirve para operar.':'');
+  setOnly();
+  if(type==='call'){const U=umbral();$('stopBox').hidden=!(U&&c.strike<U.u);}
+}
+
+/* ---- Entrada de la cadena ---- */
+function applyText(text,source='text',html=''){
+  try{
+    market=parseOptionChain(text,source,html);picked=null;
+    const sp=market.contracts.call.some(x=>Number.isFinite(x.bid))&&market.contracts.put.some(x=>Number.isFinite(x.bid));
+    status(`Cadena reconocida: ${market.contracts.call.length} CALL y ${market.contracts.put.length} PUT con Mark.${sp?'':' No vino la compra/venta: confirmala con el mercado abierto.'}`,'ok');
+    if(!STOCK||STOCK.ticker!==market.ticker){if(!selectedTicker())$('ticker').value=market.ticker;}
+    render();$('res').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){status(e.message||'No pudimos interpretar la cadena.','error');}
+}
+function queueText(text,html=''){
+  if(!String(text||'').trim()&&!html){status('No encontramos texto ni una imagen en el portapapeles.','error');return;}
+  pending={kind:'text',text:String(text||''),html};$('paste').value='Cadena recibida';$('analyze').disabled=false;
+  status('Información recibida. Tocá "Analizar cadena".');
+}
+function queueImage(file){
+  if(!file||!file.type.startsWith('image/')){status('El archivo no es una imagen compatible.','error');return;}
+  if(file.size>12*1024*1024){status('La imagen supera 12 MB. Recortá solo la cadena.','error');return;}
+  pending={kind:'image',file};if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(file);
+  $('previewImg').src=previewUrl;$('preview').hidden=false;$('paste').value='Captura recibida';$('analyze').disabled=false;
+  status('Captura recibida. Tocá "Analizar cadena".');
+}
+
+/* ---- Preferencias ---- */
+function loadPrefs(){
+  try{const p=JSON.parse(localStorage.getItem(PREF_LS)||'{}');if(p.cap)$('capital').value=p.cap;}catch(e){}
+  try{const r=JSON.parse(localStorage.getItem(RUEDA_LS)||'{}');['contratos','acciones','precioAsig','primasCob','limiteCall'].forEach(k=>{if(r[k]!=null&&r[k]!=='')$(k).value=r[k];});}catch(e){}
+  if(!$('limiteCall').value){let d=200;try{const p=JSON.parse(localStorage.getItem(PREF_LS)||'{}');if(+p.rsk>0)d=+p.rsk;}catch(e){}$('limiteCall').value=d;}
+}
+function savePrefs(){
+  try{const p=JSON.parse(localStorage.getItem(PREF_LS)||'{}');p.cap=$('capital').value;localStorage.setItem(PREF_LS,JSON.stringify(p));}catch(e){}
+  try{const r={};['contratos','acciones','precioAsig','primasCob','limiteCall'].forEach(k=>r[k]=$(k).value);localStorage.setItem(RUEDA_LS,JSON.stringify(r));}catch(e){}
+}
+
+/* ---- Eventos ---- */
+document.querySelectorAll('.tabs button[data-type]').forEach(b=>b.addEventListener('click',()=>{
+  type=b.dataset.type;document.querySelectorAll('.tabs button[data-type]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  intro();rebuildObjectives();setOnly();render();
+}));
+$('objective').addEventListener('change',()=>{objective=$('objective').value;picked=null;$('stopCall').value='';render();});
+$('cands').addEventListener('click',e=>{const b=e.target.closest('.cand');if(!b)return;picked=parseFloat(b.dataset.k);$('stopCall').value='';render();});
+['capital','contratos','acciones','precioAsig','primasCob','stopCall','limiteCall'].forEach(id=>$(id).addEventListener('input',render));
+['chkCal','chkBal'].forEach(id=>$(id).addEventListener('change',render));
+$('btnMedir').addEventListener('click',medir);
+$('ticker').addEventListener('keydown',e=>{if(e.key==='Enter')medir();});
+$('ticker').addEventListener('input',updateLinks);
+$('gateBtn').addEventListener('click',submitGate);
+$('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
+$('fileBtn').addEventListener('click',()=>$('file').click());
+$('file').addEventListener('change',()=>queueImage($('file').files?.[0]));
+$('paste').addEventListener('paste',e=>{
+  e.preventDefault();
+  const img=Array.from(e.clipboardData?.items||[]).find(i=>i.type.startsWith('image/'));
+  if(img){queueImage(img.getAsFile());return;}
+  queueText(e.clipboardData?.getData('text/plain')||'',e.clipboardData?.getData('text/html')||'');
+});
+['dragenter','dragover'].forEach(n=>$('drop').addEventListener(n,e=>{e.preventDefault();$('drop').classList.add('is-dragging');}));
+['dragleave','drop'].forEach(n=>$('drop').addEventListener(n,e=>{e.preventDefault();$('drop').classList.remove('is-dragging');}));
+$('drop').addEventListener('drop',e=>{const f=Array.from(e.dataTransfer?.files||[]).find(i=>i.type.startsWith('image/'));if(f)queueImage(f);});
+$('analyze').addEventListener('click',()=>{
+  if(!pending){status('Todavía no pegaste una cadena o una captura.','error');return;}
+  if(pending.kind==='image')processImage(pending.file);else applyText(pending.text,'text',pending.html);
+});
+$('demoBtn').addEventListener('click',()=>{
+  market=JSON.parse(JSON.stringify(demoMarket));picked=null;
+  if(!selectedTicker()){$('ticker').value='B';updateLinks();}
+  status('Cadena de ejemplo cargada (Barrick, precios de septiembre de 2026). Sirve para ver cómo funciona, no para operar.','ok');
+  render();$('res').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  loadPrefs();intro();rebuildObjectives();setOnly();
+  const sym=(new URLSearchParams(location.search).get('symbol')||'').trim().toUpperCase();
+  if(sym&&/^[A-Z][A-Z0-9.]{0,7}$/.test(sym)){$('ticker').value=sym;updateLinks();medir();}
+});
+</script>
+</body>
+</html>
