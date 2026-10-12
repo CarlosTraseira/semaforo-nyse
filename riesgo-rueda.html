@@ -201,17 +201,11 @@ footer span{color:var(--text2)}
         <div class="cap">Precio al que compraste las acciones (o el strike del put que te asignaron)</div>
       </div>
       <div>
-        <div class="mw"><span class="pre">$</span><input class="num" id="primasCob" type="number" inputmode="decimal" step="0.01" value="0" aria-label="Primas ya cobradas por acción"></div>
-        <div class="cap">Primas que ya cobraste, por acción (el put y los calls anteriores)</div>
-      </div>
-    </div>
-    <div class="row2" data-only="call" hidden>
-      <div>
         <div class="mw"><span class="pre">$</span><input class="num" id="limiteCall" type="number" inputmode="decimal" step="10" aria-label="Lo máximo que aceptás perder si cerrás el call"></div>
         <div class="cap">Lo máximo que aceptás perder si tenés que cerrar el call</div>
       </div>
-      <div class="auto" id="costoTxt"></div>
     </div>
+    <div class="auto" data-only="call" id="costoTxt" hidden></div>
   </div>
 
   <!-- 1 · La acción -->
@@ -282,7 +276,7 @@ footer span{color:var(--text2)}
 
       <div class="box warnb" id="stopBox" data-only="call" hidden>
         <h3>Tu regla: stop para recomprar el call</h3>
-        <p>El strike queda por debajo de tu umbral. Para no vender las acciones, ponés una orden que <strong>recompra el call si la acción sube un poco por encima del strike</strong>. Un poco por encima, y no justo en el strike, para que un toque y vuelta no te haga recomprar en vano.</p>
+        <p>El strike queda por debajo de lo que pagaste. Para no vender las acciones, ponés una orden que <strong>recompra el call si la acción sube un poco por encima del strike</strong>. Un poco por encima, y no justo en el strike, para que un toque y vuelta no te haga recomprar en vano.</p>
         <div class="row2">
           <div>
             <div class="mw"><span class="pre">$</span><input class="num" id="stopCall" type="number" inputmode="decimal" step="0.01" aria-label="Precio de la acción que dispara la recompra del call"></div>
@@ -301,11 +295,11 @@ footer span{color:var(--text2)}
 
   <div class="exp">
     <h3>🎯 Para qué te sirve esta app</h3>
-    <p>En la rueda no apostás a que la acción suba: <strong>cobrás por esperar</strong>. Vendés un put y cobrás una prima. Si la acción cae por debajo del strike, te asignan y comprás 100 acciones por contrato. Con las acciones, vendés calls y cobrás otra prima. Si el strike del call queda en tu umbral (lo que pagaste más las primas cobradas) o arriba, dejás que te las compren. Si queda abajo, lo vendés con un stop para recomprarlo y quedarte con las acciones.</p>
+    <p>En la rueda no apostás a que la acción suba: <strong>cobrás por esperar</strong>. Vendés un put y cobrás una prima. Si la acción cae por debajo del strike, te asignan y comprás 100 acciones por contrato. Con las acciones, vendés calls y cobrás otra prima. Si el strike del call queda en lo que pagaste o más arriba, dejás que te las compren. Si queda abajo, lo vendés con un stop para recomprarlo y quedarte con las acciones.</p>
     <p>La pregunta que decide todo es una sola: <strong>¿te conviene que te asignen?</strong> Esta app te la responde con números, antes de mandar la orden:</p>
     <ul>
       <li><strong>Con el put:</strong> cuánta plata te bloquea, a qué precio comprarías, qué renta cobrás, cada cuánto te asignan a esa distancia y cuánto puede estar cayendo la acción cuando te asignan.</li>
-      <li><strong>Con el call:</strong> si el strike queda arriba o abajo de tu umbral, cuánto ganás si te las compran, dónde poner el stop para recomprar el call y cuánto te puede costar si salta.</li>
+      <li><strong>Con el call:</strong> si el strike queda arriba o abajo de lo que pagaste, cuánto ganás si te las compran, dónde poner el stop para recomprar el call y cuánto te puede costar si salta.</li>
     </ul>
     <p>El contrato lo elige el mismo criterio del Copiloto de Opciones: el delta según tu objetivo. Lo nuevo es la capa de riesgo.</p>
   </div>
@@ -328,7 +322,7 @@ footer span{color:var(--text2)}
 
   <div class="exp">
     <h3>🛑 El stop del call: lo que medimos</h3>
-    <p>Cuando el strike queda debajo de tu umbral, la regla es poner un stop sobre la acción <strong>un poco por encima del strike</strong> (con strike 45, en 45,50 o 46) que recompra el call. La idea: si el precio toca el strike y vuelve, que no te haga recomprar en vano.</p>
+    <p>Cuando el strike queda debajo de lo que pagaste por las acciones, la regla es poner un stop sobre la acción <strong>un poco por encima del strike</strong> (con strike 45, en 45,50 o 46) que recompra el call. La idea: si el precio toca el strike y vuelve, que no te haga recomprar en vano.</p>
     <p>Lo probamos con calls a un mes sobre las mismas ~130 acciones, entre 2016 y 2026. Para un call de delta 0,28 (el "equilibrio"):</p>
     <table class="pruebas">
       <tr><th>Stop en la acción</th><th>Te venden las acciones</th><th>Salta el stop</th><th>…y fue en vano<small>el call igual vencía sin valor</small></th></tr>
@@ -363,7 +357,7 @@ footer span{color:var(--text2)}
   <details class="ver">
     <summary>Semáforo de Riesgo · La rueda · versión 1 (prototipo) · 12-oct-2026 · qué cambió</summary>
     <ul>
-      <li><b>v1 · 12-oct-2026.</b> Primera versión. El lector de cadenas y el criterio por delta vienen del Copiloto de Opciones. Suma la capa de riesgo: tu cuenta, tu umbral (lo pagado + primas), la probabilidad medida de asignación, el golpe cuando te asignan y el stop del call (strike + 1% por defecto, medido) con su tope.</li>
+      <li><b>v1 · 12-oct-2026.</b> Primera versión. El lector de cadenas y el criterio por delta vienen del Copiloto de Opciones. Suma la capa de riesgo: tu cuenta, lo que pagaste por las acciones, la probabilidad medida de asignación, el golpe cuando te asignan y el stop del call (strike + 1% por defecto, medido) con su tope.</li>
     </ul>
   </details>
 
@@ -391,7 +385,7 @@ const RUEDA_LS='sem_rueda_prefs';
 /* Put: no hay tope de concentración (si te asignan, quedarte con las acciones ES el plan).
    El tope va en el call: cuánto podés perder si tenés que recomprarlo (lo fija el alumno). */
 
-/* Stop del call cuando el strike queda debajo del umbral (lo pagado + primas cobradas):
+/* Stop del call cuando el strike queda debajo de lo que pagaste por las acciones:
    stop sobre la ACCIÓN en strike × (1 + b) que dispara la recompra del call.
    Medido en Documents\semaforo_research\stop_call.py y stop_call_costo.py (2016-2026, call a ~1 mes,
    strike por delta). Primas con Black-Scholes e IV ≈ vol. realizada × 1,1: APROXIMACIÓN, no hay primas
@@ -650,20 +644,21 @@ function setOnly(){document.querySelectorAll('[data-only]').forEach(el=>{el.hidd
 function intro(){
   $('intro').innerHTML=type==='put'
     ?'<span class="lead">Vendés el put y cobrás por esperar. La pregunta es una sola: ¿te conviene que te asignen?</span>Si te asignan, comprás 100 acciones por contrato al strike. Antes de vender, la app te muestra cuánta plata bloqueás, a qué precio comprarías y qué tan feo puede estar el panorama cuando te asignan.'
-    :'<span class="lead">Ya tenés las acciones. Vendés un call y cobrás otra prima.</span>Tu umbral es lo que pagaste más las primas que ya cobraste. Si el strike queda en el umbral o arriba, que te las compren está bien. Si queda abajo, ponés un stop un poco arriba del strike para recomprar el call y quedarte con las acciones.';
+    :'<span class="lead">Ya tenés las acciones. Vendés un call y cobrás otra prima.</span>Si el strike queda en lo que pagaste o más arriba, que te las compren está bien. Si queda abajo, ponés un stop un poco arriba del strike para recomprar el call y quedarte con las acciones.';
 }
 function rebuildObjectives(){
   $('objective').innerHTML=definitions[type].objectives.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
   objective=definitions[type].objectives[0].value;$('objective').value=objective;picked=null;
 }
-/* Umbral de la regla de Carlos: lo que pagaste por las acciones + las primas que ya cobraste.
-   Strike en el umbral o más arriba: dejás que te las compren. Más abajo: stop para recomprar el call. */
-function umbral(){const a=num('precioAsig');if(a==null||a<=0)return null;const pr=num('primasCob')||0;return{pagado:a,primas:pr,u:a+pr};}
+/* Regla de Carlos (13-oct): se compara el strike con LO QUE PAGASTE por las acciones, sin restar primas
+   (restarlas todas, después de 10 o 20 calls, es poco práctico). Strike igual o mayor: dejás que te las
+   compren. Strike menor: stop para recomprar el call. */
+function umbral(){const a=num('precioAsig');if(a==null||a<=0)return null;return{pagado:a,u:a};}
 
 function render(){
   savePrefs();
   const cap=Math.max(num('capital')||0,0);
-  if(type==='call'){const U=umbral();$('costoTxt').innerHTML=U?`Tu umbral: $${nf(U.pagado,2)} que pagaste + $${nf(U.primas,2)} de primas = <b>$${nf(U.u,2)}</b>. Strike en el umbral o más arriba: dejás que te las compren. Más abajo: stop para recomprar el call.`:'Cargá el precio al que compraste para calcular tu umbral.';}
+  if(type==='call'){const U=umbral();$('costoTxt').innerHTML=U?`Pagaste <b>$${nf(U.pagado,2)}</b>. Strike de $${nf(U.pagado,2)} o más: dejás que te las compren. Strike más abajo: stop para recomprar el call.`:'Cargá el precio al que compraste las acciones.';}
   if(!market)return;
   $('res').hidden=false;
   const g=goal();const best=bestContract(g);
@@ -736,13 +731,13 @@ function render(){
     const U=umbral(),prima=p*sh;
     const base=U?U.pagado:S;
     const per=p/base,anual=per*365/dte;
-    const res=U?(K-U.pagado+U.primas+p)*sh:null;          // resultado de toda la rueda si te las compran
+    const res=U?(K-U.pagado+p)*sh:null;                   // si te las compran: diferencia de precio + esta prima
     const debajo=!!U&&K<U.u;
     $('mets').innerHTML=
       `<div class="met"><div class="k">Prima que cobrás</div><div class="v green">${usd(prima)}</div><div class="x">$${nf(p,2)} × ${sh} acciones · ${ctr} ${ctr===1?'contrato':'contratos'}</div></div>`+
-      `<div class="met"><div class="k">Strike vs. tu umbral</div><div class="v ${!U?'':debajo?'amber':'green'}">${!U?'—':(debajo?'−':'+')+'$'+nf(Math.abs(K-U.u),2)}</div><div class="x">${!U?'cargá lo que pagaste arriba':`strike $${nf(K,2)} · umbral $${nf(U.u,2)}`}</div></div>`+
+      `<div class="met"><div class="k">Strike vs. lo que pagaste</div><div class="v ${!U?'':debajo?'amber':'green'}">${!U?'—':(debajo?'−':'+')+'$'+nf(Math.abs(K-U.u),2)}</div><div class="x">${!U?'cargá lo que pagaste arriba':`strike $${nf(K,2)} · pagaste $${nf(U.pagado,2)}`}</div></div>`+
       `<div class="met"><div class="k">Renta sobre ${U?'lo que pagaste':'el precio de hoy'}</div><div class="v">${pc(per,2)}</div><div class="x">en ${dte} días · ${pc(anual,1)} anual teórico</div></div>`+
-      `<div class="met"><div class="k">Si te las compran</div><div class="v ${res==null?'':res>=0?'green':'red'}">${res==null?'—':usd(res)}</div><div class="x">${res==null?'necesita lo que pagaste':'resultado de toda la rueda'}</div></div>`;
+      `<div class="met"><div class="k">Si te las compran</div><div class="v ${res==null?'':res>=0?'green':'red'}">${res==null?'—':usd(res)}</div><div class="x">${res==null?'necesita lo que pagaste':'diferencia de precio + esta prima'}</div></div>`;
 
     /* Si te las compran */
     const callTxt=hasAtr?`<p class="big">A esta distancia, te las compraron <b>${pc(m.pcall,0)}</b> de las veces <span style="color:var(--text3)">(el delta dice ${pc(Math.abs(c.delta),0)})</span>.</p>`+
@@ -750,12 +745,11 @@ function render(){
       `<p>Cuando te las compraron, la acción terminó en promedio <b>${pc(m.cm*w,1)}</b> por encima del strike: es lo que dejaste de ganar por haber vendido el call.</p>`
       :`<p>${tickerMismatch?`Mediste <b>${STOCK.ticker}</b>, pero la cadena es de <b>${market.ticker}</b>.`:''} Medí la acción en el paso 1 para ver cada cuánto te las compran a esta distancia.</p>`;
     let extra='';
-    const neto=U?U.pagado-U.primas:null;
-    if(neto!=null&&S<neto&&p>0){const n=Math.ceil((neto-S)/p);extra=`<p>La acción está ${usd(neto-S,2)} debajo de lo que pagaste menos las primas. Con primas como esta, te faltan unos <b>${n} ${n===1?'vencimiento':'vencimientos'}</b> para recuperarlo.</p>`;}
+    if(U&&S<U.pagado&&p>0){const n=Math.ceil((U.pagado-S)/p);extra=`<p>La acción está ${usd(U.pagado-S,2)} debajo de lo que pagaste. Con primas como esta, te faltan unos <b>${n} ${n===1?'vencimiento':'vencimientos'}</b> para recuperarlo.</p>`;}
     $('ifBox').className='box'+(hasAtr?'':' warnb');
     $('ifBox').innerHTML=`<h3>Si te las compran</h3>`+callTxt+extra;
 
-    /* Stop para recomprar el call (strike debajo del umbral) */
+    /* Stop para recomprar el call (strike debajo de lo que pagaste) */
     let st=null,T=null,buf=0,loss95=null,lossM=null;
     const lim=num('limiteCall');
     if(debajo){
@@ -771,15 +765,15 @@ function render(){
       $('stopStats').innerHTML=`Medido con el stop en strike + ${pc(buf,1)}: te vendieron las acciones el <b>${pc(st.venden,1)}</b> de las veces (sin stop: ${pc(st.sin,0)}). El stop saltó el <b>${pc(st.salta,0)}</b> de las veces, y en ${pc(st.vano,0)} de esas el call igual vencía sin valor (recompraste en vano).`;
     }
 
-    if(!U){level='warn';title='Cargá lo que pagaste';desc='Para saber si te conviene que te compren las acciones, la app necesita saber a cuánto las pagaste y qué primas ya cobraste.';}
-    else if(!debajo){level='ok';title='Si te las compran, está bien';desc=`El strike queda en tu umbral o arriba (+$${nf(K-U.u,2)}). Si te las compran, cerrás la rueda ganando <b>${usd(res)}</b> (${pc(res/(U.pagado*sh),1)} sobre lo que pagaste). Si no, cobrás ${usd(prima)} y seguís con las acciones.`;}
+    if(!U){level='warn';title='Cargá lo que pagaste';desc='Para saber si te conviene que te compren las acciones, la app necesita saber a cuánto las pagaste.';}
+    else if(!debajo){level='ok';title='Si te las compran, está bien';desc=`El strike queda ${K===U.pagado?'en lo que pagaste':`<b>$${nf(K-U.pagado,2)}</b> arriba de lo que pagaste`}. Si te las compran, ganás <b>${usd(res)}</b> (${pc(res/(U.pagado*sh),1)} sobre lo que pagaste, contando esta prima) en ${dte} días. Si no, cobrás ${usd(prima)} y seguís con las acciones.`;}
     else if(lim>0&&loss95>lim){
       const maxC=Math.floor(lim/(st.costo95*S*100));
       level='bad';title='El stop puede costarte más que tu límite';
-      desc=`El strike queda <b>$${nf(U.u-K,2)}</b> debajo de tu umbral, así que va con stop en <b>$${nf(T,2)}</b>. Si salta, en el peor 5% recomprar el call te cuesta <b>${usd(loss95)}</b>, más que tu límite de ${usd(lim)}. ${maxC>0?`Con tu límite te entran ${maxC} ${maxC===1?'contrato':'contratos'}.`:'Con tu límite no te entra ni un contrato: buscá un strike en tu umbral o esperá.'}`;
+      desc=`El strike queda <b>$${nf(U.u-K,2)}</b> debajo de lo que pagaste, así que va con stop en <b>$${nf(T,2)}</b>. Si salta, en el peor 5% recomprar el call te cuesta <b>${usd(loss95)}</b>, más que tu límite de ${usd(lim)}. ${maxC>0?`Con tu límite te entran ${maxC} ${maxC===1?'contrato':'contratos'}.`:'Con tu límite no te entra ni un contrato: buscá un strike en tu umbral o esperá.'}`;
     }else{
-      level='warn';title='Debajo de tu umbral: vendelo con stop';
-      desc=`El strike queda <b>$${nf(U.u-K,2)}</b> debajo de tu umbral ($${nf(U.u,2)}). Para no vender las acciones, poné el stop en <b>$${nf(T,2)}</b>. Si salta, recomprar el call te cuesta en promedio ${usd(lossM)} (peor 5%: ${usd(loss95)}).`;
+      level='warn';title='Debajo de lo que pagaste: vendelo con stop';
+      desc=`El strike queda <b>$${nf(U.u-K,2)}</b> debajo de lo que pagaste ($${nf(U.u,2)}). Para no vender las acciones, poné el stop en <b>$${nf(T,2)}</b>. Si salta, recomprar el call te cuesta en promedio ${usd(lossM)} (peor 5%: ${usd(loss95)}).`;
       if(!(lim>0))reasons.push('Cargá cuánto aceptás perder si tenés que cerrar el call, para saber si el peor caso te entra.');
     }
     if(isFinite(spread)&&spread>0.2&&level!=='bad'){if(level==='ok')level='warn';reasons.push('La diferencia entre compra y venta es amplia: la prima real puede ser menor.');}
@@ -827,12 +821,12 @@ function queueImage(file){
 /* ---- Preferencias ---- */
 function loadPrefs(){
   try{const p=JSON.parse(localStorage.getItem(PREF_LS)||'{}');if(p.cap)$('capital').value=p.cap;}catch(e){}
-  try{const r=JSON.parse(localStorage.getItem(RUEDA_LS)||'{}');['contratos','acciones','precioAsig','primasCob','limiteCall'].forEach(k=>{if(r[k]!=null&&r[k]!=='')$(k).value=r[k];});}catch(e){}
+  try{const r=JSON.parse(localStorage.getItem(RUEDA_LS)||'{}');['contratos','acciones','precioAsig','limiteCall'].forEach(k=>{if(r[k]!=null&&r[k]!=='')$(k).value=r[k];});}catch(e){}
   if(!$('limiteCall').value){let d=200;try{const p=JSON.parse(localStorage.getItem(PREF_LS)||'{}');if(+p.rsk>0)d=+p.rsk;}catch(e){}$('limiteCall').value=d;}
 }
 function savePrefs(){
   try{const p=JSON.parse(localStorage.getItem(PREF_LS)||'{}');p.cap=$('capital').value;localStorage.setItem(PREF_LS,JSON.stringify(p));}catch(e){}
-  try{const r={};['contratos','acciones','precioAsig','primasCob','limiteCall'].forEach(k=>r[k]=$(k).value);localStorage.setItem(RUEDA_LS,JSON.stringify(r));}catch(e){}
+  try{const r={};['contratos','acciones','precioAsig','limiteCall'].forEach(k=>r[k]=$(k).value);localStorage.setItem(RUEDA_LS,JSON.stringify(r));}catch(e){}
 }
 
 /* ---- Eventos ---- */
@@ -842,7 +836,7 @@ document.querySelectorAll('.tabs button[data-type]').forEach(b=>b.addEventListen
 }));
 $('objective').addEventListener('change',()=>{objective=$('objective').value;picked=null;$('stopCall').value='';render();});
 $('cands').addEventListener('click',e=>{const b=e.target.closest('.cand');if(!b)return;picked=parseFloat(b.dataset.k);$('stopCall').value='';render();});
-['capital','contratos','acciones','precioAsig','primasCob','stopCall','limiteCall'].forEach(id=>$(id).addEventListener('input',render));
+['capital','contratos','acciones','precioAsig','stopCall','limiteCall'].forEach(id=>$(id).addEventListener('input',render));
 ['chkCal','chkBal'].forEach(id=>$(id).addEventListener('change',render));
 $('btnMedir').addEventListener('click',medir);
 $('ticker').addEventListener('keydown',e=>{if(e.key==='Enter')medir();});
