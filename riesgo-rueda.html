@@ -223,24 +223,19 @@ footer span{color:var(--text2)}
       </div>
       <div class="lock-err" id="gateErr"></div>
     </div>
-    <div class="stock" id="stockTxt">Escribí el ticker y tocá <b>Medir</b>. Sin esto la app igual calcula la prima y el capital, pero no puede medir el riesgo de que te asignen.</div>
+    <div class="stock" id="stockTxt">Escribí el ticker y tocá <b>Medir</b>: la app trae cuánto se mueve la acción, su luz de Entrada y la cadena de opciones.</div>
   </div>
 
   <!-- 2 · La cadena -->
-  <div class="sec">2 · La cadena de opciones <span class="opt">· desde TradingView</span></div>
+  <div class="sec">2 · La cadena de opciones <span class="opt">· la trae la app desde Yahoo Finance</span></div>
   <div class="card">
-    <p class="help">En TradingView elegí el vencimiento, mostrá ±10 strikes y copiá toda la tabla (o sacale una captura). Hacelo con el mercado abierto, así los precios son recientes. <a id="tvLink" href="#" target="_blank" rel="noopener" hidden>Abrir la cadena en TradingView ↗</a></p>
-    <div class="drop" id="drop">
-      <input class="catch" id="paste" type="text" readonly placeholder="Hacé clic acá y pegá la tabla o la captura (Ctrl+V)" aria-label="Pegar la cadena de opciones">
-      <div class="btns">
-        <button class="btn ghost" id="fileBtn" type="button">Elegir captura</button>
-        <input class="file-input" id="file" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Elegir una captura de la cadena">
-        <button class="btn ghost" id="demoBtn" type="button">Probar con una cadena de ejemplo</button>
-      </div>
-      <div class="preview" id="preview" hidden><img id="previewImg" alt="Vista previa de la captura"></div>
+    <div id="chainBox" hidden>
+      <span class="lbl" style="margin-bottom:8px">Vencimiento</span>
+      <select id="expSel" aria-label="Vencimiento"></select>
+      <div class="cap" id="chainMeta"></div>
     </div>
-    <button class="btn" id="analyze" type="button" disabled>Analizar cadena</button>
-    <div class="msg" id="status" aria-live="polite">La información se procesa en este navegador y no se guarda.</div>
+    <div class="msg" id="status" aria-live="polite">Tocá Medir en el paso 1: la app trae la cadena sola y propone el vencimiento más cercano a 30 días.</div>
+    <a class="link" id="tvLink" href="#" target="_blank" rel="noopener" hidden>Ver la misma cadena en TradingView ↗</a>
   </div>
 
   <!-- 3 · Objetivo y resultado -->
@@ -346,7 +341,8 @@ footer span{color:var(--text2)}
 
   <div class="exp">
     <h3>⚠️ Los límites de esta medición</h3>
-    <p><strong>La prima es la de la cadena, no una simulación.</strong> Usamos el mark que muestra TradingView. Es una referencia: tu orden puede ejecutarse a otro precio, sobre todo si la diferencia entre compra y venta es amplia.</p>
+    <p><strong>La prima es la de la cadena, no una simulación.</strong> La app trae la cadena de Yahoo Finance, con unos 15 minutos de demora, y usa el punto medio entre compra y venta. Es una referencia: tu orden puede ejecutarse a otro precio, sobre todo si la diferencia entre compra y venta es amplia. Con el mercado cerrado, a veces no hay compra/venta publicada y usa el último precio operado.</p>
+    <p><strong>El delta lo calculamos nosotros.</strong> Yahoo no lo publica: lo sacamos con la fórmula de Black-Scholes a partir de la volatilidad implícita de cada contrato. Puede diferir en un par de centésimas del que ves en tu broker.</p>
     <p><strong>Medimos al vencimiento.</strong> En acciones de EE. UU. te pueden asignar antes, sobre todo cerca de un dividendo. La medición mira dónde terminó el precio el día del vencimiento.</p>
     <p><strong>Supervivencia.</strong> La muestra son acciones que hoy cotizan. Incluimos castigadas de verdad (Intel, cruceros, aerolíneas), pero las que quebraron no están: en la vida real el peor caso puede ser peor.</p>
     <p><strong>Sin comisiones ni impuestos.</strong> Y el anualizado es teórico: supone repetir la misma operación todo el año, sin meses vacíos ni asignaciones.</p>
@@ -355,8 +351,9 @@ footer span{color:var(--text2)}
   </div>
 
   <details class="ver">
-    <summary>Semáforo de Riesgo · La rueda · versión 1 (prototipo) · 12-oct-2026 · qué cambió</summary>
+    <summary>Semáforo de Riesgo · La rueda · versión 1.1 (prototipo) · 12-oct-2026 · qué cambió</summary>
     <ul>
+      <li><b>v1.1 · 12-oct-2026.</b> La cadena de opciones la trae la app sola desde Yahoo Finance (con el vencimiento más cercano a 30 días); el delta se calcula con Black-Scholes. Se muestra el criterio de cada objetivo y la distancia de cada strike.</li>
       <li><b>v1 · 12-oct-2026.</b> Primera versión. El lector de cadenas y el criterio por delta vienen del Copiloto de Opciones. Suma la capa de riesgo: tu cuenta, lo que pagaste por las acciones, la probabilidad medida de asignación, el golpe cuando te asignan y el stop del call (strike + 1% por defecto, medido) con su tope.</li>
     </ul>
   </details>
@@ -364,10 +361,9 @@ footer span{color:var(--text2)}
 </div>
 
 <footer>
-  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Semáforo de Riesgo · La rueda v1 · Datos: Yahoo Finance y TradingView · Uso educativo — no es recomendación de inversión
+  <span>© 2026 Carlos Traseira</span> · El Semáforo del Inversor · Semáforo de Riesgo · La rueda v1.1 · Datos: Yahoo Finance · Uso educativo — no es recomendación de inversión
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script>
 /* ============================================================
    Semáforo de Riesgo · La rueda (put vendido → acciones → call cubierto)
@@ -423,26 +419,29 @@ let type='put', objective=null, market=null, picked=null, STOCK=null, CLIENT_COD
 /* ---- Criterio por delta (del Copiloto) ---- */
 const definitions={
   put:{label:'PUT',objectives:[
-    {value:'premium',label:'Conservar la prima',min:0.10,max:0.20,band:'0,10–0,20',summary:'Strikes más lejos del precio: menos prima, menos chances de que te asignen.'},
-    {value:'balance',label:'Equilibrio',min:0.21,max:0.35,band:'0,21–0,35',summary:'Más prima a cambio de más chances de que te asignen.'},
-    {value:'assignment',label:'Comprar las acciones si asignan',min:0.40,max:0.60,band:'0,40–0,60',summary:'Strike cerca del precio: la prima más alta, y muchas chances de comprar. Solo si querés esas acciones a ese precio.'}]},
+    {value:'premium',label:'Conservar la prima',min:0.10,max:0.20,band:'0,10–0,20',summary:'Busca más distancia por debajo del precio actual y acepta una prima menor.',criterion:'Se priorizan PUT fuera del dinero con Delta absoluta entre 0,10 y 0,20. Dentro del rango, se favorecen la distancia al precio actual y una ejecución razonable.'},
+    {value:'balance',label:'Equilibrio',min:0.21,max:0.35,band:'0,21–0,35',summary:'Acepta una posibilidad relativa de asignación mayor a cambio de una prima superior.',criterion:'Se buscan PUT con Delta absoluta entre 0,21 y 0,35. El objetivo es equilibrar ingreso, distancia y calidad de ejecución.'},
+    {value:'assignment',label:'Comprar las acciones si asignan',min:0.40,max:0.60,band:'0,40–0,60',summary:'Prioriza una prima mayor y un strike cercano al mercado, siempre que quieras comprar las acciones a ese precio.',criterion:'Se buscan PUT cercanas al dinero con Delta absoluta entre 0,40 y 0,60. El strike solo puede seleccionarse si aceptarías comprar 100 acciones a ese precio.'}]},
   call:{label:'CALL',objectives:[
-    {value:'shares',label:'Conservar las acciones',min:0.10,max:0.20,band:'0,10–0,20',summary:'Strikes más lejos: menos prima, menos chances de que te las compren.'},
-    {value:'balance',label:'Equilibrio',min:0.21,max:0.35,band:'0,21–0,35',summary:'Más prima a cambio de más chances de que te las compren.'},
-    {value:'assignment',label:'Vender las acciones si asignan',min:0.40,max:0.60,band:'0,40–0,60',summary:'Strike cerca del precio: la prima más alta y muchas chances de vender. Solo si querés vender a ese precio.'}]}
+    {value:'shares',label:'Conservar las acciones',min:0.10,max:0.20,band:'0,10–0,20',summary:'Busca más distancia por encima del precio actual y acepta una prima menor.',criterion:'Se priorizan CALL fuera del dinero con Delta entre 0,10 y 0,20. Dentro del rango, se favorecen la distancia al precio actual y una ejecución razonable.'},
+    {value:'balance',label:'Equilibrio',min:0.21,max:0.35,band:'0,21–0,35',summary:'Acepta una posibilidad relativa de asignación mayor a cambio de una prima superior.',criterion:'Se buscan CALL con Delta entre 0,21 y 0,35. El objetivo es equilibrar ingreso, recorrido adicional de las acciones y calidad de ejecución.'},
+    {value:'assignment',label:'Vender las acciones si asignan',min:0.40,max:0.60,band:'0,40–0,60',summary:'Prioriza una prima mayor y un strike cercano al mercado, siempre que quieras vender las acciones a ese precio.',criterion:'Se buscan CALL cercanas al dinero con Delta entre 0,40 y 0,60. El strike solo puede seleccionarse si aceptarías vender 100 acciones a ese precio.'}]}
 };
-const demoMarket={ticker:'B',exchange:'NYSE',last:45.65,expiry:'18 sep 2026',dte:20,source:'demo',isDemo:true,
-  contracts:{
-    put:[{strike:42,delta:-0.18,mark:0.42,bid:0.31,ask:0.53,volume:0},{strike:43,delta:-0.26,mark:0.75,bid:0.68,ask:0.82,volume:0},{strike:44,delta:-0.34,mark:1.145,bid:1.08,ask:1.21,volume:0},{strike:46,delta:-0.51,mark:2.07,bid:1.88,ask:2.26,volume:0}],
-    call:[{strike:46,delta:0.49,mark:1.675,bid:1.59,ask:1.76,volume:0},{strike:49,delta:0.25,mark:0.65,bid:0.50,ask:0.80,volume:0},{strike:50,delta:0.21,mark:0.53,bid:0.45,ask:0.61,volume:0},{strike:51,delta:0.16,mark:0.40,bid:0.34,ask:0.46,volume:0}]}};
 
 function goal(){return definitions[type].objectives.find(o=>o.value===objective)||definitions[type].objectives[0];}
 function bestContract(g){
-  const cs=market.contracts[type].filter(c=>Number.isFinite(c.mark)&&c.mark>0&&Number.isFinite(c.delta));
-  const inside=cs.filter(c=>Math.abs(c.delta)>=g.min&&Math.abs(c.delta)<=g.max);
-  const pool=inside.length?inside:cs, target=(g.min+g.max)/2;
+  /* Por niveles: 1) dentro del rango de delta con compra/venta normal; 2) dentro del rango aunque la
+     compra/venta esté muy separada; 3) dentro del rango sin compra/venta; 4) el más cercano al rango
+     entre los de compra/venta normal; 5) el más cercano entre todos. Dentro de cada nivel, el delta más
+     cerca del centro del rango (con una penalización chica por spread, como el Copiloto). */
+  const all=market.contracts[type].filter(c=>Number.isFinite(c.mark)&&c.mark>0&&Number.isFinite(c.delta));
+  const inBand=c=>Math.abs(c.delta)>=g.min&&Math.abs(c.delta)<=g.max;
+  const target=(g.min+g.max)/2;
   const sp=c=>c.mark&&Number.isFinite(c.ask)&&Number.isFinite(c.bid)?Math.max(0,(c.ask-c.bid)/c.mark):0.25;
-  return pool.slice().sort((a,b)=>(Math.abs(Math.abs(a.delta)-target)+sp(a)*0.02)-(Math.abs(Math.abs(b.delta)-target)+sp(b)*0.02))[0];
+  const score=c=>Math.abs(Math.abs(c.delta)-target)+sp(c)*0.02;
+  const niveles=[all.filter(c=>inBand(c)&&c.good!==false),all.filter(c=>inBand(c)&&!c.fromLast),all.filter(inBand),all.filter(c=>c.good!==false),all];
+  const pool=niveles.find(n=>n.length)||[];
+  return pool.slice().sort((a,b)=>score(a)-score(b))[0];
 }
 
 /* ---- Lector de cadenas (del Copiloto, sin cambios de lógica) ---- */
@@ -609,21 +608,98 @@ async function medir(){
   updateLinks();
   $('btnMedir').disabled=true;
   if(!(await ensureAccess())){$('btnMedir').disabled=false;$('lock').hidden=false;setTimeout(()=>$('gateInput').focus(),60);return;}
-  $('stockTxt').textContent='Midiendo cuánto se mueve…';
+  $('stockTxt').textContent='Midiendo cuánto se mueve…';market=null;$('res').hidden=true;$('chainBox').hidden=true;
   try{
     const ind=indicadores(await fetchHist(t));STOCK={...ind,ticker:t};
     const luzTxt={g:'verde',a:'amarilla',r:'roja'}[ind.luz]||'sin datos';
     $('stockTxt').innerHTML=`<b>${t}</b> · precio $${nf(ind.price,2)} · se mueve <b>${nf(ind.atr*100,2)}% por día</b> (promedio de 14 ruedas)<br>`+
       (ind.luz?`<span class="dot ${ind.luz}"></span>Semáforo de Entrada: luz ${luzTxt}${ind.luz==='r'?' — se mueve más que de costumbre: la prima es más alta por algo':''}`:'');
-    render();
   }catch(e){STOCK=null;$('stockTxt').textContent=`No pude leer ${t}: ${e.message||e}. Probá de nuevo o con otro ticker.`;}
-  finally{$('btnMedir').disabled=false;}
+  await loadChain(null);
+  $('btnMedir').disabled=false;
 }
 function updateLinks(){
   const t=selectedTicker();const ok=/^[A-Z][A-Z0-9.]{0,7}$/.test(t);
   $('tvLink').hidden=!ok;
-  if(ok){$('tvLink').href=`https://www.tradingview.com/symbols/${exchangeFor(t)}-${t}/options-chain/`;$('tvLink').textContent=`Abrir la cadena de ${t} en TradingView ↗`;
+  if(ok){$('tvLink').href=`https://www.tradingview.com/symbols/${exchangeFor(t)}-${t}/options-chain/`;$('tvLink').textContent=`Ver la cadena de ${t} en TradingView ↗`;
     $('calLink').href=`index.html?symbol=${encodeURIComponent(t)}`;$('balLink').href=`https://finance.yahoo.com/quote/${encodeURIComponent(t)}/`;}
+}
+
+/* ---- La cadena desde Yahoo Finance (Worker /?opt=) ----
+   Yahoo trae compra, venta, último precio y volatilidad implícita (IV), con ~15 min de demora.
+   El delta NO viene: lo calculamos con Black-Scholes (tasa 4%, sin dividendos) desde la IV. */
+const TASA=0.04, MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+let EXPS=[];
+function ncdf(x){const t=1/(1+0.2316419*Math.abs(x)),d=0.3989423*Math.exp(-x*x/2);const p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p;}
+function bs(tipo,S,K,T,sg){const v=sg*Math.sqrt(T),d1=(Math.log(S/K)+(TASA+sg*sg/2)*T)/v,d2=d1-v;
+  return tipo==='call'?{p:S*ncdf(d1)-K*Math.exp(-TASA*T)*ncdf(d2),d:ncdf(d1)}:{p:K*Math.exp(-TASA*T)*ncdf(-d2)-S*ncdf(-d1),d:ncdf(d1)-1};}
+function ivDe(tipo,S,K,T,precio){const intr=Math.max(0,tipo==='call'?S-K:K-S);if(!(precio>intr))return NaN;let lo=0.01,hi=5;
+  for(let i=0;i<60;i++){const m=(lo+hi)/2;if(bs(tipo,S,K,T,m).p>precio)hi=m;else lo=m;}return(lo+hi)/2;}
+const venceMs=e=>e*1000+20*3600e3;                 // Yahoo da 00:00 UTC; el vencimiento es al cierre (~20:00 UTC)
+const fmtExp=e=>{const d=new Date(e*1000);return`${d.getUTCDate()} ${MESES[d.getUTCMonth()]} ${d.getUTCFullYear()}`;};
+const dteOf=e=>Math.max(1,Math.round((venceMs(e)-Date.now())/864e5));
+async function fetchChain(sym,date){
+  const r=await fetch(`${PROXY}/?opt=${encodeURIComponent(sym)}${date?`&date=${date}`:''}&k=${encodeURIComponent(CLIENT_CODE||'')}`);
+  const j=await r.json().catch(()=>null);
+  if(r.status===400&&j&&/symbol/.test(j.error||''))throw new Error('el servidor de datos todavía no tiene la cadena de opciones');
+  if(!r.ok||!j||j.error)throw new Error((j&&j.error)||`HTTP ${r.status}`);
+  return j;
+}
+function marketFromYahoo(j,t){
+  const S=j.price,T=Math.max(1/365,(venceMs(j.expiration)-Date.now())/(365*864e5));
+  let fromLast=0;
+  /* "Buenos" = compra y venta publicadas y no muy separadas. Los demás (sin compra/venta, o con el medio
+     poco confiable) suelen traer precios viejos y una IV de Yahoo sin sentido (ej. 122%): a esos les
+     estimamos la IV interpolando entre los strikes buenos vecinos del mismo lado. Verificado contra
+     TradingView (BP, 16-oct-2026): diferencias de 0,00 a 0,02 en el delta. */
+  const conv=(rows,tipo)=>{
+    const cs=(rows||[]).map(([k,b,a,l,iv,oi,v])=>{
+      if(!(k>0.5*S&&k<1.5*S))return null;
+      const both=b>0&&a>0&&a>=b, wide=both&&(a-b)/((a+b)/2)>0.5;
+      const good=both&&!wide;
+      const mark=both?(b+a)/2:(l>0?l:NaN);
+      if(!(mark>0))return null;
+      let sg=NaN;
+      if(good){sg=iv>0.03&&iv<3?iv:ivDe(tipo,S,k,T,mark);if(!(sg>0.03&&sg<5))sg=NaN;}
+      return{strike:k,mark,bid:b>0?b:NaN,ask:a>0?a:NaN,volume:v||0,oi:oi||0,yiv:iv,iv:sg,good,wide,fromLast:!both};
+    }).filter(Boolean).sort((x,y)=>x.strike-y.strike);
+    const ref=cs.filter(c=>c.good&&isFinite(c.iv));
+    const ivAt=k=>{
+      if(!ref.length)return NaN;
+      if(k<=ref[0].strike)return ref[0].iv;if(k>=ref[ref.length-1].strike)return ref[ref.length-1].iv;
+      let i=0;while(ref[i+1].strike<k)i++;const a=ref[i],b=ref[i+1];return a.iv+(b.iv-a.iv)*(k-a.strike)/(b.strike-a.strike);
+    };
+    return cs.map(c=>{
+      let sg=c.iv;
+      if(!isFinite(sg))sg=ref.length>=2?ivAt(c.strike):(c.yiv>0.03&&c.yiv<3?c.yiv:NaN);
+      if(!(sg>0.03&&sg<5))return null;
+      if(c.fromLast)fromLast++;
+      return{...c,iv:sg,delta:bs(tipo,S,c.strike,T,sg).d};
+    }).filter(Boolean);
+  };
+  return{ticker:t,exchange:exchangeFor(t),last:S,expiry:fmtExp(j.expiration),expEpoch:j.expiration,dte:dteOf(j.expiration),source:'yahoo',isDemo:false,
+    marketState:j.marketState||'',contracts:{put:conv(j.puts,'put'),call:conv(j.calls,'call')},fromLast};
+}
+async function loadChain(date){
+  const t=(STOCK&&STOCK.ticker)||selectedTicker();
+  status(`Trayendo la cadena de ${t}…`,'working');
+  try{
+    let j=await fetchChain(t,date);
+    EXPS=j.expirations||[];
+    if(!date&&EXPS.length){
+      const best=EXPS.slice().sort((a,b)=>Math.abs(dteOf(a)-30)-Math.abs(dteOf(b)-30))[0];
+      if(best!==j.expiration)j=await fetchChain(t,best);
+    }
+    if(!(j.price>0))throw new Error('Yahoo no trajo el precio de la acción');
+    market=marketFromYahoo(j,t);picked=null;$('stopCall').value='';
+    $('expSel').innerHTML=EXPS.map(e=>`<option value="${e}"${e===j.expiration?' selected':''}>${fmtExp(e)} · ${dteOf(e)} días</option>`).join('');
+    $('chainBox').hidden=false;
+    const cerrado=market.marketState&&market.marketState!=='REGULAR';
+    $('chainMeta').textContent=`Precio $${nf(j.price,2)} · ${market.contracts.put.length} puts y ${market.contracts.call.length} calls · Yahoo Finance, con unos 15 minutos de demora`+(cerrado?' · mercado cerrado: precios del último cierre':'');
+    if(market.contracts.put.length<3||market.contracts.call.length<3)throw new Error('la cadena vino casi vacía para ese vencimiento');
+    status(`Cadena de ${t} lista: vence el ${market.expiry} (${market.dte} días).`,'ok');
+    render();
+  }catch(e){status(`No pude traer la cadena de ${t}: ${e.message||e}. Probá otro vencimiento o más tarde.`,'error');}
 }
 
 /* ---- La medición: interpolación en la tabla RUEDA ---- */
@@ -664,13 +740,13 @@ function render(){
   const g=goal();const best=bestContract(g);
   const c=(picked&&market.contracts[type].find(x=>x.strike===picked))||best;
   if(!c){status(`No hay suficientes contratos ${definitions[type].label} utilizables. Pegá una cadena más completa.`,'error');return;}
-  $('srcTxt').textContent=`${market.isDemo?'cadena de ejemplo':'tu cadena'} · ${market.ticker} · vence ${market.expiry} (${market.dte} días)`;
-  $('objHelp').textContent=`${g.summary} La app elige el strike con el delta más cerca de ${g.band}; podés tocar otro de la lista.`;
+  $('srcTxt').textContent=`${market.ticker} · vence el ${market.expiry} (${market.dte} días) · precio $${nf(market.last,2)}`;
+  $('objHelp').innerHTML=`${g.summary}<br><b>Criterio:</b> ${g.criterion} Podés tocar otro strike de la lista.`;
 
   /* candidatos */
   const target=(g.min+g.max)/2;
   const cands=market.contracts[type].slice().sort((a,b)=>Math.abs(Math.abs(a.delta)-target)-Math.abs(Math.abs(b.delta)-target)).slice(0,5).sort((a,b)=>a.strike-b.strike);
-  $('cands').innerHTML=cands.map(x=>`<button type="button" class="cand" data-k="${x.strike}" aria-pressed="${x.strike===c.strike}"><b>${definitions[type].label} ${nf(x.strike,x.strike%1?1:0)}</b><span>Delta ${nf(Math.abs(x.delta),2)}</span><span>Prima $${nf(x.mark,2)}</span><span>${pc(x.mark/(type==='put'?x.strike:market.last)*365/market.dte,1)} anual teórico</span></button>`).join('');
+  $('cands').innerHTML=cands.map(x=>`<button type="button" class="cand" data-k="${x.strike}" aria-pressed="${x.strike===c.strike}"><b>${definitions[type].label} ${nf(x.strike,x.strike%1?1:0)}<small style="display:block;font-weight:400;color:var(--text3)">${pc(Math.abs(x.strike-market.last)/market.last,1)} ${x.strike<market.last?'abajo':'arriba'}</small></b><span>Delta ${nf(Math.abs(x.delta),2)}</span><span>Prima $${nf(x.mark,2)}${x.fromLast?' <small style="color:var(--amber)">sin compra/venta</small>':x.wide?' <small style="color:var(--amber)">compra/venta muy separadas</small>':''}</span><span>${pc(x.mark/(type==='put'?x.strike:market.last)*365/market.dte,1)} anual teórico</span></button>`).join('');
 
   const S=market.last,K=c.strike,p=c.mark,dte=market.dte;
   const hasAtr=!!(STOCK&&STOCK.ticker===market.ticker);
@@ -788,9 +864,10 @@ function render(){
   $('heroList').innerHTML=reasons.map(r=>`<li>· ${r}</li>`).join('');
 
   /* ejecución */
-  $('execTxt').innerHTML=`<b>${definitions[type].label} ${nf(K,K%1?1:0)}</b> · delta ${nf(Math.abs(c.delta),2)} · prima de referencia (mark) $${nf(p,2)}`+
-    (isFinite(spread)?` · diferencia compra/venta ${pc(spread,0)}${spread>0.2?' (amplia)':''}`:' · sin compra/venta en la captura: confirmá el precio con el mercado abierto')+
-    (market.isDemo?' · <b>cadena de ejemplo con precios viejos</b>: no sirve para operar.':'');
+  $('execTxt').innerHTML=`<b>${definitions[type].label} ${nf(K,K%1?1:0)}</b> · delta ${nf(Math.abs(c.delta),2)} · prima $${nf(p,2)} `+
+    (c.fromLast?'(último precio operado: no había compra/venta publicada)':'(punto medio entre compra y venta)')+
+    (isFinite(spread)?` · diferencia compra/venta ${pc(spread,0)}${spread>0.2?' (amplia: tu orden puede salir a otro precio)':''}`:' · confirmá el precio con el mercado abierto')+
+    ' · Yahoo Finance, ~15 min de demora.';
   setOnly();
   if(type==='call'){const U=umbral();$('stopBox').hidden=!(U&&c.strike<U.u);}
 }
@@ -843,27 +920,7 @@ $('ticker').addEventListener('keydown',e=>{if(e.key==='Enter')medir();});
 $('ticker').addEventListener('input',updateLinks);
 $('gateBtn').addEventListener('click',submitGate);
 $('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitGate();});
-$('fileBtn').addEventListener('click',()=>$('file').click());
-$('file').addEventListener('change',()=>queueImage($('file').files?.[0]));
-$('paste').addEventListener('paste',e=>{
-  e.preventDefault();
-  const img=Array.from(e.clipboardData?.items||[]).find(i=>i.type.startsWith('image/'));
-  if(img){queueImage(img.getAsFile());return;}
-  queueText(e.clipboardData?.getData('text/plain')||'',e.clipboardData?.getData('text/html')||'');
-});
-['dragenter','dragover'].forEach(n=>$('drop').addEventListener(n,e=>{e.preventDefault();$('drop').classList.add('is-dragging');}));
-['dragleave','drop'].forEach(n=>$('drop').addEventListener(n,e=>{e.preventDefault();$('drop').classList.remove('is-dragging');}));
-$('drop').addEventListener('drop',e=>{const f=Array.from(e.dataTransfer?.files||[]).find(i=>i.type.startsWith('image/'));if(f)queueImage(f);});
-$('analyze').addEventListener('click',()=>{
-  if(!pending){status('Todavía no pegaste una cadena o una captura.','error');return;}
-  if(pending.kind==='image')processImage(pending.file);else applyText(pending.text,'text',pending.html);
-});
-$('demoBtn').addEventListener('click',()=>{
-  market=JSON.parse(JSON.stringify(demoMarket));picked=null;
-  if(!selectedTicker()){$('ticker').value='B';updateLinks();}
-  status('Cadena de ejemplo cargada (Barrick, precios de septiembre de 2026). Sirve para ver cómo funciona, no para operar.','ok');
-  render();$('res').scrollIntoView({behavior:'smooth',block:'start'});
-});
+$('expSel').addEventListener('change',()=>loadChain($('expSel').value));
 
 document.addEventListener('DOMContentLoaded',()=>{
   loadPrefs();intro();rebuildObjectives();setOnly();
