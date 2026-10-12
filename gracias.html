@@ -41,6 +41,14 @@
   .foot{text-align:center;margin-top:26px;font-size:13px;color:var(--gray);}
   .foot a{color:var(--navy);font-weight:700;}
   .copied{color:var(--green)!important;}
+  .codebox{margin-top:22px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;background:#0b111c;
+    border:1px solid #2a3446;border-radius:6px;padding:16px 20px;}
+  .codebox .lbl{width:100%;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#98a2b3;font-weight:700;}
+  .codebox code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:22px;font-weight:700;
+    color:var(--yellow);letter-spacing:.06em;}
+  .codebox .copy{background:none;border:1px solid #2a3446;color:#e4e9f0;border-radius:6px;padding:8px 14px;
+    font:600 13px Inter,system-ui,Arial,sans-serif;cursor:pointer;}
+  .codebox .copy:hover{border-color:var(--yellow);}
 </style>
 </head>
 <body>
@@ -71,7 +79,8 @@
       name: "la App Semáforo de Riesgo",
       type: "app",
       url: "https://carlostraseira.github.io/semaforo-nyse/calculadora.html",
-      cta: "Abrir el Semáforo de Riesgo"
+      cta: "Abrir el Semáforo de Riesgo",
+      code: atob("U0VNQUZPUk9OWVNFMjAyNg==")   // código de acceso (el mismo del Worker); en base64 solo para no figurar como texto plano
     },
     operar: {
       name: "el Checklist «¿Operar o esperar?»",
@@ -102,7 +111,24 @@
 
   document.getElementById('prodName').textContent = b.name;
 
-  if(b.type === 'app'){
+  if(b.type === 'app' && b.code){
+    cont.innerHTML =
+      '<div class="lead">Tu acceso está listo. Primero copiá tu código: la app te lo pide la primera vez que medís una acción.</div>'+
+      '<div class="codebox"><span class="lbl">Tu código de acceso</span><code id="cbox">'+esc(b.code)+'</code>'+
+      '<button type="button" class="copy" id="copyCode">Copiar código</button></div>'+
+      '<a class="btn" href="'+b.url+'" target="_blank" rel="noopener">'+b.cta+' →</a>'+
+      '<div class="note">💡 Guardá el link y el código. También te llegó el recibo de tu compra por email.</div>';
+    var cb = document.getElementById('copyCode');
+    cb.addEventListener('click', function(){
+      navigator.clipboard.writeText(b.code).then(function(){
+        cb.textContent = '✓ Copiado'; cb.classList.add('copied');
+        setTimeout(function(){ cb.textContent='Copiar código'; cb.classList.remove('copied'); }, 2200);
+      }).catch(function(){
+        var r=document.createRange(); r.selectNodeContents(document.getElementById('cbox'));
+        var s=getSelection(); s.removeAllRanges(); s.addRange(r);
+      });
+    });
+  } else if(b.type === 'app'){
     cont.innerHTML =
       '<div class="lead">Tu acceso está listo. Entrá cuando quieras desde este botón:</div>'+
       '<a class="btn" href="'+b.url+'" target="_blank" rel="noopener">'+b.cta+' →</a>'+
