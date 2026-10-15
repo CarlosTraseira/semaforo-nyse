@@ -1,5 +1,5 @@
 {
-  "updated_iso": "2026-10-14T00:56:54Z",
+  "updated_iso": "2026-10-15T00:19:40Z",
   "version": 2,
   "states": {
     "ADBE": "r",
@@ -15,7 +15,7 @@
     "META": "g",
     "NVDA": "g",
     "MSFT": "g",
-    "JNJ": "g",
+    "JNJ": "a",
     "V": "g",
     "CSCO": "g",
     "AAPL": "g",
