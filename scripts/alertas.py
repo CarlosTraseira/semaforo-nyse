@@ -114,7 +114,7 @@ def build_email(alerts, now):
           </table>
         </td></tr>
         <tr><td style="font-family:Arial,Helvetica,sans-serif;background:#fff7e6;border:1px solid #ffe0a3;border-radius:10px;padding:14px 18px;font-size:13px;color:#664d00;">
-          ⚖️ <strong>Antes de operar:</strong> calidad ✅ y momento 🟢 ya están. Falta tu tercer semáforo — calculá en el <strong>Semáforo de Riesgo</strong> dónde va el stop y cuántas acciones comprar, y recién ahí decidí.
+          ⚖️ <strong>Antes de operar:</strong> calidad ✅ y momento 🟢 ya están. Falta tu tercer semáforo: calcula en el <strong>Semáforo de Riesgo</strong> dónde va el stop y cuántas acciones comprar, y recién ahí decide. Antes del clic final, repasa el checklist <strong>¿Operar o esperar?</strong>
         </td></tr>
         <tr><td style="font-family:Arial,Helvetica,sans-serif;text-align:center;padding:20px 0 0;font-size:11px;color:#9090a0;">
           El Semáforo del Inversor · Aviso educativo, no es recomendación de inversión.<br>
