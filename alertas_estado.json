@@ -1,5 +1,5 @@
 {
-  "updated_iso": "2026-10-21T00:25:42Z",
+  "updated_iso": "2026-10-22T00:28:48Z",
   "version": 2,
   "states": {
     "ADBE": "a",
@@ -11,7 +11,7 @@
     "HON": "r",
     "PEP": "r",
     "NKE": "r",
-    "IBM": "r",
+    "IBM": "a",
     "META": "g",
     "NVDA": "g",
     "MSFT": "g",
