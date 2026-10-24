@@ -1,21 +1,21 @@
 {
-  "updated_iso": "2026-10-23T00:27:08Z",
+  "updated_iso": "2026-10-24T00:21:57Z",
   "version": 2,
   "states": {
-    "ADBE": "a",
+    "ADBE": "g",
     "ACN": "g",
     "GOOGL": "a",
-    "INTU": "r",
+    "INTU": "a",
     "QCOM": "a",
     "PG": "g",
     "HON": "r",
     "PEP": "r",
     "NKE": "r",
     "IBM": "a",
-    "META": "g",
-    "NVDA": "g",
+    "META": "a",
+    "NVDA": "a",
     "MSFT": "g",
-    "CSCO": "g",
+    "CSCO": "a",
     "V": "g",
     "AAPL": "g",
     "AVGO": "r",
@@ -23,6 +23,7 @@
   },
   "last_alert": {
     "ACN": "2026-10-13",
-    "PG": "2026-10-13"
+    "PG": "2026-10-13",
+    "ADBE": "2026-10-24"
   }
 }
