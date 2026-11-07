@@ -1,5 +1,5 @@
 {
-  "updated_iso": "2026-11-06T02:03:33Z",
+  "updated_iso": "2026-11-07T01:42:24Z",
   "version": 2,
   "states": {
     "HON": "a",
@@ -16,11 +16,11 @@
     "IBM": "a",
     "UNH": "g",
     "CAT": "r",
-    "NVDA": "a",
+    "NVDA": "r",
     "MSFT": "g",
-    "CSCO": "a",
+    "CSCO": "r",
     "V": "g",
-    "TXN": "g",
+    "TXN": "a",
     "AAPL": "g"
   },
   "last_alert": {
