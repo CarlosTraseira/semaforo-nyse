@@ -142,7 +142,7 @@ def send(payload):
         sys.exit(1)
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     req = urllib.request.Request(WEBHOOK, data=data,
-                                 headers={"Content-Type": "application/json"})
+                                 headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (semaforo-alertas)"})
     with urllib.request.urlopen(req, timeout=30) as r:
         print(f"Webhook → HTTP {r.status}")
 
