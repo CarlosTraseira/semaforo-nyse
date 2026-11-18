@@ -1,5 +1,5 @@
 {
-  "updated_iso": "2026-11-17T04:21:24Z",
+  "updated_iso": "2026-11-18T03:23:41Z",
   "version": 2,
   "states": {
     "HON": "a",
@@ -14,8 +14,8 @@
     "CVX": "g",
     "NKE": "r",
     "PEP": "a",
-    "IBM": "a",
-    "UNH": "g",
+    "IBM": "r",
+    "UNH": "a",
     "CAT": "r",
     "CSCO": "a",
     "PG": "g",
